@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const colors = {
   gold: "#F4D03F",
@@ -32,8 +32,8 @@ const styles = `
   }
   @keyframes float {
     0%,100% { transform: translate(0,0) scale(1); }
-    33%      { transform: translate(30px,-30px) scale(1.1); }
-    66%      { transform: translate(-20px,20px) scale(0.9); }
+    33%      { transform: translate(30px,-30px) scale(1.05); }
+    66%      { transform: translate(-20px,20px) scale(0.95); }
   }
 
   .navbar {
@@ -65,13 +65,15 @@ const styles = `
   .hero {
     position: relative; height: 100vh;
     display: flex; align-items: center; overflow: hidden;
-    background: linear-gradient(135deg, #0A1128 0%, #1a2847 100%);
+    background: #0A1128;
   }
   .hero-bg {
-    position: absolute; inset: 0; opacity: 0.15;
-    background-image:
-      radial-gradient(circle at 20% 50%, #F4D03F 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, #C8B8DB 0%, transparent 50%);
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(10, 17, 40, 0.7), rgba(10, 17, 40, 0.7)), 
+                      url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=2000');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
     animation: float 20s ease-in-out infinite;
   }
   .hero-content {
@@ -242,12 +244,12 @@ export default function App() {
         <div className="hero-content">
           <div style={{ color: colors.gold, letterSpacing: '3px', fontWeight: 600, marginBottom: '1.5rem' }}>WELCOME TO A WORLD OF CHAMPIONS</div>
           <h1 className="hero-title">Raising <span style={{ color: colors.gold }}>Transformational Leaders</span></h1>
-          <p style={{ color: 'white', opacity: 0.8, fontSize: '1.2rem', maxWidth: '600px', marginBottom: '2rem' }}>Empowering individuals to discover their purpose and lead with lasting impact.</p>
+          <p style={{ color: 'white', opacity: 0.9, fontSize: '1.2rem', maxWidth: '600px', marginBottom: '2rem', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Empowering individuals to discover their purpose and lead with lasting impact through character and competence.</p>
           <blockquote style={{ color: colors.gold, borderLeft: `4px solid ${colors.gold}`, paddingLeft: '1.5rem', fontStyle: 'italic', marginBottom: '2.5rem' }}>
             "You can make decisions, not consequences" <br />
             <span style={{ fontSize: '0.9rem', color: 'white', fontStyle: 'normal' }}>— J.A. Oyedele</span>
           </blockquote>
-          <button style={{ background: colors.gold, color: colors.navy, padding: '1rem 2.5rem', borderRadius: '50px', fontWeight: 700, border: 'none', cursor: 'pointer' }} onClick={() => scrollTo("about")}>Get Started Today</button>
+          <button style={{ background: colors.gold, color: colors.navy, padding: '1rem 2.5rem', borderRadius: '50px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(244, 208, 63, 0.3)' }} onClick={() => scrollTo("about")}>Get Started Today</button>
         </div>
       </section>
 
