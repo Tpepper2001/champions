@@ -168,6 +168,7 @@ const styles = `
   .pillar-link {
     display: inline-block; margin-top: 1.5rem; color: #0A1128;
     font-weight: 600; text-decoration: none; transition: transform 0.3s;
+    background: none; border: none; cursor: pointer; padding: 0; font-size: inherit; font-family: inherit;
   }
   .pillar-link:hover { transform: translateX(5px); }
 
@@ -266,6 +267,7 @@ const styles = `
   .read-more {
     color: #F4D03F; font-weight: 600; text-decoration: none;
     display: inline-flex; align-items: center; gap: 0.5rem; transition: gap 0.3s;
+    background: none; border: none; cursor: pointer; padding: 0; font-size: inherit; font-family: inherit;
   }
   .read-more:hover { gap: 1rem; }
 
@@ -337,25 +339,25 @@ const teamMembers = [
     designation: "Program Director",
     bio: "James is a science communicator and Engineering Physics student at Obafemi Awolowo University. He is committed to seeing young people thrive in career and character, inspiring his audience to achieve their greatest potential. He believes everyone has a God-given unique potential waiting to be discovered.",
     linkedin: "https://www.linkedin.com/in/james-olatunbosun",
-    photo: "JAMES_OLATUNBOSUN_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1e7yVcdaOrgUxB4833PFZcIGH6iWia0iU",
     initial: "J",
     avatarBg: "linear-gradient(135deg, #F4D03F, #fce181)",
   },
   {
     name: "Ogbaudu Oghenefegor Believe",
     designation: "Corp Member",
-    bio: "A faith-based writer, published author of two books, page poet, and founder of GAP INITIATIVE â€” an NGO empowering youth to discover their gifts and purpose. She also founded Deo-Sterling Designs, a modest and elegant female fashion brand, and is a skilled virtual assistant.",
+    bio: "A faith-based writer, published author of two books, page poet, and founder of GAP INITIATIVE — an NGO empowering youth to discover their gifts and purpose. She also founded Deo-Sterling Designs, a modest and elegant female fashion brand, and is a skilled virtual assistant.",
     linkedin: null,
-    photo: "OGBAUDU_OGHENEFEGOR_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1BGrxj4uIsOemM1bGZc5Bz-V7N2RmKaSB",
     initial: "O",
     avatarBg: "linear-gradient(135deg, #C8B8DB, #ddd0ea)",
   },
   {
     name: "Oluwatoyin Oluwabukola Yakubu",
     designation: "Head, Content",
-    bio: "Oluwatoyin is passionate about helping people find healing from trauma, low self-esteem, and depression. She loves honest conversations on controversial topics and is always available to help with life choices and write-ups â€” academic or otherwise.",
+    bio: "Oluwatoyin is passionate about helping people find healing from trauma, low self-esteem, and depression. She loves honest conversations on controversial topics and is always available to help with life choices and write-ups — academic or otherwise.",
     linkedin: "https://www.linkedin.com/in/oluwatoyin-yakubu-a2b1b6258",
-    photo: "OLUWATOYIN_YAKUBU_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1nRpqZSiLb5qja6Or4MWMgAzRXEAPJ2z3",
     initial: "T",
     avatarBg: "linear-gradient(135deg, #A8DADC, #c9e9eb)",
   },
@@ -364,16 +366,16 @@ const teamMembers = [
     designation: "Community Manager",
     bio: "A communication advocate, leadership enthusiast, and development-driven professional. With a background in Linguistics and years of experience teaching, mentoring, and driving community initiatives, Deborah is passionate about purpose discovery and building impactful leaders.",
     linkedin: "https://www.linkedin.com/in/temitope-deborah-joseph-b24580227",
-    photo: "DEBORAH_JOSEPH_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1IqopO9gGNjW6sdeN28P8iVm1cLZL4GnL",
     initial: "D",
     avatarBg: "linear-gradient(135deg, #f9c784, #f7b16e)",
   },
   {
     name: "Promise Nseobong",
     designation: "Human Resource",
-    bio: "An accounting student with a clear vision for excellence in finance, specialising in taxation and auditing. Beyond academics, Promise is a creative voice â€” running a YouTube channel on motivation and writing spoken-word poetry. Purpose-oriented and driven to achieve major professional milestones early.",
+    bio: "An accounting student with a clear vision for excellence in finance, specialising in taxation and auditing. Beyond academics, Promise is a creative voice — running a YouTube channel on motivation and writing spoken-word poetry. Purpose-oriented and driven to achieve major professional milestones early.",
     linkedin: "https://www.linkedin.com/in/nseobong-promise-02498a338",
-    photo: "PROMISE_NSEOBONG_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1Ddq6HcQQ5fsmFne5NNGV8CiKcQ5tzEbP",
     initial: "P",
     avatarBg: "linear-gradient(135deg, #C86B56, #e8876d)",
     initialColor: "white",
@@ -381,9 +383,9 @@ const teamMembers = [
   {
     name: "Grace Temitope Babatunde",
     designation: "Admin",
-    bio: "A communication specialist and Business Administration postgraduate student. With a foundation in English Language, Grace has transitioned her focus to Human Resources Management and leadership advocacy â€” combining mastery of language with a passion for people-management to drive excellence in the corporate space.",
+    bio: "A communication specialist and Business Administration postgraduate student. With a foundation in English Language, Grace has transitioned her focus to Human Resources Management and leadership advocacy — combining mastery of language with a passion for people-management to drive excellence in the corporate space.",
     linkedin: "https://www.linkedin.com/in/gracetemibabatunde",
-    photo: "GRACE_BABATUNDE_PHOTO_URL",
+    photo: "https://drive.google.com/uc?export=view&id=1JxZ6Tb4vGBktBxXJ0wRNISDUAj7XMqG5",
     initial: "G",
     avatarBg: "linear-gradient(135deg, #a8d8a8, #7bc47b)",
   },
@@ -391,13 +393,13 @@ const teamMembers = [
 
 const blogPosts = [
   {
-    date: "This Week â€¢ Feb 9, 2026",
+    date: "This Week • Feb 9, 2026",
     title: "The Power of Intentional Leadership",
     excerpt: "Discover how leading with intention transforms not just outcomes, but the very fabric of organizational culture...",
     image: "BLOG_POST_IMAGE_URL",
   },
   {
-    date: "Last Week â€¢ Feb 2, 2026",
+    date: "Last Week • Feb 2, 2026",
     title: "Building Trust in Uncertain Times",
     excerpt: "Trust is the currency of leadership. Learn the essential practices that create unshakeable trust with your team...",
     image: "BLOG_POST_IMAGE_URL",
@@ -411,11 +413,11 @@ const blogPosts = [
 ];
 
 const coreValues = [
-  { icon: "ðŸŽ¯", name: "Purpose" },
-  { icon: "ðŸŒ±", name: "Personal Transformation" },
-  { icon: "ðŸ‘‘", name: "Leadership" },
-  { icon: "âš¡", name: "Influence" },
-  { icon: "ðŸŒ", name: "Global Impact" },
+  { icon: "🎯", name: "Purpose" },
+  { icon: "🌱", name: "Personal Transformation" },
+  { icon: "👑", name: "Leadership" },
+  { icon: "⚡", name: "Influence" },
+  { icon: "🌍", name: "Global Impact" },
 ];
 
 function scrollTo(id) {
@@ -441,7 +443,7 @@ export default function App() {
           <div className="logo">
             {!logoError ? (
               <img
-                src="YOUR_LOGO_URL_HERE"
+                src="https://drive.google.com/uc?export=view&id=11lrkrUz3LS7TMw8_douBhbLIRPPrU71b"
                 alt="Champions Leadership Global Logo"
                 style={{ width: 45, height: 45, borderRadius: "50%", objectFit: "cover" }}
                 onError={() => setLogoError(true)}
@@ -476,7 +478,7 @@ export default function App() {
           </p>
           <blockquote className="hero-quote">
             "You can make decisions, not consequences"
-            <span className="author">â€” J.A. Oyedele</span>
+            <span className="author">— J.A. Oyedele</span>
           </blockquote>
           <button className="cta-btn" onClick={() => scrollTo("about")}>Learn More About Us</button>
         </div>
@@ -494,16 +496,16 @@ export default function App() {
               </h2>
               <div className="about-body">
                 <p>Champions' Leadership Global is a brand deeply committed to the themes of <strong>purpose, leadership, and personal development</strong>. We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey.</p>
-                <p>Our passion for leadership stems from its critical role in shaping society, nations, and the world â€” which is why we are dedicated to nurturing purposeful leaders. We are driven to help people become the best versions of themselves, offering content and programs designed for holistic transformation.</p>
+                <p>Our passion for leadership stems from its critical role in shaping society, nations, and the world — which is why we are dedicated to nurturing purposeful leaders. We are driven to help people become the best versions of themselves, offering content and programs designed for holistic transformation.</p>
                 <p>We believe that the world needs more leaders who lead from the angle of purpose and transformation in view. <strong>Transforming people is the best way to transform the world</strong>, because the world is first a people, which eventually makes the place.</p>
                 <p>Our mandate cuts across hosting conferences, seminars, workshops, bootcamps, and other innovative educational platforms for raising the leaders of this generation and the next. We also have our <strong>Champions Leadership Academy</strong>, where we equip would-be leaders with everything needed to rise to a position of influence.</p>
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               {[
-                { bg: colors.navy, icon: "ðŸ›ï¸", title: "Champions Leadership Academy", desc: "Equipping would-be leaders with every knowledge and skill needed to rise to a position of competence and influence.", titleColor: colors.gold, descColor: "rgba(255,255,255,0.78)" },
-                { bg: "white", border: "2px solid rgba(0,0,0,0.06)", icon: "ðŸŽ¤", title: "Events & Programs", desc: "Conferences, seminars, workshops, and bootcamps â€” innovative educational platforms raising leaders for this generation and the next.", titleColor: colors.navy, descColor: "rgba(0,0,0,0.6)" },
-                { bg: `linear-gradient(135deg, ${colors.gold}, #f7c948)`, icon: "ðŸŒ", title: "Global Reach", desc: "Inspiring and enlightening individuals across the world to discover their purpose and lead with lasting impact.", titleColor: colors.navy, descColor: "rgba(10,17,40,0.75)" },
+                { bg: colors.navy, icon: "🏛️", title: "Champions Leadership Academy", desc: "Equipping would-be leaders with every knowledge and skill needed to rise to a position of competence and influence.", titleColor: colors.gold, descColor: "rgba(255,255,255,0.78)" },
+                { bg: "white", border: "2px solid rgba(0,0,0,0.06)", icon: "🎤", title: "Events & Programs", desc: "Conferences, seminars, workshops, and bootcamps — innovative educational platforms raising leaders for this generation and the next.", titleColor: colors.navy, descColor: "rgba(0,0,0,0.6)" },
+                { bg: `linear-gradient(135deg, ${colors.gold}, #f7c948)`, icon: "🌍", title: "Global Reach", desc: "Inspiring and enlightening individuals across the world to discover their purpose and lead with lasting impact.", titleColor: colors.navy, descColor: "rgba(10,17,40,0.75)" },
               ].map(({ bg, border, icon, title, desc, titleColor, descColor }) => (
                 <div key={title} style={{ background: bg, border, borderRadius: 16, padding: "2rem 2.2rem", display: "flex", alignItems: "flex-start", gap: "1.2rem" }}>
                   <div style={{ fontSize: "2rem", flexShrink: 0 }}>{icon}</div>
@@ -529,7 +531,7 @@ export default function App() {
             <div className="vm-card" style={{ background: `linear-gradient(135deg, ${colors.navy}, #1a2847)` }}>
               <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: colors.gold, opacity: 0.07, borderRadius: "50%" }} />
               <div className="vm-label" style={{ color: colors.gold }}>Our Vision</div>
-              <div className="vm-icon">ðŸ”­</div>
+              <div className="vm-icon">🔭</div>
               <p className="vm-text" style={{ color: "rgba(255,255,255,0.88)" }}>
                 To raise transformational leaders who will lead in every sphere of life with{" "}
                 <strong style={{ color: colors.gold }}>dignity, diligence, discipline, and dogged determination</strong>{" "}
@@ -539,7 +541,7 @@ export default function App() {
             <div className="vm-card" style={{ background: `linear-gradient(135deg, ${colors.gold}, #f7c948)` }}>
               <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, background: "white", opacity: 0.15, borderRadius: "50%" }} />
               <div className="vm-label" style={{ color: colors.navy, opacity: 0.7 }}>Our Mission</div>
-              <div className="vm-icon">ðŸš€</div>
+              <div className="vm-icon">🚀</div>
               <p className="vm-text" style={{ color: colors.navy }}>
                 To equip would-be leaders with every knowledge and skill needed to rise to a level of{" "}
                 <strong>competence and influence</strong>, which will in turn affect their world positively.
@@ -559,15 +561,15 @@ export default function App() {
           </div>
           <div className="pillars-grid">
             {[
-              { icon: "ðŸŽ¯", title: "Purpose", text: "Purpose is the essence of living and a driving force behind every decision, action, and goal. It gives life meaning and helps individuals prioritize their time, energy, and resources.", link: "Discover Your Purpose", bg: `linear-gradient(135deg, ${colors.gold}, #fce181)` },
-              { icon: "ðŸ‘‘", title: "Leadership", text: "Leadership is the ability to influence and inspire others to work towards a common goal. It involves developing a clear vision, building trust, and empowering others to take action.", link: "Develop Leadership", bg: `linear-gradient(135deg, ${colors.lavender}, #ddd0ea)` },
-              { icon: "ðŸŒ±", title: "Personal Development", text: "Personal development is the process of growing and evolving as an individual. It involves developing new skills, building confidence, and cultivating a growth mindset.", link: "Start Growing", bg: `linear-gradient(135deg, ${colors.lightBlue}, #c9e9eb)` },
+              { icon: "🎯", title: "Purpose", text: "Purpose is the essence of living and a driving force behind every decision, action, and goal. It gives life meaning and helps individuals prioritize their time, energy, and resources.", link: "Discover Your Purpose", bg: `linear-gradient(135deg, ${colors.gold}, #fce181)` },
+              { icon: "👑", title: "Leadership", text: "Leadership is the ability to influence and inspire others to work towards a common goal. It involves developing a clear vision, building trust, and empowering others to take action.", link: "Develop Leadership", bg: `linear-gradient(135deg, ${colors.lavender}, #ddd0ea)` },
+              { icon: "🌱", title: "Personal Development", text: "Personal development is the process of growing and evolving as an individual. It involves developing new skills, building confidence, and cultivating a growth mindset.", link: "Start Growing", bg: `linear-gradient(135deg, ${colors.lightBlue}, #c9e9eb)` },
             ].map(({ icon, title, text, link, bg }, i) => (
               <div key={title} className="pillar-card" style={{ background: bg, animationDelay: `${(i + 1) * 0.1}s` }}>
                 <div className="pillar-icon">{icon}</div>
                 <h3 className="pillar-title">{title}</h3>
                 <p className="pillar-text">{text}</p>
-                <a href="#" className="pillar-link">{link} â†’</a>
+                <button className="pillar-link" onClick={() => scrollTo("about")}>{link} →</button>
               </div>
             ))}
           </div>
@@ -657,7 +659,7 @@ export default function App() {
                   <div className="blog-date">{date}</div>
                   <h3 className="blog-title">{title}</h3>
                   <p className="blog-excerpt">{excerpt}</p>
-                  <a href="#" className="read-more">Read More â†’</a>
+                  <button className="read-more" onClick={() => {}}>Read More →</button>
                 </div>
               </div>
             ))}
@@ -680,11 +682,11 @@ export default function App() {
           <div>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", marginBottom: "1rem" }}>Champions Leadership Global</h3>
             <p style={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.8, marginBottom: "1.5rem" }}>
-              We believe that everyone has the potential and responsibility to live out their purpose. Our mandate cuts across conferences, seminars, workshops, bootcamps, and our Champions Leadership Academy â€” equipping leaders for lasting impact.
+              We believe that everyone has the potential and responsibility to live out their purpose. Our mandate cuts across conferences, seminars, workshops, bootcamps, and our Champions Leadership Academy — equipping leaders for lasting impact.
             </p>
             <div className="contact-info">
-              <a href="tel:+2349064144546">ðŸ“ž +234 906 414 4546</a>
-              <a href="mailto:info@cleadglobal.com">âœ‰ï¸ info@cleadglobal.com</a>
+              <a href="tel:+2349064144546">📞 +234 906 414 4546</a>
+              <a href="mailto:info@cleadglobal.com">✉️ info@cleadglobal.com</a>
             </div>
           </div>
           <div>
@@ -712,7 +714,7 @@ export default function App() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>Â© 2026 Champions Leadership Global. All rights reserved. Raising Transformational Leaders.</p>
+          <p>© 2026 Champions Leadership Global. All rights reserved. Raising Transformational Leaders.</p>
         </div>
       </footer>
     </div>
