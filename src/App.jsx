@@ -301,7 +301,7 @@ const styles = `
   .footer-title { font-weight: 700; margin-bottom: 1.5rem; color: #F4D03F; }
   .footer-links { list-style: none; }
   .footer-links li { margin-bottom: 0.8rem; }
-  .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s; }
+  .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s; cursor: pointer; }
   .footer-links a:hover { color: #F4D03F; }
   .footer-bottom {
     border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;
@@ -452,7 +452,7 @@ export default function App() {
           <ul className="nav-links">
             {["home","about","events","team","blog","contact"].map(id => (
               <li key={id}>
-                <a onClick={() => scrollTo(id)}>
+                <a href={`#${id}`} onClick={(e) => { e.preventDefault(); scrollTo(id); }}>
                   {id === "blog" ? "Leadership Blog" : id.charAt(0).toUpperCase() + id.slice(1)}
                 </a>
               </li>
@@ -566,7 +566,7 @@ export default function App() {
                   <div className="blog-date">{post.date}</div>
                   <h3 className="blog-title">{post.title}</h3>
                   <p className="blog-excerpt">{post.excerpt}</p>
-                  <button className="read-more">Read Full Article →</button>
+                  <button className="read-more" onClick={(e) => e.preventDefault()}>Read Full Article →</button>
                 </div>
               </div>
             ))}
@@ -620,16 +620,16 @@ export default function App() {
           <div>
             <h4 className="footer-title">Navigation</h4>
             <ul className="footer-links">
-              <li><a onClick={() => scrollTo("home")}>Home</a></li>
-              <li><a onClick={() => scrollTo("about")}>About</a></li>
-              <li><a onClick={() => scrollTo("events")}>Events</a></li>
+              <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollTo("home"); }}>Home</a></li>
+              <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollTo("about"); }}>About</a></li>
+              <li><a href="#events" onClick={(e) => { e.preventDefault(); scrollTo("events"); }}>Events</a></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-title">Social</h4>
             <ul className="footer-links">
-              <li><a href="https://youtube.com/@cleadglobal" target="_blank">YouTube</a></li>
-              <li><a href="https://www.facebook.com/share/1Ks3M8DqJs/" target="_blank">Facebook</a></li>
+              <li><a href="https://youtube.com/@cleadglobal" target="_blank" rel="noreferrer">YouTube</a></li>
+              <li><a href="https://www.facebook.com/share/1Ks3M8DqJs/" target="_blank" rel="noreferrer">Facebook</a></li>
             </ul>
           </div>
         </div>
