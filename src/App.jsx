@@ -213,11 +213,11 @@ export default function App() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
                   <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Vision</h3>
-                  <p>To raise transformational leaders who lead with dignity and diligence globally.</p>
+                  <p>To raise transformational leaders who will lead in every sphere of life with dignity, diligence, discipline, and dogged determination to raise others who will in turn transform their world.</p>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
                   <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Mission</h3>
-                  <p>Equipping leaders with skills to rise to positions of competence and influence.</p>
+                  <p>To equip would-be leaders with every knowledge and skill needed to rise to a level of competence and influence, which will in turn affect their world positively.</p>
                 </div>
               </div>
             </div>
