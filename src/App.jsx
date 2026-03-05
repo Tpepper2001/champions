@@ -193,7 +193,11 @@ export default function App() {
           <ul className="nav-links">
             {["home", "about", "events", "team", "blog", "contact"].map((id) => (
               <li key={id}>
-                <a className={view === id ? "active" : ""} onClick={() => navigate(id)}>
+                <a 
+                  href="#!" 
+                  className={view === id ? "active" : ""} 
+                  onClick={(e) => { e.preventDefault(); navigate(id); }}
+                >
                   {id.charAt(0).toUpperCase() + id.slice(1)}
                 </a>
               </li>
@@ -301,7 +305,17 @@ export default function App() {
                   <h3 className="team-name">{member.name}</h3>
                   <div style={{ color: colors.terracotta, fontWeight: 700, fontSize: '0.8rem', marginBottom: '1rem' }}>{member.designation}</div>
                   <p className="team-bio">{member.bio}</p>
-                  {member.linkedin && <a href={member.linkedin} target="_blank" className="team-linkedin" style={{textDecoration:'none', color: colors.navy, fontWeight: 700, fontSize: '0.8rem'}}><LinkedInIcon /> LinkedIn</a>}
+                  {member.linkedin && (
+                    <a 
+                      href={member.linkedin} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="team-linkedin" 
+                      style={{textDecoration:'none', color: colors.navy, fontWeight: 700, fontSize: '0.8rem'}}
+                    >
+                      <LinkedInIcon /> LinkedIn
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -324,7 +338,7 @@ export default function App() {
                     <div style={{ color: colors.terracotta, fontSize: '0.8rem', fontWeight: 700 }}>{post.date}</div>
                     <h3 style={{ fontFamily: 'Playfair Display', margin: '0.5rem 0' }}>{post.title}</h3>
                     <p style={{fontSize: '0.9rem', opacity: 0.7, marginBottom: '1rem'}}>Exploring the depths of intentional leadership and personal growth.</p>
-                    <span style={{ color: colors.navy, fontWeight: 700 }}>Read More →</span>
+                    <a href="#!" onClick={(e) => e.preventDefault()} style={{ color: colors.navy, fontWeight: 700, textDecoration: 'none' }}>Read More →</a>
                   </div>
                 </div>
               ))}
@@ -342,7 +356,7 @@ export default function App() {
             </div>
             <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
               <form onSubmit={e => e.preventDefault()}>
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem'}}>
                     <input type="text" placeholder="Full Name" className="contact-input" />
                     <input type="email" placeholder="Email Address" className="contact-input" />
                 </div>
