@@ -66,7 +66,7 @@ const styles = `
 
   /* Hero */
   .hero {
-    position: relative; height: 80vh;
+    position: relative; height: 85vh;
     display: flex; align-items: center; overflow: hidden;
     background: #0A1128;
   }
@@ -89,40 +89,21 @@ const styles = `
     line-height: 1.1; margin-bottom: 1.5rem; max-width: 900px;
   }
 
-  /* Shared Sections */
+  /* Sections */
   .page-padding { padding: 8rem 2rem 5rem 2rem; min-height: 80vh; }
+  .home-section { padding: 6rem 2rem; }
   .section-container { max-width: 1400px; margin: 0 auto; position: relative; }
   .section-header { text-align: center; margin-bottom: 4rem; }
   .section-label { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; color: #C86B56; font-weight: 600; margin-bottom: 1rem; }
   .section-title { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; color: #0A1128; margin-bottom: 1rem; }
 
-  /* Framework Pillars */
-  .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 2rem; }
-  .pillar-card {
-    padding: 3rem 2rem; border-radius: 20px; background: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.4s;
-    border: 1px solid rgba(0,0,0,0.03);
-  }
-  .pillar-card:hover { transform: translateY(-10px); }
-  .pillar-icon { font-size: 2.5rem; margin-bottom: 1.5rem; }
-  .pillar-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #0A1128; }
-  
-  /* Team Section */
-  .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-  .team-card {
-    background: white; border-radius: 20px; padding: 2.5rem 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column;
-  }
+  .team-grid, .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .team-card { background: white; border-radius: 20px; padding: 2.5rem 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
   .team-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; }
-  .team-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #0A1128; margin-bottom: 0.5rem; }
-  .team-bio { font-size: 0.95rem; color: rgba(0,0,0,0.6); line-height: 1.7; margin-bottom: 1.5rem; flex-grow: 1; }
   
-  /* Blog */
-  .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
   .blog-card { border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
   .blog-img { width: 100%; height: 220px; object-fit: cover; }
 
-  /* Video/CEO */
   .video-container {
     max-width: 1000px; margin: 0 auto; border-radius: 24px; overflow: hidden;
     aspect-ratio: 16/9; background: linear-gradient(135deg, #0A1128, #1a2847);
@@ -132,18 +113,13 @@ const styles = `
 
   .contact-input { width: 100%; padding: 1.2rem; background: #fff; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; }
 
-  @media (max-width: 992px) { 
-    .team-grid, .blog-grid, .pillars-grid { grid-template-columns: 1fr 1fr; } 
-  }
-
+  @media (max-width: 992px) { .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 768px) {
     .navbar { position: sticky; }
     .nav-container { flex-direction: column; gap: 1rem; padding: 1rem; }
     .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
-    .nav-links a { font-size: 0.8rem; }
-    .team-grid, .blog-grid, .pillars-grid { grid-template-columns: 1fr !important; }
-    .hero-title { font-size: 2.5rem; }
-    .page-padding { padding: 4rem 1.5rem; }
+    .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
+    .hero-title { font-size: 2.8rem; }
   }
 `;
 
@@ -173,9 +149,8 @@ export default function App() {
     const style = document.createElement("style");
     style.textContent = styles;
     document.head.appendChild(style);
-    window.scrollTo(0, 0);
     return () => document.head.removeChild(style);
-  }, [view]);
+  }, []);
 
   const navigate = (v) => {
     setView(v);
@@ -191,17 +166,10 @@ export default function App() {
             <span>Champions Leadership Global</span>
           </div>
           <ul className="nav-links">
-            {["home", "about", "events", "team", "blog", "contact"].map((id) => (
-              <li key={id}>
-                <a 
-                  href="#!" 
-                  className={view === id ? "active" : ""} 
-                  onClick={(e) => { e.preventDefault(); navigate(id); }}
-                >
-                  {id.charAt(0).toUpperCase() + id.slice(1)}
-                </a>
-              </li>
-            ))}
+            <li><a href="#!" className={view === "home" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a></li>
+            <li><a href="#!" className={view === "events" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("events"); }}>Events</a></li>
+            <li><a href="#!" className={view === "team" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("team"); }}>Team</a></li>
+            <li><a href="#!" className={view === "blog" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("blog"); }}>Blog</a></li>
           </ul>
         </div>
       </nav>
@@ -212,77 +180,107 @@ export default function App() {
             <div className="hero-bg" />
             <div className="hero-content">
               <div style={{ color: colors.gold, letterSpacing: '3px', fontWeight: 600, marginBottom: '1.5rem' }}>WELCOME TO A WORLD OF CHAMPIONS</div>
-              <h1 className="hero-title">Raising <span style={{ color: colors.gold }}>Transformational Leaders</span></h1>
+              <h1 className="hero-title">Raising <span style={{ color: colors.gold }}>Transformational</span> Leaders</h1>
               <p style={{ color: 'white', opacity: 0.9, fontSize: '1.2rem', maxWidth: '600px', marginBottom: '2rem' }}>Empowering individuals to discover their purpose and lead with lasting impact.</p>
-              <button style={{ background: colors.gold, color: colors.navy, padding: '1rem 2.5rem', borderRadius: '50px', fontWeight: 700, border: 'none', cursor: 'pointer' }} onClick={() => navigate("about")}>Discover Our Story</button>
+              <button style={{ background: colors.gold, color: colors.navy, padding: '1rem 2.5rem', borderRadius: '50px', fontWeight: 700, border: 'none', cursor: 'pointer' }} onClick={() => {
+                const el = document.getElementById('about-us');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}>Get Started</button>
             </div>
           </section>
 
-          <section className="page-padding">
+          <section id="about-us" className="home-section" style={{ background: 'white' }}>
             <div className="section-container">
-                <div className="section-header">
-                    <div className="section-label">Our Philosophy</div>
-                    <h2 className="section-title">The Champions' Framework</h2>
+              <div className="section-label">Our Story</div>
+              <h2 className="section-title" style={{ textAlign: 'left' }}>About Us</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem' }}>
+                <div style={{ fontSize: '1.1rem', color: '#444' }}>
+                  <p style={{ marginBottom: '1.5rem' }}>Champions' Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development.</p>
+                  <p style={{ marginBottom: '1.5rem' }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our passion for leadership stems from its critical role in shaping society, nations, and the world, which is why we are dedicated to nurturing purposeful leaders.</p>
+                  <p style={{ marginBottom: '1.5rem' }}>We are driven to help people become the best versions of themselves, offering content and programs designed for holistic transformation. We believe that the world needs more leaders who lead from the angle of purpose and transformation in view.</p>
+                  <p style={{ fontWeight: 600, color: colors.navy }}>Transforming people is the best way to transform the world, because the world is first a people, which eventually makes the place.</p>
                 </div>
-                <div className="pillars-grid">
-                    {[{ icon: "🎯", title: "Purpose" }, { icon: "👑", title: "Leadership" }, { icon: "🌱", title: "Development" }].map((p, i) => (
-                        <div key={i} className="pillar-card" style={{textAlign: 'center'}}>
-                            <div className="pillar-icon">{p.icon}</div>
-                            <h3 className="pillar-title">{p.title}</h3>
-                            <button onClick={() => navigate('about')} style={{background: 'none', border: 'none', color: colors.terracotta, fontWeight: 700, cursor: 'pointer'}}>Learn More</button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-          </section>
-
-          <section style={{ padding: "5rem 2rem", background: colors.navy, color: 'white', textAlign: 'center' }}>
-             <h2 style={{ fontFamily: 'Playfair Display', fontSize: '2.5rem', marginBottom: '1.5rem' }}>"You can make decisions, not consequences"</h2>
-             <p>— J.A. Oyedele</p>
-          </section>
-        </>
-      )}
-
-      {view === "about" && (
-        <section className="page-padding">
-          <div className="section-container">
-            <div className="section-header">
-              <div className="section-label">About Us</div>
-              <h2 className="section-title">Who We Are</h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}>
-              <div>
-                <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>Champions' Leadership Global is deeply committed to <strong>purpose, leadership, and personal development</strong>. We host conferences, workshops, and the Champions Leadership Academy to equip the next generation of influence.</p>
-                <div style={{ background: colors.navy, color: 'white', padding: '2rem', borderRadius: '20px', marginBottom: '1rem' }}>
-                    <h3 style={{ color: colors.gold, marginBottom: '0.5rem' }}>Vision</h3>
-                    <p>To raise transformational leaders who lead with dignity and diligence globally.</p>
-                </div>
-                <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #eee' }}>
-                    <h3 style={{ color: colors.navy, marginBottom: '0.5rem' }}>Mission</h3>
-                    <p>Equipping leaders with skills to rise to positions of competence and influence.</p>
+                <div style={{ fontSize: '1rem', background: colors.cream, padding: '2.5rem', borderRadius: '25px' }}>
+                  <p style={{ marginBottom: '1.5rem' }}>Our mandates cuts across hosting conferences, seminars, workshops, bootcamp, and other innovative educational platforms for raising the leaders of this generation and the next.</p>
+                  <p>We also have our leadership academy <strong>(Champions Leadership Academy)</strong>, where we are focused on equipping would-be leaders with everything needed to rise to a position of influence.</p>
                 </div>
               </div>
-              <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800" alt="Leadership" style={{ width: '100%', borderRadius: '20px' }} />
             </div>
-          </div>
-        </section>
+          </section>
+
+          <section className="home-section" style={{ background: colors.navy, color: 'white' }}>
+            <div className="section-container">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
+                  <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Vision</h3>
+                  <p>To raise transformational leaders who lead with dignity and diligence globally.</p>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
+                  <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Mission</h3>
+                  <p>Equipping leaders with skills to rise to positions of competence and influence.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="home-section">
+            <div className="section-container">
+              <div className="section-header">
+                <div className="section-label">Meet Our Founder</div>
+                <h2 className="section-title">A Message from Our CEO</h2>
+              </div>
+              <div className="video-container">
+                <div style={{ textAlign: 'center', color: 'white', padding: '2rem' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '2rem', marginBottom: '1.5rem' }}>Connect with Us</h3>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <a href="https://youtube.com/@cleadglobal" target="_blank" rel="noreferrer" style={{ background: '#FF0000', color: 'white', textDecoration: 'none', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 700 }}>YouTube Channel</a>
+                    <a href="https://www.facebook.com/share/1Ks3M8DqJs/" target="_blank" rel="noreferrer" style={{ background: '#1877F2', color: 'white', textDecoration: 'none', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 700 }}>Facebook Page</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="contact" className="home-section" style={{ background: 'white' }}>
+            <div className="section-container">
+              <div className="section-header">
+                <div className="section-label">Connect</div>
+                <h2 className="section-title">Contact Us</h2>
+              </div>
+              <div style={{ maxWidth: '800px', margin: '0 auto', background: colors.cream, padding: '3rem', borderRadius: '30px' }}>
+                <form onSubmit={e => e.preventDefault()}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                    <input type="text" placeholder="Full Name" className="contact-input" />
+                    <input type="email" placeholder="Email Address" className="contact-input" />
+                  </div>
+                  <textarea placeholder="Message" className="contact-input" style={{ height: '150px', resize: 'none' }}></textarea>
+                  <button style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Send Message</button>
+                </form>
+                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                  <p><strong>Email:</strong> info@cleadglobal.com</p>
+                  <p><strong>Phone:</strong> +234 906 414 4546</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
       )}
 
       {view === "events" && (
         <section className="page-padding">
           <div className="section-container">
             <div className="section-header">
-              <div className="section-label">Events</div>
-              <h2 className="section-title">Upcoming Programs</h2>
+              <div className="section-label">Programs</div>
+              <h2 className="section-title">Upcoming Events</h2>
             </div>
             <div className="team-grid">
               {[
                 { date: "APR 15, 2026", title: "Leadership Bootcamp", loc: "OAU Auditorium" },
                 { date: "MAY 22, 2026", title: "Purpose Webinar", loc: "Online (Zoom)" }
               ].map((e, i) => (
-                <div key={i} style={{ padding: '2rem', background: 'white', borderRadius: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
+                <div key={i} style={{ padding: '2.5rem', background: 'white', borderRadius: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
                   <div style={{ color: colors.terracotta, fontWeight: 700, marginBottom: '0.5rem' }}>{e.date}</div>
-                  <h3 style={{ fontFamily: 'Playfair Display', marginBottom: '1rem' }}>{e.title}</h3>
+                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '1.5rem', marginBottom: '1rem' }}>{e.title}</h3>
                   <p style={{ opacity: 0.7 }}>{e.loc}</p>
                 </div>
               ))}
@@ -295,27 +293,17 @@ export default function App() {
         <section className="page-padding">
           <div className="section-container">
             <div className="section-header">
-              <div className="section-label">Our People</div>
-              <h2 className="section-title">Meet The Team</h2>
+              <div className="section-label">Leadership</div>
+              <h2 className="section-title">Meet Our Team</h2>
             </div>
             <div className="team-grid">
               {teamMembers.map((member, i) => (
                 <div key={i} className="team-card">
                   <img src={member.photo} alt={member.name} className="team-avatar" />
-                  <h3 className="team-name">{member.name}</h3>
-                  <div style={{ color: colors.terracotta, fontWeight: 700, fontSize: '0.8rem', marginBottom: '1rem' }}>{member.designation}</div>
-                  <p className="team-bio">{member.bio}</p>
-                  {member.linkedin && (
-                    <a 
-                      href={member.linkedin} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="team-linkedin" 
-                      style={{textDecoration:'none', color: colors.navy, fontWeight: 700, fontSize: '0.8rem'}}
-                    >
-                      <LinkedInIcon /> LinkedIn
-                    </a>
-                  )}
+                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '1.3rem', marginBottom: '0.5rem' }}>{member.name}</h3>
+                  <div style={{ color: colors.terracotta, fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '1rem' }}>{member.designation}</div>
+                  <p style={{ fontSize: '0.95rem', opacity: 0.8, flexGrow: 1 }}>{member.bio}</p>
+                  {member.linkedin && <a href={member.linkedin} target="_blank" rel="noreferrer" className="logo" style={{ marginTop: '1rem', fontSize: '0.8rem' }}><LinkedInIcon /> LinkedIn</a>}
                 </div>
               ))}
             </div>
@@ -337,36 +325,10 @@ export default function App() {
                   <div style={{ padding: '1.5rem' }}>
                     <div style={{ color: colors.terracotta, fontSize: '0.8rem', fontWeight: 700 }}>{post.date}</div>
                     <h3 style={{ fontFamily: 'Playfair Display', margin: '0.5rem 0' }}>{post.title}</h3>
-                    <p style={{fontSize: '0.9rem', opacity: 0.7, marginBottom: '1rem'}}>Exploring the depths of intentional leadership and personal growth.</p>
-                    <a href="#!" onClick={(e) => e.preventDefault()} style={{ color: colors.navy, fontWeight: 700, textDecoration: 'none' }}>Read More →</a>
+                    <a href="#!" onClick={e => e.preventDefault()} style={{ color: colors.navy, fontWeight: 700, textDecoration: 'none' }}>Read Article →</a>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {view === "contact" && (
-        <section className="page-padding">
-          <div className="section-container">
-            <div className="section-header">
-              <div className="section-label">Connect</div>
-              <h2 className="section-title">Get In Touch</h2>
-            </div>
-            <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
-              <form onSubmit={e => e.preventDefault()}>
-                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem'}}>
-                    <input type="text" placeholder="Full Name" className="contact-input" />
-                    <input type="email" placeholder="Email Address" className="contact-input" />
-                </div>
-                <textarea placeholder="How can we help you?" className="contact-input" style={{ height: '150px', resize: 'none' }}></textarea>
-                <button style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Send Message</button>
-              </form>
-              <div style={{ marginTop: '3rem', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-                <p><strong>Email:</strong> info@cleadglobal.com</p>
-                <p><strong>Phone:</strong> +234 906 414 4546</p>
-              </div>
             </div>
           </div>
         </section>
