@@ -93,7 +93,18 @@ const styles = `
   .section-label { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; color: #C86B56; font-weight: 600; margin-bottom: 1rem; }
   .section-title { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; color: #0A1128; margin-bottom: 1rem; }
 
-  /* Framework Pillars */
+  /* Section Responsive Padding */
+  .padded-section { padding: 8rem 2rem; }
+
+  /* About Grid */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  /* Pillars Framework */
   .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 4rem; }
   .pillar-card {
     padding: 3.5rem 2.5rem; border-radius: 20px; background: white;
@@ -106,12 +117,20 @@ const styles = `
   .pillar-text { font-size: 1.05rem; line-height: 1.8; color: rgba(0,0,0,0.7); margin-bottom: 1.5rem; }
   
   /* Core Values */
+  .values-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; }
   .value-card {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(244,208,63,0.25);
     border-radius: 16px; padding: 2.5rem 2rem; text-align: center;
     flex: 1; min-width: 180px; max-width: 200px; transition: all 0.3s;
   }
   .value-card:hover { background: rgba(244,208,63,0.12); transform: translateY(-6px); }
+
+  /* Events Grid */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
 
   /* Team Section */
   .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
@@ -137,6 +156,13 @@ const styles = `
   .blog-card { border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
   .blog-img { width: 100%; height: 220px; object-fit: cover; }
 
+  /* Contact Grid */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+
   /* Video/CEO */
   .video-container {
     max-width: 1000px; margin: 0 auto; border-radius: 24px; overflow: hidden;
@@ -147,16 +173,37 @@ const styles = `
 
   .contact-input { width: 100%; padding: 1.2rem; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; }
 
-  @media (max-width: 992px) { .team-grid, .blog-grid, .pillars-grid { grid-template-columns: 1fr 1fr; } }
+  /* RESPONSIVE BREAKPOINTS */
+  @media (max-width: 1024px) {
+    .hero-title { font-size: 4rem; }
+    .padded-section { padding: 5rem 2rem; }
+  }
+
+  @media (max-width: 992px) { 
+    .team-grid, .blog-grid, .pillars-grid { grid-template-columns: 1fr 1fr; } 
+    .about-grid, .contact-grid { gap: 2rem; }
+  }
+
   @media (max-width: 768px) {
-    .team-grid, .blog-grid, .pillars-grid { grid-template-columns: 1fr !important; }
-    .hero-title { font-size: 3rem; }
+    .team-grid, .blog-grid, .pillars-grid, .about-grid, .contact-grid { grid-template-columns: 1fr !important; }
+    .hero-title { font-size: 2.8rem; }
     .nav-links { display: none; }
+    .padded-section { padding: 4rem 1.5rem; }
+    .section-title { font-size: 2.2rem; }
+    .nav-container { justify-content: center; }
+    .logo span { font-size: 0.9rem; }
+    .value-card { max-width: 100%; }
+    .about-grid img { order: -1; } /* Image on top on mobile */
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: 2.2rem; }
+    .video-container { aspect-ratio: 4/3; }
   }
 `;
 
 const LinkedInIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.76-1.75 1.76zm13.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.36h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.59v5.61z"/></svg>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0-2.76 2.24-5 5-5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.76-1.75 1.76zm13.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.36h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.59v5.61z"/></svg>
 );
 
 const teamMembers = [
@@ -254,14 +301,14 @@ export default function App() {
       </section>
 
       {/* About */}
-      <section id="about" style={{ padding: "8rem 2rem", background: colors.cream }}>
+      <section id="about" className="padded-section" style={{ background: colors.cream }}>
         <div className="section-container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '4rem', alignItems: 'center' }}>
+          <div className="about-grid">
             <div>
               <div className="section-label">Our Story</div>
               <h2 className="section-title" style={{ textAlign: 'left' }}>Who We Are</h2>
               <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Champions' Leadership Global is deeply committed to <strong>purpose, leadership, and personal development</strong>. We host conferences, workshops, and the Champions Leadership Academy to equip the next generation of influence.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                 <div style={{ background: colors.navy, color: 'white', padding: '1.5rem', borderRadius: '15px' }}>
                   <h4 style={{ color: colors.gold, marginBottom: '0.5rem' }}>Vision</h4>
                   <p style={{ fontSize: '0.9rem' }}>To raise transformational leaders who lead with dignity and diligence globally.</p>
@@ -278,7 +325,7 @@ export default function App() {
       </section>
 
       {/* Three Pillars Framework */}
-      <section style={{ padding: "8rem 2rem", background: "white" }}>
+      <section className="padded-section" style={{ background: "white" }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label">Our Foundation</div>
@@ -303,13 +350,13 @@ export default function App() {
       </section>
 
       {/* Core Values */}
-      <section style={{ padding: "8rem 2rem", background: `linear-gradient(135deg, ${colors.navy} 0%, #1a2847 100%)` }}>
+      <section className="padded-section" style={{ background: `linear-gradient(135deg, ${colors.navy} 0%, #1a2847 100%)` }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label" style={{ color: colors.gold }}>What Drives Us</div>
             <h2 className="section-title" style={{ color: "white" }}>Our Core Values</h2>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+          <div className="values-container">
             {["Purpose", "Transformation", "Leadership", "Influence", "Global Impact"].map((v, i) => (
               <div key={i} className="value-card">
                 <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{["🎯", "🌱", "👑", "⚡", "🌍"][i]}</div>
@@ -321,7 +368,7 @@ export default function App() {
       </section>
 
       {/* CEO Message */}
-      <section style={{ padding: "8rem 2rem", background: colors.cream }}>
+      <section className="padded-section" style={{ background: colors.cream }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label">Meet Our Founder</div>
@@ -340,13 +387,13 @@ export default function App() {
       </section>
 
       {/* Events */}
-      <section id="events" style={{ padding: "8rem 2rem", background: "white" }}>
+      <section id="events" className="padded-section" style={{ background: "white" }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label">Participation</div>
             <h2 className="section-title">Upcoming Events</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div className="events-grid">
             {[
               { date: "APR 15, 2026", title: "Leadership Bootcamp", loc: "OAU Auditorium" },
               { date: "MAY 22, 2026", title: "Purpose Webinar", loc: "Online (Zoom)" }
@@ -363,7 +410,7 @@ export default function App() {
       </section>
 
       {/* Team */}
-      <section id="team" style={{ padding: "8rem 2rem", background: colors.cream }}>
+      <section id="team" className="padded-section" style={{ background: colors.cream }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label">Leadership</div>
@@ -388,7 +435,7 @@ export default function App() {
       </section>
 
       {/* Blog */}
-      <section id="blog" style={{ padding: "8rem 2rem", background: colors.navy }}>
+      <section id="blog" className="padded-section" style={{ background: colors.navy }}>
         <div className="section-container">
           <div className="section-header">
             <div className="section-label" style={{ color: colors.gold }}>Insights</div>
@@ -410,9 +457,9 @@ export default function App() {
       </section>
 
       {/* Contact */}
-      <section id="contact" style={{ padding: "8rem 2rem", background: "white" }}>
+      <section id="contact" className="padded-section" style={{ background: "white" }}>
         <div className="section-container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
+          <div className="contact-grid">
             <div>
               <div className="section-label">Connect</div>
               <h2 className="section-title" style={{ textAlign: 'left' }}>Get In Touch</h2>
