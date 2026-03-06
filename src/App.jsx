@@ -135,7 +135,7 @@ const blogPosts = [
 
 export default function App() {
   const [view, setView] = useState("home");
-  const formAction = "https://formspree.io/f/championscorner27@gmail.com";
+  const formAction = "https://formspree.io/f/mqeykgyy";
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -235,18 +235,14 @@ export default function App() {
               </div>
               <div style={{ maxWidth: '800px', margin: '0 auto', background: colors.cream, padding: '3rem', borderRadius: '30px' }}>
                 <form action={formAction} method="POST">
-                  <input type="hidden" name="_subject" value="New Contact Message - CLG Website" />
+                  <input type="hidden" name="_subject" value="New Website Message" />
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                    <input type="text" name="name" placeholder="Full Name" className="contact-input" required />
-                    <input type="email" name="email" placeholder="Email Address" className="contact-input" required />
+                    <input type="text" name="Name" placeholder="Full Name" className="contact-input" required />
+                    <input type="email" name="Email" placeholder="Email Address" className="contact-input" required />
                   </div>
-                  <textarea name="message" placeholder="Message" className="contact-input" style={{ height: '150px', resize: 'none' }} required></textarea>
+                  <textarea name="Message" placeholder="Message" className="contact-input" style={{ height: '150px', resize: 'none' }} required></textarea>
                   <button type="submit" style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Send Message</button>
                 </form>
-                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                  <p><strong>Email:</strong> championscorner27@gmail.com</p>
-                  <p><strong>Phone:</strong> +234 906 414 4546</p>
-                </div>
               </div>
             </div>
           </section>
@@ -269,18 +265,18 @@ export default function App() {
                 </div>
               </div>
               <div style={{ fontSize: '1.1rem', color: '#333' }}>
-                <p style={{ marginBottom: '1.5rem' }}>Jerry Oyedele is a sought-after public speaker with over a decade of experience, a musicologist with over 300 music compositions, and a mentor to many. He is the founder of <strong>Champions' Leadership Global</strong>, a leadership brand that focuses on purpose discovery, development, and delivery. He is currently a post-graduate student of the department of music, Obafemi Owolowo University, Ile-Ife, Osun state.</p>
+                <p style={{ marginBottom: '1.5rem' }}>Jerry Oyedele is a sought-after public speaker with over a decade of experience, a musicologist with over 300 music compositions, and a mentor to many. He is the founder of <strong>Champions' Leadership Global</strong>, a leadership brand that focuses on purpose discovery, development, and delivery. He is currently a post-graduate student of the department of music, Obafemi Awolowo University, Ile-Ife, Osun state.</p>
                 <p style={{ marginBottom: '1.5rem' }}>His journey into purpose started when he had to take a bold step by leaving engineering at 500level to study music from 100level. This story was the start of the fresh journey which opened him up to an understanding of purpose, self awareness, and leadership.</p>
                 <p style={{ marginBottom: '1.5rem' }}>As a musicologist, Jerry has over two decades of experience in the field of music, and is a seasoned music composer with over 300 works in the last seven years. He is also the founder of <strong>Jebion Music</strong>, a music brand that seeks to reveal the light of the glorious gospel through the music of the kingdom.</p>
 
                 <div style={{ marginTop: '4rem', padding: '3rem', background: 'white', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                   <h3 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '1.5rem' }}>Book CEO for a Conference</h3>
                   <form action={formAction} method="POST">
-                    <input type="hidden" name="_subject" value="CEO Conference Booking Request" />
-                    <input type="text" name="organization" placeholder="Organization / Event Name" className="contact-input" required />
-                    <input type="text" name="location" placeholder="Event Location" className="contact-input" required />
-                    <input type="date" name="event_date" className="contact-input" required />
-                    <textarea name="details" placeholder="Tell us about the event audience and theme" className="contact-input" style={{ height: '120px' }} required></textarea>
+                    <input type="hidden" name="_subject" value="CEO Conference Booking" />
+                    <input type="text" name="EventName" placeholder="Organization / Event Name" className="contact-input" required />
+                    <input type="text" name="Location" placeholder="Event Location" className="contact-input" required />
+                    <input type="date" name="Date" className="contact-input" required />
+                    <textarea name="EventDetails" placeholder="Tell us about the event audience and theme" className="contact-input" style={{ height: '120px' }} required></textarea>
                     <button type="submit" style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Submit Booking Request</button>
                   </form>
                 </div>
@@ -299,9 +295,9 @@ export default function App() {
             </div>
             <div style={{ maxWidth: '600px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
               <form action={formAction} method="POST">
-                <input type="hidden" name="_subject" value="New Coaching Session Request" />
+                <input type="hidden" name="_subject" value="New Coaching Request" />
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Type of Session</label>
-                <select name="session_type" className="contact-input" required>
+                <select name="SessionType" className="contact-input" required>
                   <option>Purpose discovery</option>
                   <option>Identity crisis</option>
                   <option>Personal development and transformation</option>
@@ -309,9 +305,9 @@ export default function App() {
                   <option>Organizational Leadership coaching</option>
                   <option>Others</option>
                 </select>
-                <input type="text" name="full_name" placeholder="Your Name" className="contact-input" required />
-                <input type="email" name="email" placeholder="Email Address" className="contact-input" required />
-                <input type="date" name="preferred_date" className="contact-input" required />
+                <input type="text" name="FullName" placeholder="Your Name" className="contact-input" required />
+                <input type="email" name="Email" placeholder="Email Address" className="contact-input" required />
+                <input type="date" name="RequestedDate" className="contact-input" required />
                 <button type="submit" style={{ width: '100%', background: colors.terracotta, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Schedule Session</button>
               </form>
             </div>
