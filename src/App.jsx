@@ -77,6 +77,11 @@ const styles = `
     opacity: 0.6;
     animation: float 25s ease-in-out infinite;
   }
+  .hero-content {
+    position: relative; max-width: 1400px; margin: 0 auto;
+    padding: 0 2rem; z-index: 2;
+    animation: fadeInUp 1s ease-out 0.3s both;
+  }
   .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 900; color: white;
@@ -94,19 +99,25 @@ const styles = `
   .team-card { background: white; border-radius: 20px; padding: 2.5rem 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
   .team-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; }
   
-  .blog-card { border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  .blog-card { border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s; }
+  .blog-card:hover { transform: translateY(-5px); }
   .blog-img { width: 100%; height: 220px; object-fit: cover; }
 
-  .contact-input { width: 100%; padding: 1.2rem; background: #fff; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; font-size: 1rem; }
-  .form-feedback-text { font-size: 0.85rem; opacity: 0.7; text-align: center; margin-top: 1rem; display: block; }
+  .contact-input { width: 100%; padding: 1.2rem; background: #fff; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; font-size: 1rem; transition: border-color 0.3s; }
+  .contact-input:focus { border-color: #C86B56; outline: none; }
+  .form-feedback-text { font-size: 0.85rem; opacity: 0.7; text-align: center; margin-top: 1rem; display: block; color: #444; }
 
-  @media (max-width: 992px) { .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 992px) { 
+    .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; } 
+    .hero-title { font-size: 3.5rem; }
+  }
   @media (max-width: 768px) {
-    .navbar { position: relative; }
+    .navbar { position: sticky; top: 0; }
     .nav-container { flex-direction: column; gap: 1rem; padding: 1rem; }
     .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
     .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
     .hero-title { font-size: 2.8rem; }
+    .page-padding { padding: 6rem 1rem 3rem 1rem; }
   }
 `;
 
@@ -124,9 +135,9 @@ const teamMembers = [
 ];
 
 const blogPosts = [
-  { title: "Intentional Leadership", img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800", date: "Feb 9, 2026" },
-  { title: "Building Trust", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800", date: "Feb 2, 2026" },
-  { title: "Vision to Action", img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800", date: "Jan 26, 2026" },
+  { title: "Intentional Leadership", img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800", date: "Feb 9, 2026", excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision." },
+  { title: "Building Trust", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800", date: "Feb 2, 2026", excerpt: "Trust is the foundation of every successful team. Discover how to cultivate an environment of honesty and accountability." },
+  { title: "Vision to Action", img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800", date: "Jan 26, 2026", excerpt: "Having a vision is important, but executing it is where the real challenge lies. Learn the steps to turn ideas into reality." },
 ];
 
 export default function App() {
@@ -201,6 +212,30 @@ export default function App() {
             </div>
           </section>
 
+          {/* Featured Blog Post on Homepage */}
+          <section className="home-section" style={{ background: colors.cream }}>
+            <div className="section-container">
+              <div className="section-header">
+                <div className="section-label">Latest Insight</div>
+                <h2 className="section-title">From the Blog</h2>
+              </div>
+              <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                <div className="blog-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', overflow: 'hidden' }}>
+                  <img src={blogPosts[0].img} alt="Latest post" style={{ width: '100%', height: '100%', minHeight: '300px', objectFit: 'cover' }} />
+                  <div style={{ padding: '3rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ color: colors.terracotta, fontWeight: 700 }}>{blogPosts[0].date}</div>
+                    <h3 style={{ fontFamily: 'Playfair Display', fontSize: '2.2rem', margin: '1rem 0' }}>{blogPosts[0].title}</h3>
+                    <p style={{ opacity: 0.8, marginBottom: '1.5rem' }}>{blogPosts[0].excerpt}</p>
+                    <button 
+                      onClick={() => navigate("blog")}
+                      style={{ background: colors.navy, color: 'white', padding: '0.8rem 1.5rem', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}
+                    >Read Full Article</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section id="contact" className="home-section" style={{ background: 'white' }}>
             <div className="section-container">
               <div className="section-header">
@@ -226,12 +261,13 @@ export default function App() {
 
       {view === "ceo" && (
         <>
-          <div style={{ height: '400px', background: `linear-gradient(rgba(10,17,40,0.8), rgba(10,17,40,0.8)), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000')`, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'flex-end', padding: '4rem 2rem' }}>
-             <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
-                <h1 style={{ fontFamily: 'Playfair Display', color: 'white', fontSize: '4rem' }}>The Visionary</h1>
+          <div style={{ height: '450px', background: `linear-gradient(rgba(10,17,40,0.8), rgba(10,17,40,0.8)), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000')`, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+             <div style={{ maxWidth: '1400px', padding: '0 2rem' }}>
+                <h1 style={{ fontFamily: 'Playfair Display', color: 'white', fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>The Visionary & Founder</h1>
+                <p style={{ color: colors.gold, letterSpacing: '2px', fontWeight: 600, marginTop: '1rem', textTransform: 'uppercase' }}>Leading with Purpose and Passion</p>
              </div>
           </div>
-          <section className="page-padding" style={{ marginTop: '-100px' }}>
+          <section className="page-padding" style={{ marginTop: '-80px' }}>
             <div className="section-container">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'start' }}>
                 <div>
@@ -364,6 +400,7 @@ export default function App() {
                   <div style={{ padding: '1.5rem' }}>
                     <div style={{ color: colors.terracotta, fontSize: '0.8rem', fontWeight: 700 }}>{post.date}</div>
                     <h3 style={{ fontFamily: 'Playfair Display', margin: '0.5rem 0' }}>{post.title}</h3>
+                    <p style={{ fontSize: '0.9rem', opacity: 0.7, marginBottom: '1rem' }}>{post.excerpt}</p>
                     <a href="#!" onClick={e => e.preventDefault()} style={{ color: colors.navy, fontWeight: 700, textDecoration: 'none' }}>Read Article →</a>
                   </div>
                 </div>
