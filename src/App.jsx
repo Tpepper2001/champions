@@ -48,23 +48,22 @@ const styles = `
   .nav-container {
     max-width: 1400px; margin: 0 auto;
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.8rem 2rem;
+    padding: 0.5rem 2rem;
   }
   .logo {
     display: flex; align-items: center; gap: 1rem;
     font-weight: 700; font-size: 1.1rem; color: #0A1128;
     text-decoration: none; cursor: pointer;
   }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
   .nav-links a {
     text-decoration: none; color: #1A1A1A; font-weight: 500;
     transition: color 0.3s; position: relative; cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
   .nav-links a.active { color: #C86B56; font-weight: 700; }
   .nav-links a:hover { color: #C86B56; }
 
-  /* Hero */
   .hero {
     position: relative; height: 95vh;
     display: flex; align-items: center; overflow: hidden;
@@ -89,8 +88,7 @@ const styles = `
     line-height: 1.05; margin-bottom: 1.5rem; max-width: 900px;
   }
 
-  /* Sections */
-  .page-padding { padding: 8rem 2rem 5rem 2rem; min-height: 80vh; }
+  .page-padding { padding: 10rem 2rem 5rem 2rem; min-height: 80vh; }
   .home-section { padding: 6rem 2rem; }
   .section-container { max-width: 1400px; margin: 0 auto; position: relative; }
   .section-header { text-align: center; margin-bottom: 4rem; }
@@ -104,18 +102,11 @@ const styles = `
   .blog-card { border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
   .blog-img { width: 100%; height: 220px; object-fit: cover; }
 
-  .video-container {
-    max-width: 1000px; margin: 0 auto; border-radius: 24px; overflow: hidden;
-    aspect-ratio: 16/9; background: linear-gradient(135deg, #0A1128, #1a2847);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-  }
-
   .contact-input { width: 100%; padding: 1.2rem; background: #fff; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; font-size: 1rem; }
 
   @media (max-width: 992px) { .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 768px) {
-    .navbar { position: sticky; }
+    .navbar { position: relative; }
     .nav-container { flex-direction: column; gap: 1rem; padding: 1rem; }
     .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
     .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
@@ -124,7 +115,7 @@ const styles = `
 `;
 
 const LinkedInIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0-2.76 2.24-5 5-5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.76-1.75 1.76zm13.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.36h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.59v5.61z"/></svg>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.76-1.75 1.76zm13.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.36h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.59v5.61z"/></svg>
 );
 
 const teamMembers = [
@@ -144,6 +135,7 @@ const blogPosts = [
 
 export default function App() {
   const [view, setView] = useState("home");
+  const formAction = "https://formspree.io/f/championscorner27@gmail.com";
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -162,15 +154,16 @@ export default function App() {
       <nav className="navbar">
         <div className="nav-container">
           <div className="logo" onClick={() => navigate("home")}>
-            <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" style={{ width: 60, height: 60, borderRadius: "50%", background: 'white' }} />
-            <span>Champions' Leadership Global</span>
+            <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" style={{ width: 85, height: 85, borderRadius: "50%", background: 'white', padding: '5px' }} />
+            <span style={{ fontSize: '1.2rem' }}>Champions' Leadership Global</span>
           </div>
           <ul className="nav-links">
             <li><a href="#!" className={view === "home" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a></li>
+            <li><a href="#!" className={view === "ceo" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("ceo"); }}>Meet the CEO</a></li>
             <li><a href="#!" className={view === "events" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("events"); }}>Events</a></li>
             <li><a href="#!" className={view === "team" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("team"); }}>Team</a></li>
             <li><a href="#!" className={view === "blog" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("blog"); }}>Blog</a></li>
-            <li><a href="#!" className={view === "booking" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("booking"); }} style={{ color: colors.terracotta }}>Book a Session</a></li>
+            <li><a href="#!" className={view === "booking" ? "active" : ""} onClick={(e) => { e.preventDefault(); navigate("booking"); }} style={{ background: colors.terracotta, color: 'white', padding: '0.6rem 1.2rem', borderRadius: '50px' }}>Book a Session</a></li>
           </ul>
         </div>
       </nav>
@@ -201,27 +194,11 @@ export default function App() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem' }}>
                 <div style={{ fontSize: '1.1rem', color: '#444' }}>
                   <p style={{ marginBottom: '1.5rem' }}>Champions' Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development.</p>
-                  <p style={{ marginBottom: '1.5rem' }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our passion for leadership stems from its critical role in shaping society, nations, and the world.</p>
+                  <p style={{ marginBottom: '1.5rem' }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey.</p>
                   <p style={{ fontWeight: 600, color: colors.navy }}>Transforming people is the best way to transform the world, because the world is first a people, which eventually makes the place.</p>
                 </div>
                 <div style={{ fontSize: '1rem', background: colors.cream, padding: '2.5rem', borderRadius: '25px' }}>
                   <p style={{ marginBottom: '1.5rem' }}>Our mandates cuts across hosting conferences, seminars, workshops, bootcamp, and other innovative educational platforms for raising the leaders of this generation and the next.</p>
-                  <p>We also have our leadership academy <strong>(Champions Leadership Academy)</strong>, where we are focused on equipping would-be leaders with everything needed to rise to a position of influence.</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="home-section" style={{ background: colors.navy, color: 'white' }}>
-            <div className="section-container">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
-                  <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Vision</h3>
-                  <p>To raise transformational leaders who will lead in every sphere of life with dignity, diligence, discipline, and dogged determination to raise others who will in turn transform their world.</p>
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '3rem', borderRadius: '20px', border: `1px solid ${colors.gold}44` }}>
-                  <h3 style={{ color: colors.gold, marginBottom: '1rem', fontFamily: 'Playfair Display', fontSize: '2rem' }}>Mission</h3>
-                  <p>To equip would-be leaders with every knowledge and skill needed to rise to a level of competence and influence, which will in turn affect their world positively.</p>
                 </div>
               </div>
             </div>
@@ -250,24 +227,6 @@ export default function App() {
             </div>
           </section>
 
-          <section className="home-section">
-            <div className="section-container">
-              <div className="section-header">
-                <div className="section-label">Meet Our Founder</div>
-                <h2 className="section-title">A Message from Our CEO</h2>
-              </div>
-              <div className="video-container">
-                <div style={{ textAlign: 'center', color: 'white', padding: '2rem' }}>
-                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '2rem', marginBottom: '1.5rem' }}>Connect with Us</h3>
-                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <a href="https://youtube.com/@cleadglobal" target="_blank" rel="noreferrer" style={{ background: '#FF0000', color: 'white', textDecoration: 'none', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 700 }}>YouTube Channel</a>
-                    <a href="https://www.facebook.com/share/1Ks3M8DqJs/" target="_blank" rel="noreferrer" style={{ background: '#1877F2', color: 'white', textDecoration: 'none', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 700 }}>Facebook Page</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
           <section id="contact" className="home-section" style={{ background: 'white' }}>
             <div className="section-container">
               <div className="section-header">
@@ -275,16 +234,17 @@ export default function App() {
                 <h2 className="section-title">Contact Us</h2>
               </div>
               <div style={{ maxWidth: '800px', margin: '0 auto', background: colors.cream, padding: '3rem', borderRadius: '30px' }}>
-                <form onSubmit={e => e.preventDefault()}>
+                <form action={formAction} method="POST">
+                  <input type="hidden" name="_subject" value="New Contact Message - CLG Website" />
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                    <input type="text" placeholder="Full Name" className="contact-input" />
-                    <input type="email" placeholder="Email Address" className="contact-input" />
+                    <input type="text" name="name" placeholder="Full Name" className="contact-input" required />
+                    <input type="email" name="email" placeholder="Email Address" className="contact-input" required />
                   </div>
-                  <textarea placeholder="Message" className="contact-input" style={{ height: '150px', resize: 'none' }}></textarea>
-                  <button style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Send Message</button>
+                  <textarea name="message" placeholder="Message" className="contact-input" style={{ height: '150px', resize: 'none' }} required></textarea>
+                  <button type="submit" style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Send Message</button>
                 </form>
                 <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                  <p><strong>Email:</strong> info@cleadglobal.com</p>
+                  <p><strong>Email:</strong> championscorner27@gmail.com</p>
                   <p><strong>Phone:</strong> +234 906 414 4546</p>
                 </div>
               </div>
@@ -293,30 +253,66 @@ export default function App() {
         </>
       )}
 
+      {view === "ceo" && (
+        <section className="page-padding">
+          <div className="section-container">
+            <div className="section-header">
+              <div className="section-label">The Visionary</div>
+              <h2 className="section-title">Meet Our CEO</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'start' }}>
+              <div>
+                <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: '100%', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
+                <div style={{ marginTop: '2rem', padding: '2rem', background: colors.navy, color: 'white', borderRadius: '20px' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem' }}>Jerry Oyedele</h3>
+                  <p style={{ color: colors.gold, fontWeight: 600 }}>Founder, Champions' Leadership Global</p>
+                </div>
+              </div>
+              <div style={{ fontSize: '1.1rem', color: '#333' }}>
+                <p style={{ marginBottom: '1.5rem' }}>Jerry Oyedele is a sought-after public speaker with over a decade of experience, a musicologist with over 300 music compositions, and a mentor to many. He is the founder of <strong>Champions' Leadership Global</strong>, a leadership brand that focuses on purpose discovery, development, and delivery. He is currently a post-graduate student of the department of music, Obafemi Owolowo University, Ile-Ife, Osun state.</p>
+                <p style={{ marginBottom: '1.5rem' }}>His journey into purpose started when he had to take a bold step by leaving engineering at 500level to study music from 100level. This story was the start of the fresh journey which opened him up to an understanding of purpose, self awareness, and leadership.</p>
+                <p style={{ marginBottom: '1.5rem' }}>As a musicologist, Jerry has over two decades of experience in the field of music, and is a seasoned music composer with over 300 works in the last seven years. He is also the founder of <strong>Jebion Music</strong>, a music brand that seeks to reveal the light of the glorious gospel through the music of the kingdom.</p>
+
+                <div style={{ marginTop: '4rem', padding: '3rem', background: 'white', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '1.5rem' }}>Book CEO for a Conference</h3>
+                  <form action={formAction} method="POST">
+                    <input type="hidden" name="_subject" value="CEO Conference Booking Request" />
+                    <input type="text" name="organization" placeholder="Organization / Event Name" className="contact-input" required />
+                    <input type="text" name="location" placeholder="Event Location" className="contact-input" required />
+                    <input type="date" name="event_date" className="contact-input" required />
+                    <textarea name="details" placeholder="Tell us about the event audience and theme" className="contact-input" style={{ height: '120px' }} required></textarea>
+                    <button type="submit" style={{ width: '100%', background: colors.navy, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Submit Booking Request</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {view === "booking" && (
         <section className="page-padding">
           <div className="section-container">
             <div className="section-header">
               <div className="section-label">Transformation</div>
               <h2 className="section-title">Book a Session</h2>
-              <p style={{ maxWidth: '600px', margin: '0 auto' }}>Ready to take the next step in your leadership journey? Schedule a one-on-one consultation or coaching session.</p>
             </div>
             <div style={{ maxWidth: '600px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
-              <form onSubmit={e => { e.preventDefault(); alert("Session request sent!"); navigate("home"); }}>
+              <form action={formAction} method="POST">
+                <input type="hidden" name="_subject" value="New Coaching Session Request" />
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Type of Session</label>
-                <select className="contact-input">
-                  <option>Purpose Discovery Coaching</option>
-                  <option>Leadership Development Consultation</option>
-                  <option>Personal Branding Strategy</option>
-                  <option>Organizational Training</option>
+                <select name="session_type" className="contact-input" required>
+                  <option>Purpose discovery</option>
+                  <option>Identity crisis</option>
+                  <option>Personal development and transformation</option>
+                  <option>Personal Leadership coaching</option>
+                  <option>Organizational Leadership coaching</option>
+                  <option>Others</option>
                 </select>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Your Name</label>
-                <input type="text" className="contact-input" required />
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Email Address</label>
-                <input type="email" className="contact-input" required />
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Preferred Date</label>
-                <input type="date" className="contact-input" required />
-                <button style={{ width: '100%', background: colors.terracotta, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer', marginTop: '1rem' }}>Schedule Now</button>
+                <input type="text" name="full_name" placeholder="Your Name" className="contact-input" required />
+                <input type="email" name="email" placeholder="Email Address" className="contact-input" required />
+                <input type="date" name="preferred_date" className="contact-input" required />
+                <button type="submit" style={{ width: '100%', background: colors.terracotta, color: 'white', padding: '1.2rem', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Schedule Session</button>
               </form>
             </div>
           </div>
