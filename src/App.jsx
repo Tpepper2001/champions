@@ -103,6 +103,13 @@ const styles = `
   .blog-card:hover { transform: translateY(-5px); }
   .blog-img { width: 100%; height: 220px; object-fit: cover; }
 
+  .video-wrapper {
+    max-width: 1000px; margin: 0 auto; border-radius: 24px; overflow: hidden;
+    aspect-ratio: 16/9; background: #000;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+    position: relative;
+  }
+
   .contact-input { width: 100%; padding: 1.2rem; background: #fff; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 1.2rem; font-family: inherit; font-size: 1rem; transition: border-color 0.3s; }
   .contact-input:focus { border-color: #C86B56; outline: none; }
   .form-feedback-text { font-size: 0.85rem; opacity: 0.7; text-align: center; margin-top: 1rem; display: block; color: #444; }
@@ -136,8 +143,6 @@ const teamMembers = [
 
 const blogPosts = [
   { title: "Intentional Leadership", img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800", date: "Feb 9, 2026", excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision." },
-  { title: "Building Trust", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800", date: "Feb 2, 2026", excerpt: "Trust is the foundation of every successful team. Discover how to cultivate an environment of honesty and accountability." },
-  { title: "Vision to Action", img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800", date: "Jan 26, 2026", excerpt: "Having a vision is important, but executing it is where the real challenge lies. Learn the steps to turn ideas into reality." },
 ];
 
 export default function App() {
@@ -212,7 +217,27 @@ export default function App() {
             </div>
           </section>
 
-          {/* Featured Blog Post on Homepage */}
+          {/* New CEO Welcome Section */}
+          <section className="home-section" style={{ background: colors.navy, color: 'white' }}>
+            <div className="section-container">
+              <div className="section-header">
+                <div className="section-label" style={{ color: colors.gold }}>A Personal Note</div>
+                <h2 className="section-title" style={{ color: 'white' }}>Our CEO says Welcome</h2>
+              </div>
+              <div className="video-wrapper">
+                 <iframe 
+                   width="100%" 
+                   height="100%" 
+                   src="https://www.youtube.com/embed/S_8q0h4-QNo" 
+                   title="CEO Welcome Video" 
+                   frameBorder="0" 
+                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                   allowFullScreen
+                 ></iframe>
+              </div>
+            </div>
+          </section>
+
           <section className="home-section" style={{ background: colors.cream }}>
             <div className="section-container">
               <div className="section-header">
