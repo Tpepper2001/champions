@@ -228,7 +228,7 @@ export default function App() {
                  <iframe 
                    width="100%" 
                    height="100%" 
-                   src="https://www.youtube.com/embed/S_8q0h4-QNo" 
+                   src="https://youtu.be/XqZsoesa55w?si=GnrBf5jlYVjQUU9b" 
                    title="CEO Welcome Video" 
                    frameBorder="0" 
                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
