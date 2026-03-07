@@ -77,11 +77,6 @@ const styles = `
     opacity: 0.6;
     animation: float 25s ease-in-out infinite;
   }
-  .hero-content {
-    position: relative; max-width: 1400px; margin: 0 auto;
-    padding: 0 2rem; z-index: 2;
-    animation: fadeInUp 1s ease-out 0.3s both;
-  }
   .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 900; color: white;
@@ -217,7 +212,6 @@ export default function App() {
             </div>
           </section>
 
-          {/* New CEO Welcome Section */}
           <section className="home-section" style={{ background: colors.navy, color: 'white' }}>
             <div className="section-container">
               <div className="section-header">
@@ -228,7 +222,7 @@ export default function App() {
                  <iframe 
                    width="100%" 
                    height="100%" 
-                   src="https://www.youtube.com/embed/XqZsoesa55w" 
+                   src="https://www.youtube.com/embed/S_8q0h4-QNo" 
                    title="CEO Welcome Video" 
                    frameBorder="0" 
                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -288,7 +282,7 @@ export default function App() {
         <>
           <div style={{ height: '450px', background: `linear-gradient(rgba(10,17,40,0.8), rgba(10,17,40,0.8)), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000')`, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
              <div style={{ maxWidth: '1400px', padding: '0 2rem' }}>
-                <h1 style={{ fontFamily: 'Playfair Display', color: 'white', fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>The Visionary & Founder</h1>
+                <h1 style={{ fontFamily: 'Playfair Display', color: 'white', fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>Visioneer and Founder</h1>
                 <p style={{ color: colors.gold, letterSpacing: '2px', fontWeight: 600, marginTop: '1rem', textTransform: 'uppercase' }}>Leading with Purpose and Passion</p>
              </div>
           </div>
@@ -337,13 +331,14 @@ export default function App() {
       )}
 
       {view === "booking" && (
-        <section className="page-padding">
+        <section className="page-padding" style={{ background: `linear-gradient(rgba(255,248,240,0.9), rgba(255,248,240,0.9)), url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
           <div className="section-container">
             <div className="section-header">
               <div className="section-label">Transformation</div>
               <h2 className="section-title">Book a Session</h2>
+              <p style={{ maxWidth: '600px', margin: '0 auto', color: '#555' }}>Step into a collaborative environment designed to help you discover purpose and refine your leadership.</p>
             </div>
-            <div style={{ maxWidth: '600px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
+            <div style={{ maxWidth: '600px', margin: '0 auto', background: 'white', padding: '3rem', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
               <form action={formAction} method="POST">
                 <input type="hidden" name="_subject" value="New Coaching Request" />
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Type of Session</label>
