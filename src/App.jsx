@@ -145,7 +145,7 @@ const styles = `
   .hero-content {
     position: relative; z-index: 2;
     max-width: 1400px; margin: 0 auto;
-    padding: 0 2rem; width: 100%; padding-top: 100px;
+    padding: 100px 2rem 0; width: 100%;
     animation: fadeInUp 1s ease 0.2s both;
   }
   .hero-eyebrow {
@@ -411,27 +411,17 @@ const blogPosts = [
     category: "Leadership",
     excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision.",
     readTime: "5 min read",
-    fullContent: `Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.
-
-True leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.
-
-Intentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organizations by modeling the behavior they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.
-
-One of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.
-
-As you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.
-
-Champions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions.`
+    fullContent: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.\n\nTrue leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.\n\nIntentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organizations by modeling the behavior they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.\n\nOne of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.\n\nAs you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.\n\nChampions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions."
   },
 ];
 
 const coreValues = [
-  { icon: "🎯", title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
-  { icon: "🔄", title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
-  { icon: "👑", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
-  { icon: "🌟", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
-  { icon: "🌍", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
-  { icon: "🏛️", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+  { icon: "\uD83C\uDFAF", title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
+  { icon: "\uD83D\uDD04", title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
+  { icon: "\uD83D\uDC51", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
+  { icon: "\uD83C\uDF1F", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
+  { icon: "\uD83C\uDF0D", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
+  { icon: "\uD83C\uDFDB", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
 ];
 
 const degrees = [
@@ -499,39 +489,43 @@ export default function App() {
   return (
     <div>
       {/* NAVBAR */}
-      <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
+      <nav className={"navbar" + (scrolled ? " scrolled" : "")}>
         <div className="nav-container">
           <div className="logo" onClick={() => navigate("home")}>
             <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" className="logo-img" />
             <span>Champions&apos; Leadership Global</span>
           </div>
           <ul className="nav-links">
-            {navItems.map(({ label, key }) => (
-              <li key={key}>
-                <a href="#!" className={view === key ? "active" : ""} onClick={e => { e.preventDefault(); navigate(key); }}>{label}</a>
-              </li>
-            ))}
+            {navItems.map(function(item) {
+              return (
+                <li key={item.key}>
+                  <a href="#!" className={view === item.key ? "active" : ""} onClick={function(e) { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
+                </li>
+              );
+            })}
             <li>
-              <a href="#!" className={`nav-book-btn${view === "booking" ? " active" : ""}`} onClick={e => { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
+              <a href="#!" className={"nav-book-btn" + (view === "booking" ? " active" : "")} onClick={function(e) { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
             </li>
           </ul>
-          <button className={`hamburger${menuOpen ? " open" : ""}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+          <button className={"hamburger" + (menuOpen ? " open" : "")} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
             <span /><span /><span />
           </button>
         </div>
       </nav>
 
       {/* MOBILE MENU */}
-      <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
-        {navItems.map(({ label, key }) => (
-          <a key={key} href="#!" className={view === key ? "active" : ""} onClick={e => { e.preventDefault(); navigate(key); }}>{label}</a>
-        ))}
-        <a href="#!" className="mobile-book-btn" onClick={e => { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
+      <div className={"mobile-menu" + (menuOpen ? " open" : "")}>
+        {navItems.map(function(item) {
+          return (
+            <a key={item.key} href="#!" className={view === item.key ? "active" : ""} onClick={function(e) { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
+          );
+        })}
+        <a href="#!" className="mobile-book-btn" onClick={function(e) { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
       </div>
 
-      {/* ── HOME ── */}
+      {/* HOME */}
       {view === "home" && (
-        <>
+        <div>
           {/* HERO */}
           <section className="hero">
             <div className="hero-bg" />
@@ -545,7 +539,7 @@ export default function App() {
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
               <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; Jerry Oyedele</p>
               <div className="hero-cta-row">
-                <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); el?.scrollIntoView({ behavior: "smooth" }); }}>
+                <button className="btn-primary" onClick={function() { var el = document.getElementById("about-us"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
                 </button>
                 <button className="btn-outline" onClick={() => navigate("booking")}>
@@ -562,9 +556,10 @@ export default function App() {
           {/* MARQUEE */}
           <div className="marquee-strip">
             <div className="marquee-inner">
-              {Array(6).fill(["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"]).flat().map((t, i) => (
-                <span key={i} className="marquee-item">{t} <span className="marquee-dot">&bull;</span> </span>
-              ))}
+              {["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation",
+                "Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"].map(function(t, i) {
+                return <span key={i} className="marquee-item">{t} <span className="marquee-dot">&bull;</span> </span>;
+              })}
             </div>
           </div>
 
@@ -572,30 +567,32 @@ export default function App() {
           <section style={{ background: "#0A1128", padding: "6rem 2rem", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: "-80px", left: "-80px", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(244,208,63,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", bottom: "-60px", right: "-60px", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(200,107,86,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
-            <div style={{ maxWidth: 1200px, margin: "0 auto", position: "relative", zIndex: 1 }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1 }}>
               <div style={{ textAlign: "center", marginBottom: "4rem" }}>
                 <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center", marginBottom: "0.8rem" }}>Our Impact So Far</div>
-                <h2 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 900, lineHeight: 1.1 }}>
+                <h2 style={{ fontFamily: "Playfair Display, serif", color: "white", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 900, lineHeight: 1.1 }}>
                   Every Number Tells <em style={{ fontStyle: "italic", color: "#F4D03F" }}>a Story</em>
                 </h2>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
-                {statItems.map((s, i) => (
-                  <div key={i}
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "2.5rem 2rem", textAlign: "center", position: "relative", overflow: "hidden", transition: "transform 0.3s, background 0.3s", cursor: "default" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                  >
-                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
-                    <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
-                    <div style={{ fontFamily: "Playfair Display", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
-                      <span style={{ color: "white" }}>{s.num}</span>
-                      <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
+                {statItems.map(function(s, i) {
+                  return (
+                    <div key={i}
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "2.5rem 2rem", textAlign: "center", position: "relative", overflow: "hidden", transition: "transform 0.3s, background 0.3s", cursor: "default" }}
+                      onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                      onMouseLeave={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                    >
+                      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
+                      <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
+                      <div style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
+                        <span style={{ color: "white" }}>{s.num}</span>
+                        <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
+                      </div>
+                      <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
+                      <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
                     </div>
-                    <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
-                    <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
                 <div>
@@ -626,19 +623,15 @@ export default function App() {
                   </blockquote>
                 </div>
                 <div>
-                  <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: "28px", marginBottom: "1.5rem" }}>
-                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🌍</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
-                    <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>
-                      A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.
-                    </p>
+                  <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: 28, marginBottom: "1.5rem" }}>
+                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>\uD83C\uDF0D</div>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
+                    <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.</p>
                   </div>
-                  <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: "28px", border: "1px solid rgba(0,0,0,0.06)" }}>
-                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🎯</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
-                    <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>
-                      To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.
-                    </p>
+                  <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
+                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>\uD83C\uDFAF</div>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
+                    <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.</p>
                   </div>
                 </div>
               </div>
@@ -654,15 +647,17 @@ export default function App() {
                 <p style={{ maxWidth: 560, margin: "0 auto", color: "#666", lineHeight: 1.7 }}>These values are not aspirations — they are the daily operating system of everyone who bears the Champions&apos; Leadership Global name.</p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
-                {coreValues.map((v, i) => (
-                  <div key={i} className="value-card">
-                    <div className="value-icon">{v.icon}</div>
-                    <div>
-                      <h4 style={{ fontFamily: "Playfair Display", fontSize: "1.1rem", color: "#0A1128", marginBottom: "0.4rem" }}>{v.title}</h4>
-                      <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.7 }}>{v.desc}</p>
+                {coreValues.map(function(v, i) {
+                  return (
+                    <div key={i} className="value-card">
+                      <div className="value-icon">{v.icon}</div>
+                      <div>
+                        <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.1rem", color: "#0A1128", marginBottom: "0.4rem" }}>{v.title}</h4>
+                        <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.7 }}>{v.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -679,7 +674,7 @@ export default function App() {
                 <iframe width="100%" height="100%" src="https://www.youtube.com/embed/S_8q0h4-QNo" title="CEO Welcome Video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
-                <button onClick={() => navigate("ceo")} style={{ background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "0.9rem 2rem", borderRadius: "50px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", fontSize: "0.95rem" }}>
+                <button onClick={() => navigate("ceo")} style={{ background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "0.9rem 2rem", borderRadius: 50, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", fontSize: "0.95rem" }}>
                   Read Full Bio &rarr;
                 </button>
               </div>
@@ -704,9 +699,9 @@ export default function App() {
                       <span style={{ color: "#aaa", fontSize: "0.8rem" }}>{blogPosts[0].readTime}</span>
                     </div>
                     <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.85rem" }}>{blogPosts[0].date}</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", margin: "0.8rem 0", color: "#0A1128" }}>{blogPosts[0].title}</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", margin: "0.8rem 0", color: "#0A1128" }}>{blogPosts[0].title}</h3>
                     <p style={{ opacity: 0.75, marginBottom: "1.8rem", lineHeight: 1.7 }}>{blogPosts[0].excerpt}</p>
-                    <button onClick={() => { setSelectedPost(blogPosts[0]); navigate("blog"); }}
+                    <button onClick={function() { setSelectedPost(blogPosts[0]); navigate("blog"); }}
                       style={{ background: "#0A1128", color: "white", padding: "0.9rem 1.8rem", borderRadius: 10, border: "none", fontWeight: 700, cursor: "pointer", alignSelf: "flex-start", fontFamily: "inherit" }}>
                       Read Full Article
                     </button>
@@ -738,15 +733,15 @@ export default function App() {
               </div>
             </div>
           </section>
-        </>
+        </div>
       )}
 
-      {/* ── CEO ── */}
+      {/* CEO */}
       {view === "ceo" && (
-        <>
+        <div>
           <div style={{ background: "#0A1128", padding: "120px 2rem 4rem", textAlign: "center" }}>
             <div className="section-label" style={{ justifyContent: "center", color: "#F4D03F", marginBottom: "1rem" }}>Visioneer &amp; Founder</div>
-            <h1 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
+            <h1 style={{ fontFamily: "Playfair Display, serif", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
               Meet <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Jerry Oyedele</em>
             </h1>
             <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem" }}>Leading with Purpose and Passion</p>
@@ -761,67 +756,67 @@ export default function App() {
                   <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.12)" }}>
                     <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: "100%", display: "block" }} />
                   </div>
-
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#0A1128", color: "white", borderRadius: 20 }}>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", marginBottom: "0.3rem" }}>Jerry Oyedele</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", marginBottom: "0.3rem" }}>Jerry Oyedele</h3>
                     <p style={{ color: "#F4D03F", fontWeight: 600, marginBottom: "1.2rem" }}>Founder &amp; CEO, Champions&apos; Leadership Global</p>
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {["Public Speaker", "Musicologist", "Mentor", "Choir Leader", "Educator"].map(tag => (
-                        <span key={tag} style={{ background: "rgba(255,255,255,0.1)", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 600 }}>{tag}</span>
-                      ))}
+                      {["Public Speaker", "Musicologist", "Mentor", "Choir Leader", "Educator"].map(function(tag) {
+                        return <span key={tag} style={{ background: "rgba(255,255,255,0.1)", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 600 }}>{tag}</span>;
+                      })}
                     </div>
                   </div>
-
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
-                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
-                    {degrees.map((d, i) => (
-                      <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
-                        <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
-                        <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.4rem" }}>{d.school}</div>
-                        <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
-                      </div>
-                    ))}
-                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
-                    {certifications.map((c, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
-                        <div>
-                          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
-                          <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
+                    <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
+                    {degrees.map(function(d, i) {
+                      return (
+                        <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
+                          <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
+                          <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.4rem" }}>{d.school}</div>
+                          <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
+                    <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
+                    {certifications.map(function(c, i) {
+                      return (
+                        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
+                          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
+                          <div>
+                            <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
+                            <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* FULL BIO */}
+                {/* BIO */}
                 <div>
                   <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
-                  <h2 style={{ fontFamily: "Playfair Display", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
+                  <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
                   <div style={{ fontSize: "1.05rem", color: "#444", lineHeight: 1.9 }}>
                     <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.</p>
                     <p style={{ marginBottom: "1.5rem" }}>He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.</p>
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
                       &ldquo;I had to make the hardest decision of my life: leave engineering at 500 level and start music all over again from 100 level. That decision became the doorway to my purpose.&rdquo;
                     </blockquote>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Journey to Purpose</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Journey to Purpose</h3>
                     <p style={{ marginBottom: "1.5rem" }}>Jerry&apos;s story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a &ldquo;serious&rdquo; path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.</p>
                     <p style={{ marginBottom: "1.5rem" }}>From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions&apos; Leadership Global was born out of that tension.</p>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Musicologist</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Musicologist</h3>
                     <p style={{ marginBottom: "1.5rem" }}>As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan — covering music composition, theory, songwriting, piano literature, and psychology.</p>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
+                    <p style={{ marginBottom: "1.5rem" }}>Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan.</p>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
                     <p style={{ marginBottom: "1.5rem" }}>With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.</p>
                     <p style={{ marginBottom: "1.5rem" }}>As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development.</p>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>Faith &amp; Church Life</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>Faith &amp; Church Life</h3>
                     <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.</p>
                     <p style={{ marginBottom: "1.5rem" }}>For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity.</p>
                   </div>
-
-                  {/* INVITE FORM */}
                   <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
                     <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7 }}>Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.</p>
                     <form action={formAction} method="POST">
                       <input type="hidden" name="_subject" value="CEO Conference Invitation" />
@@ -844,12 +839,12 @@ export default function App() {
               </div>
             </div>
           </section>
-        </>
+        </div>
       )}
 
-      {/* ── BOOKING ── */}
+      {/* BOOKING */}
       {view === "booking" && (
-        <section className="page-padding" style={{ background: "linear-gradient(135deg, rgba(255,248,240,0.97) 0%, rgba(255,248,240,0.92) 100%), url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <section className="page-padding" style={{ background: "#FFF8F0" }}>
           <div className="section-container">
             <div className="section-header">
               <div className="section-label">Begin Your Journey</div>
@@ -880,7 +875,7 @@ export default function App() {
         </section>
       )}
 
-      {/* ── EVENTS ── */}
+      {/* EVENTS */}
       {view === "events" && (
         <section className="page-padding" style={{ background: "#FFF8F0" }}>
           <div className="section-container">
@@ -890,31 +885,33 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Join us at our upcoming programmes and be part of a movement raising the next generation of champions.</p>
             </div>
             <div className="team-grid">
-              {events.map((e, i) => (
-                <div key={i} className="event-card">
-                  <div className="event-date-badge">
-                    <div>
-                      <div className="event-day">{e.day}</div>
-                      <div className="event-month-year">{e.month} {e.year}</div>
+              {events.map(function(e, i) {
+                return (
+                  <div key={i} className="event-card">
+                    <div className="event-date-badge">
+                      <div>
+                        <div className="event-day">{e.day}</div>
+                        <div className="event-month-year">{e.month} {e.year}</div>
+                      </div>
+                      <div style={{ marginLeft: "auto" }}>
+                        <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
+                      </div>
                     </div>
-                    <div style={{ marginLeft: "auto" }}>
-                      <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
+                    <div className="event-body">
+                      <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
+                      <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>&#128205; {e.loc}</p>
+                      <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7 }}>{e.desc}</p>
                     </div>
+                    <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
                   </div>
-                  <div className="event-body">
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
-                    <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>&#128205; {e.loc}</p>
-                    <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7 }}>{e.desc}</p>
-                  </div>
-                  <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
       )}
 
-      {/* ── TEAM ── */}
+      {/* TEAM */}
       {view === "team" && (
         <section className="page-padding" style={{ background: "white" }}>
           <div className="section-container">
@@ -924,28 +921,30 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>A passionate, purpose-driven team committed to raising transformational leaders.</p>
             </div>
             <div className="team-grid">
-              {teamMembers.map((member, i) => (
-                <div key={i} className="team-card">
-                  <div className="team-avatar-wrap">
-                    <img src={member.photo} alt={member.name} className="team-avatar" />
-                    <div className="team-avatar-ring" />
+              {teamMembers.map(function(member, i) {
+                return (
+                  <div key={i} className="team-card">
+                    <div className="team-avatar-wrap">
+                      <img src={member.photo} alt={member.name} className="team-avatar" />
+                      <div className="team-avatar-ring" />
+                    </div>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.25rem", marginBottom: "0.4rem", color: "#0A1128" }}>{member.name}</h3>
+                    <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
+                    <p style={{ fontSize: "0.93rem", color: "#666", flexGrow: 1, lineHeight: 1.7 }}>{member.bio}</p>
+                    {member.linkedin && (
+                      <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#0A1128", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: "#FFF8F0", borderRadius: 20 }}>
+                        <LinkedInIcon /> Connect on LinkedIn
+                      </a>
+                    )}
                   </div>
-                  <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.25rem", marginBottom: "0.4rem", color: "#0A1128" }}>{member.name}</h3>
-                  <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
-                  <p style={{ fontSize: "0.93rem", color: "#666", flexGrow: 1, lineHeight: 1.7 }}>{member.bio}</p>
-                  {member.linkedin && (
-                    <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#0A1128", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: "#FFF8F0", borderRadius: 20 }}>
-                      <LinkedInIcon /> Connect on LinkedIn
-                    </a>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
       )}
 
-      {/* ── BLOG LIST ── */}
+      {/* BLOG LIST */}
       {view === "blog" && !selectedPost && (
         <section className="page-padding" style={{ background: "#FFF8F0" }}>
           <div className="section-container">
@@ -955,29 +954,31 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Practical wisdom, purpose-driven insights, and leadership truths for the champion in you.</p>
             </div>
             <div className="blog-grid">
-              {blogPosts.map((post, i) => (
-                <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => setSelectedPost(post)}>
-                  <div className="blog-img-wrap">
-                    <img src={post.img} alt={post.title} className="blog-img" />
-                  </div>
-                  <div style={{ padding: "1.8rem" }}>
-                    <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", marginBottom: "0.8rem" }}>
-                      <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
-                      <span style={{ color: "#aaa", fontSize: "0.78rem" }}>{post.readTime}</span>
+              {blogPosts.map(function(post, i) {
+                return (
+                  <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => setSelectedPost(post)}>
+                    <div className="blog-img-wrap">
+                      <img src={post.img} alt={post.title} className="blog-img" />
                     </div>
-                    <div style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.35rem", marginBottom: "0.8rem", color: "#0A1128" }}>{post.title}</h3>
-                    <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1.2rem", lineHeight: 1.7 }}>{post.excerpt}</p>
-                    <span style={{ color: "#0A1128", fontWeight: 800, fontSize: "0.88rem" }}>Read Article &rarr;</span>
+                    <div style={{ padding: "1.8rem" }}>
+                      <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", marginBottom: "0.8rem" }}>
+                        <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
+                        <span style={{ color: "#aaa", fontSize: "0.78rem" }}>{post.readTime}</span>
+                      </div>
+                      <div style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
+                      <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.35rem", marginBottom: "0.8rem", color: "#0A1128" }}>{post.title}</h3>
+                      <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1.2rem", lineHeight: 1.7 }}>{post.excerpt}</p>
+                      <span style={{ color: "#0A1128", fontWeight: 800, fontSize: "0.88rem" }}>Read Article &rarr;</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
       )}
 
-      {/* ── BLOG ARTICLE ── */}
+      {/* BLOG ARTICLE */}
       {view === "blog" && selectedPost && (
         <section className="page-padding" style={{ background: "white" }}>
           <div className="section-container">
@@ -990,14 +991,14 @@ export default function App() {
                 <span style={{ color: "#aaa", fontSize: "0.8rem" }}>{selectedPost.readTime}</span>
                 <span style={{ color: "#aaa", fontSize: "0.8rem" }}>&middot; {selectedPost.date}</span>
               </div>
-              <h1 style={{ fontFamily: "Playfair Display", fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#0A1128", lineHeight: 1.1, marginBottom: "2rem" }}>{selectedPost.title}</h1>
+              <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#0A1128", lineHeight: 1.1, marginBottom: "2rem" }}>{selectedPost.title}</h1>
               <div style={{ borderRadius: 20, overflow: "hidden", marginBottom: "3rem", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" }}>
                 <img src={selectedPost.img} alt={selectedPost.title} style={{ width: "100%", height: 380, objectFit: "cover", display: "block" }} />
               </div>
               <div className="article-content">
-                {selectedPost.fullContent.trim().split("\n\n").map((para, i) => (
-                  <p key={i}>{para.trim()}</p>
-                ))}
+                {selectedPost.fullContent.trim().split("\n\n").map(function(para, i) {
+                  return <p key={i}>{para.trim()}</p>;
+                })}
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem", background: "#FFF8F0", borderRadius: 20, textAlign: "center" }}>
                 <p style={{ fontWeight: 700, color: "#0A1128", marginBottom: "1rem" }}>Ready to start your leadership journey?</p>
@@ -1014,17 +1015,19 @@ export default function App() {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
               <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" style={{ width: 60, height: 60, borderRadius: "50%", background: "white", padding: 4 }} />
-              <span style={{ fontFamily: "Playfair Display", fontSize: "1.2rem" }}>Champions&apos; Leadership Global</span>
+              <span style={{ fontFamily: "Playfair Display, serif", fontSize: "1.2rem" }}>Champions&apos; Leadership Global</span>
             </div>
             <p style={{ opacity: 0.55, fontSize: "0.9rem", lineHeight: 1.8, maxWidth: 340 }}>Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
           </div>
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Navigation</h4>
-            {[["Home","home"],["Meet the CEO","ceo"],["Events","events"],["Team","team"],["Blog","blog"],["Book a Session","booking"]].map(([label, key]) => (
-              <div key={key} style={{ marginBottom: "0.8rem" }}>
-                <a href="#!" onClick={e => { e.preventDefault(); navigate(key); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", cursor: "pointer" }}>{label}</a>
-              </div>
-            ))}
+            {[["Home","home"],["Meet the CEO","ceo"],["Events","events"],["Team","team"],["Blog","blog"],["Book a Session","booking"]].map(function(item) {
+              return (
+                <div key={item[1]} style={{ marginBottom: "0.8rem" }}>
+                  <a href="#!" onClick={function(e) { e.preventDefault(); navigate(item[1]); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", cursor: "pointer" }}>{item[0]}</a>
+                </div>
+              );
+            })}
           </div>
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Contact</h4>
