@@ -455,7 +455,21 @@ const coreValues = [
   { icon: "👑", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
   { icon: "🌟", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
   { icon: "🌍", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
-  { icon: "🏛️", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+  { icon: "\u{1F3DB}", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+];
+
+const degrees = [
+  { degree: "B.A. Music \u2014 Second Class Upper", school: "Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria", status: "Completed" },
+  { degree: "M.A. Music", school: "Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria", status: "Ongoing" },
+];
+
+const certifications = [
+  { cert: "Write Like Mozart: An Introduction to Classical Music Composition", school: "National University of Singapore" },
+  { cert: "Introduction to Classical Music", school: "Yale University" },
+  { cert: "Fundamentals of Music Theory", school: "The University of Edinburgh" },
+  { cert: "Introduction to Psychology", school: "Yale University" },
+  { cert: "Songwriting: Writing the Lyrics", school: "Berklee College of Music" },
+  { cert: "Exploring Piano Literature: The Piano Sonata", school: "University of Michigan" },
 ];
 
 const events = [
@@ -535,7 +549,6 @@ export default function App() {
       {/* ── HOME ── */}
       {view === "home" && (
         <>
-          {/* HERO */}
           <section className="hero">
             <div className="hero-bg" />
             <div className="hero-content">
@@ -546,7 +559,7 @@ export default function App() {
                 Leaders
               </h1>
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
-             <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; Jerry Oyedele</p>
+              <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; Jerry Oyedele</p>
               <div className="hero-cta-row">
                 <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); el?.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
@@ -562,7 +575,6 @@ export default function App() {
             </div>
           </section>
 
-          {/* MARQUEE */}
           <div className="marquee-strip">
             <div className="marquee-inner">
               {Array(6).fill(["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"]).flat().map((t, i) => (
@@ -571,7 +583,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* STATS */}
           <section className="stats-section">
             <div className="stats-grid">
               {[
@@ -595,7 +606,6 @@ export default function App() {
                 <div className="section-label">Our Story</div>
                 <h2 className="section-title">About Champions&apos; Leadership Global</h2>
               </div>
-
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "5rem" }}>
                 <div style={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.9 }}>
                   <p style={{ marginBottom: "1.5rem" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
@@ -738,11 +748,12 @@ export default function App() {
             <div className="section-container">
               <div className="ceo-grid">
 
-                {/* Sidebar — no sticky so it doesn't overlap on mobile */}
+                {/* SIDEBAR */}
                 <div>
                   <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.12)" }}>
                     <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: "100%", display: "block" }} />
                   </div>
+
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#0A1128", color: "white", borderRadius: 20 }}>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", marginBottom: "0.3rem" }}>Jerry Oyedele</h3>
                     <p style={{ color: "#F4D03F", fontWeight: 600, marginBottom: "1.2rem" }}>Founder &amp; CEO, Champions&apos; Leadership Global</p>
@@ -752,44 +763,34 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+
+                  {/* DEGREES & CERTIFICATIONS */}
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
-  <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
+                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
 
-  {/* Degrees */}
-  {[
-    { degree: "B.A. Music — Second Class Upper", school: "Obafemi Awolowo University, Ile-Ife", status: "Completed" },
-    { degree: "M.A. Music", school: "Obafemi Awolowo University, Ile-Ife", status: "Ongoing" },
-  ].map((d, i) => (
-    <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i === 0 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
-      <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
-      <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.2rem" }}>{d.school}</div>
-      <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
-    </div>
-  ))}
+                    {degrees.map((d, i) => (
+                      <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
+                        <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.4rem" }}>{d.school}</div>
+                        <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
+                      </div>
+                    ))}
 
-  <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
+                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
 
-  {[
-    { cert: "Write Like Mozart: An Introduction to Classical Music Composition", school: "National University of Singapore" },
-    { cert: "Introduction to Classical Music", school: "Yale University" },
-    { cert: "Fundamentals of Music Theory", school: "The University of Edinburgh" },
-    { cert: "Introduction to Psychology", school: "Yale University" },
-    { cert: "Songwriting: Writing the Lyrics", school: "Berklee College of Music" },
-    { cert: "Exploring Piano Literature: The Piano Sonata", school: "University of Michigan" },
-  ].map((c, i) => (
-    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
-      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
-      <div>
-        <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
-        <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
-      </div>
-    </div>
-  ))}
-</div>
+                    {certifications.map((c, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
+                        <div>
+                          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
+                          <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Full bio */}
+                {/* FULL BIO */}
                 <div>
                   <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
                   <h2 style={{ fontFamily: "Playfair Display", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
@@ -799,7 +800,7 @@ export default function App() {
                       Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.
                     </p>
                     <p style={{ marginBottom: "1.5rem" }}>
-                      He is currently a post-graduate student in the Department of Music at Obafemi Awolowo University, Ile-Ife, Osun State, where he continues to deepen his academic and creative formation.
+                      He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.
                     </p>
 
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
@@ -819,7 +820,7 @@ export default function App() {
                       As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.
                     </p>
                     <p style={{ marginBottom: "1.5rem" }}>
-                      Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses in music theory, history, and production from world-class institutions including the University of Edinburgh, the National University of Singapore, the University of Michigan, and Yale University.
+                      Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan — covering music composition, theory, songwriting, piano literature, and psychology.
                     </p>
 
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
@@ -839,7 +840,7 @@ export default function App() {
                     </p>
                   </div>
 
-                  {/* Invite form */}
+                  {/* INVITE FORM */}
                   <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
