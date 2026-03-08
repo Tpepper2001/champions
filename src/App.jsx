@@ -455,6 +455,7 @@ const coreValues = [
   { icon: "👑", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
   { icon: "🌟", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
   { icon: "🌍", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
+  { icon: "🏛️", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
 ];
 
 const events = [
@@ -545,7 +546,7 @@ export default function App() {
                 Leaders
               </h1>
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
-              <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; J. A. Oyedele</p>
+             <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; Jerry Oyedele</p>
               <div className="hero-cta-row">
                 <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); el?.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
@@ -577,7 +578,7 @@ export default function App() {
                 { num: "2", suffix: "+", label: "Years of Impact" },
                 { num: "1K", suffix: "+", label: "Lives Transformed" },
                 { num: "6", suffix: "", label: "Core Team Members" },
-                { num: "5", suffix: "", label: "Core Values" },
+                { num: "6", suffix: "", label: "Core Values" },
               ].map((s, i) => (
                 <div key={i} className="stat-item">
                   <div className="stat-number">{s.num}<span>{s.suffix}</span></div>
