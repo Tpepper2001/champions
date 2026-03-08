@@ -753,13 +753,39 @@ export default function App() {
                     </div>
                   </div>
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
-                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1rem" }}>Certifications &amp; Institutions</h4>
-                    {["University of Edinburgh", "National University of Singapore", "University of Michigan", "Yale University"].map(inst => (
-                      <div key={inst} style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#C86B56", flexShrink: 0 }} />
-                        <span style={{ fontSize: "0.88rem", color: "#444" }}>{inst}</span>
-                      </div>
-                    ))}
+  <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
+
+  {/* Degrees */}
+  {[
+    { degree: "B.A. Music — Second Class Upper", school: "Obafemi Awolowo University, Ile-Ife", status: "Completed" },
+    { degree: "M.A. Music", school: "Obafemi Awolowo University, Ile-Ife", status: "Ongoing" },
+  ].map((d, i) => (
+    <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i === 0 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
+      <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
+      <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.2rem" }}>{d.school}</div>
+      <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
+    </div>
+  ))}
+
+  <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
+
+  {[
+    { cert: "Write Like Mozart: An Introduction to Classical Music Composition", school: "National University of Singapore" },
+    { cert: "Introduction to Classical Music", school: "Yale University" },
+    { cert: "Fundamentals of Music Theory", school: "The University of Edinburgh" },
+    { cert: "Introduction to Psychology", school: "Yale University" },
+    { cert: "Songwriting: Writing the Lyrics", school: "Berklee College of Music" },
+    { cert: "Exploring Piano Literature: The Piano Sonata", school: "University of Michigan" },
+  ].map((c, i) => (
+    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
+      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
+      <div>
+        <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
+        <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
+      </div>
+    </div>
+  ))}
+</div>
                   </div>
                 </div>
 
