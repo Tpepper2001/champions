@@ -156,8 +156,8 @@ const styles = `
   .hero-eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--gold); }
   .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3.2rem, 8vw, 6rem); font-weight: 900; color: white;
-    line-height: 1.02; margin-bottom: 1.8rem; max-width: 820px;
+    font-size: clamp(2.2rem, 6vw, 6rem); font-weight: 900; color: white;
+    line-height: 1.08; margin-bottom: 1.8rem; max-width: 820px;
   }
   .hero-title em {
     font-style: italic;
@@ -347,15 +347,6 @@ const styles = `
   }
   .event-register-btn:hover { background: var(--navy); color: white; }
 
-  .ceo-hero-banner {
-    min-height: 420px;
-    background: linear-gradient(rgba(10,17,40,0.85), rgba(10,17,40,0.85)),
-                url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000');
-    background-size: cover; background-position: center;
-    display: flex; align-items: flex-end; padding-bottom: 4rem;
-    justify-content: center; text-align: center; padding-top: 120px;
-  }
-
   .ceo-grid {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -392,7 +383,7 @@ const styles = `
     .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; }
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .hero-title { font-size: 3.5rem; }
+    .hero-title { font-size: 3rem; }
     .ceo-grid { grid-template-columns: 1fr; gap: 3rem; }
   }
   @media (max-width: 768px) {
@@ -401,7 +392,7 @@ const styles = `
     .hamburger { display: flex; }
     .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
     .stats-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; }
-    .hero-title { font-size: 2.8rem; }
+    .hero-title { font-size: 2.2rem; }
     .page-padding { padding: 5rem 1.2rem 3rem; }
     .home-section { padding: 4rem 1.2rem; }
     .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -455,7 +446,7 @@ const coreValues = [
   { icon: "👑", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
   { icon: "🌟", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
   { icon: "🌍", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
-  { icon: "\u{1F3DB}", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+  { icon: "🏛️", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
 ];
 
 const degrees = [
@@ -549,6 +540,7 @@ export default function App() {
       {/* ── HOME ── */}
       {view === "home" && (
         <>
+          {/* HERO */}
           <section className="hero">
             <div className="hero-bg" />
             <div className="hero-content">
@@ -575,6 +567,7 @@ export default function App() {
             </div>
           </section>
 
+          {/* MARQUEE */}
           <div className="marquee-strip">
             <div className="marquee-inner">
               {Array(6).fill(["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"]).flat().map((t, i) => (
@@ -583,6 +576,7 @@ export default function App() {
             </div>
           </div>
 
+          {/* STATS */}
           <section className="stats-section">
             <div className="stats-grid">
               {[
@@ -606,7 +600,7 @@ export default function App() {
                 <div className="section-label">Our Story</div>
                 <h2 className="section-title">About Champions&apos; Leadership Global</h2>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "5rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "2rem" }}>
                 <div style={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.9 }}>
                   <p style={{ marginBottom: "1.5rem" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
                   <p style={{ marginBottom: "1.5rem" }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our work is rooted in the conviction that the world&apos;s greatest problems are not structural — they are leadership problems, and leadership problems are ultimately people problems.</p>
@@ -734,14 +728,13 @@ export default function App() {
       {/* ── CEO ── */}
       {view === "ceo" && (
         <>
-          <div className="ceo-hero-banner">
-            <div style={{ padding: "0 2rem", textAlign: "center" }}>
-              <div className="section-label" style={{ justifyContent: "center", color: "#F4D03F", marginBottom: "1rem" }}>Visioneer &amp; Founder</div>
-              <h1 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
-                Meet <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Jerry Oyedele</em>
-              </h1>
-              <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem" }}>Leading with Purpose and Passion</p>
-            </div>
+          {/* CLEAN NAVY HEADER — no background image */}
+          <div style={{ background: "#0A1128", padding: "120px 2rem 4rem", textAlign: "center" }}>
+            <div className="section-label" style={{ justifyContent: "center", color: "#F4D03F", marginBottom: "1rem" }}>Visioneer &amp; Founder</div>
+            <h1 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
+              Meet <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Jerry Oyedele</em>
+            </h1>
+            <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem" }}>Leading with Purpose and Passion</p>
           </div>
 
           <section className="page-padding" style={{ background: "white", marginTop: "-40px" }}>
