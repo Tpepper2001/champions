@@ -167,7 +167,12 @@ const styles = `
   }
   .hero-sub {
     color: rgba(255,255,255,0.85); font-size: 1.15rem;
-    max-width: 540px; margin-bottom: 3rem; font-weight: 300; line-height: 1.7;
+    max-width: 540px; margin-bottom: 1rem; font-weight: 300; line-height: 1.7;
+  }
+  .hero-quote {
+    color: rgba(255,255,255,0.6); font-size: 0.98rem;
+    font-style: italic; font-family: 'Playfair Display', serif;
+    max-width: 540px; margin-bottom: 3rem; line-height: 1.6;
   }
   .hero-cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
   .btn-primary {
@@ -245,15 +250,6 @@ const styles = `
     font-family: 'Playfair Display', serif; font-size: 1.25rem;
     font-style: italic; color: var(--navy); line-height: 1.6; margin: 2rem 0;
   }
-
-  .pillar-card {
-    background: white; border-radius: 20px; padding: 2.5rem 2rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    border-top: 4px solid var(--gold);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .pillar-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
-  .pillar-icon { font-size: 2.5rem; margin-bottom: 1rem; }
 
   .value-card {
     background: white; border-radius: 16px; padding: 2rem;
@@ -360,6 +356,13 @@ const styles = `
     justify-content: center; text-align: center; padding-top: 120px;
   }
 
+  .ceo-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
   .article-content { font-size: 1.1rem; line-height: 1.9; color: #333; }
   .article-content p { margin-bottom: 1.5rem; }
   .article-content h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin: 2.5rem 0 1rem; }
@@ -390,6 +393,7 @@ const styles = `
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
     .hero-title { font-size: 3.5rem; }
+    .ceo-grid { grid-template-columns: 1fr; gap: 3rem; }
   }
   @media (max-width: 768px) {
     .navbar { position: sticky; top: 0; }
@@ -404,6 +408,7 @@ const styles = `
     .hero-cta-row { flex-direction: column; }
     .hero-cta-row button { width: 100%; }
     .nav-container { padding: 0.5rem 1.2rem; }
+    .ceo-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   }
 `;
 
@@ -444,19 +449,12 @@ Champions' Leadership Global exists to raise exactly this kind of leader: intent
   },
 ];
 
-const pillars = [
-  { icon: "🎯", title: "Purpose Discovery", desc: "We help individuals uncover the unique reason they exist — their God-given assignment on earth. Without purpose, life is reduced to mere existence. We believe every person carries a distinct mandate, and our role is to help them find it." },
-  { icon: "🌱", title: "Personal Development", desc: "Discovery is only the beginning. We equip individuals with the tools, mindset, and disciplines needed to grow into their purpose. True development is holistic — spirit, soul, and body — and that is the standard we hold." },
-  { icon: "👑", title: "Leadership Excellence", desc: "We raise leaders who lead from character, not position. Our programmes cultivate servant-hearted, values-driven leaders who can navigate complexity, inspire teams, and leave a legacy that outlasts their tenure." },
-];
-
 const coreValues = [
-  { icon: "✝️", title: "Faith", desc: "Every programme and platform is grounded in a sincere faith in God and the authority of Scripture." },
-  { icon: "🔥", title: "Passion", desc: "We approach every engagement with wholehearted energy and genuine care for the people we serve." },
-  { icon: "💡", title: "Intentionality", desc: "Nothing about our work is accidental. We are deliberate in our design, delivery, and discipleship." },
-  { icon: "🤝", title: "Integrity", desc: "We say what we mean and do what we say. Our credibility is our most guarded asset." },
-  { icon: "🌍", title: "Impact", desc: "We measure success not by attendance numbers but by the transformed lives that ripple out into communities." },
-  { icon: "🏆", title: "Excellence", desc: "We raise the bar in everything we do because the people we serve and the God we represent deserve nothing less." },
+  { icon: "🎯", title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
+  { icon: "🔄", title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
+  { icon: "👑", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
+  { icon: "🌟", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
+  { icon: "🌍", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
 ];
 
 const events = [
@@ -547,6 +545,7 @@ export default function App() {
                 Leaders
               </h1>
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
+              <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; J. A. Oyedele</p>
               <div className="hero-cta-row">
                 <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); el?.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
@@ -575,10 +574,10 @@ export default function App() {
           <section className="stats-section">
             <div className="stats-grid">
               {[
-                { num: "10", suffix: "+", label: "Years of Impact" },
-                { num: "300", suffix: "+", label: "Music Compositions" },
+                { num: "2", suffix: "+", label: "Years of Impact" },
                 { num: "1K", suffix: "+", label: "Lives Transformed" },
                 { num: "6", suffix: "", label: "Core Team Members" },
+                { num: "5", suffix: "", label: "Core Values" },
               ].map((s, i) => (
                 <div key={i} className="stat-item">
                   <div className="stat-number">{s.num}<span>{s.suffix}</span></div>
@@ -588,7 +587,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* ABOUT US — FULL */}
+          {/* ABOUT US */}
           <section id="about-us" className="home-section" style={{ background: "white" }}>
             <div className="section-container">
               <div style={{ textAlign: "center", marginBottom: "4rem" }}>
@@ -596,7 +595,6 @@ export default function App() {
                 <h2 className="section-title">About Champions&apos; Leadership Global</h2>
               </div>
 
-              {/* Intro block */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "5rem" }}>
                 <div style={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.9 }}>
                   <p style={{ marginBottom: "1.5rem" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
@@ -621,24 +619,6 @@ export default function App() {
                       To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* What We Do */}
-              <div style={{ marginBottom: "1rem" }}>
-                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-                  <div className="section-label">What We Do</div>
-                  <h3 style={{ fontFamily: "Playfair Display", fontSize: "2.2rem", fontWeight: 900, color: "#0A1128" }}>Our Three Pillars</h3>
-                  <p style={{ maxWidth: 580, margin: "1rem auto 0", color: "#666", lineHeight: 1.7 }}>Everything we do flows through three interconnected areas of focus that form the backbone of our work.</p>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
-                  {pillars.map((p, i) => (
-                    <div key={i} className="pillar-card">
-                      <div className="pillar-icon">{p.icon}</div>
-                      <h4 style={{ fontFamily: "Playfair Display", fontSize: "1.35rem", color: "#0A1128", marginBottom: "1rem" }}>{p.title}</h4>
-                      <p style={{ fontSize: "0.95rem", color: "#555", lineHeight: 1.8 }}>{p.desc}</p>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -755,10 +735,10 @@ export default function App() {
 
           <section className="page-padding" style={{ background: "white", marginTop: "-40px" }}>
             <div className="section-container">
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "5rem", alignItems: "start" }}>
+              <div className="ceo-grid">
 
-                {/* Sticky sidebar */}
-                <div style={{ position: "sticky", top: "120px" }}>
+                {/* Sidebar — no sticky so it doesn't overlap on mobile */}
+                <div>
                   <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.12)" }}>
                     <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: "100%", display: "block" }} />
                   </div>
@@ -771,7 +751,6 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                  {/* Credentials */}
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
                     <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1rem" }}>Certifications &amp; Institutions</h4>
                     {["University of Edinburgh", "National University of Singapore", "University of Michigan", "Yale University"].map(inst => (
@@ -833,7 +812,7 @@ export default function App() {
                     </p>
                   </div>
 
-                  {/* Invite Jerry form */}
+                  {/* Invite form */}
                   <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
