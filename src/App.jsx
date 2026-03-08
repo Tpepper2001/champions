@@ -1,15 +1,5 @@
 import { useEffect, useState } from "react";
 
-const colors = {
-  gold: "#F4D03F",
-  navy: "#0A1128",
-  lavender: "#C8B8DB",
-  lightBlue: "#A8DADC",
-  terracotta: "#C86B56",
-  cream: "#FFF8F0",
-  darkText: "#1A1A1A",
-};
-
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap');
 
