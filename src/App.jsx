@@ -215,19 +215,6 @@ const styles = `
   }
   .marquee-dot { color: var(--gold); }
 
-  .stats-section { background: white; padding: 5rem 2rem; }
-  .stats-grid {
-    max-width: 1000px; margin: 0 auto;
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center;
-  }
-  .stat-item { padding: 2rem 1rem; }
-  .stat-number {
-    font-family: 'Playfair Display', serif; font-size: 3.5rem;
-    font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 0.5rem;
-  }
-  .stat-number span { color: var(--terracotta); }
-  .stat-label { font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; color: #888; font-weight: 600; }
-
   .page-padding { padding: 10rem 2rem 5rem 2rem; min-height: 80vh; }
   .home-section { padding: 7rem 2rem; }
   .section-container { max-width: 1400px; margin: 0 auto; position: relative; }
@@ -381,7 +368,6 @@ const styles = `
 
   @media (max-width: 992px) {
     .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; }
-    .stats-grid { grid-template-columns: repeat(2,1fr); }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
     .hero-title { font-size: 3rem; }
     .ceo-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -391,7 +377,6 @@ const styles = `
     .nav-links { display: none; }
     .hamburger { display: flex; }
     .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
-    .stats-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; }
     .hero-title { font-size: 2.2rem; }
     .page-padding { padding: 5rem 1.2rem 3rem; }
     .home-section { padding: 4rem 1.2rem; }
@@ -467,6 +452,13 @@ const events = [
   { day: "15", month: "APR", year: "2026", title: "Leadership Bootcamp", loc: "OAU Auditorium, Ile-Ife", desc: "An intensive two-day bootcamp on purpose-driven leadership for students and young professionals.", tag: "Physical" },
   { day: "22", month: "MAY", year: "2026", title: "Purpose Webinar", loc: "Online (Zoom)", desc: "A powerful online seminar exploring identity, purpose, and how to align your life with your calling.", tag: "Virtual" },
   { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD \u2014 Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
+];
+
+const statItems = [
+  { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "\u{1F4C5}" },
+  { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "\u{1F331}" },
+  { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "\u{1F91D}" },
+  { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "\u{1F9ED}" },
 ];
 
 export default function App() {
@@ -576,73 +568,46 @@ export default function App() {
             </div>
           </div>
 
-         {/* STATS */}
-<section style={{ background: "#0A1128", padding: "6rem 2rem", position: "relative", overflow: "hidden" }}>
-  {/* decorative blobs */}
-  <div style={{ position: "absolute", top: "-80px", left: "-80px", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(244,208,63,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-  <div style={{ position: "absolute", bottom: "-60px", right: "-60px", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(200,107,86,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
-
-  <div style={{ maxWidth: 1200px, margin: "0 auto", position: "relative", zIndex: 1 }}>
-
-    {/* heading */}
-    <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-      <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center", marginBottom: "0.8rem" }}>Our Impact So Far</div>
-      <h2 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 900, lineHeight: 1.1 }}>
-        Every Number Tells<br /><em style={{ fontStyle: "italic", color: "#F4D03F" }}>a Story</em>
-      </h2>
-    </div>
-
-    {/* stat cards */}
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
-      {[
-        { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "📅" },
-        { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "🌱" },
-        { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "🤝" },
-        { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "🧭" },
-      ].map((s, i) => (
-        <div key={i} style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 24,
-          padding: "2.5rem 2rem",
-          textAlign: "center",
-          position: "relative",
-          overflow: "hidden",
-          transition: "transform 0.3s, background 0.3s",
-          cursor: "default",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
-        >
-          {/* top accent line */}
-          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
-
-          <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
-
-          <div style={{ fontFamily: "Playfair Display", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
-            <span style={{ color: "white" }}>{s.num}</span>
-            <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
-          </div>
-
-          <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
-          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
-        </div>
-      ))}
-    </div>
-
-    {/* bottom CTA strip */}
-    <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
-      <div>
-        <p style={{ color: "white", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.3rem" }}>Ready to become part of the story?</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>Join thousands of champions already on the journey.</p>
-      </div>
-      <button onClick={() => navigate("booking")} className="btn-primary" style={{ whiteSpace: "nowrap" }}>
-        Book a Session &rarr;
-      </button>
-    </div>
-
-  </div>
-</section>
+          {/* STATS */}
+          <section style={{ background: "#0A1128", padding: "6rem 2rem", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-80px", left: "-80px", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(244,208,63,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: "-60px", right: "-60px", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(200,107,86,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ maxWidth: 1200px, margin: "0 auto", position: "relative", zIndex: 1 }}>
+              <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+                <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center", marginBottom: "0.8rem" }}>Our Impact So Far</div>
+                <h2 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 900, lineHeight: 1.1 }}>
+                  Every Number Tells <em style={{ fontStyle: "italic", color: "#F4D03F" }}>a Story</em>
+                </h2>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
+                {statItems.map((s, i) => (
+                  <div key={i}
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "2.5rem 2rem", textAlign: "center", position: "relative", overflow: "hidden", transition: "transform 0.3s, background 0.3s", cursor: "default" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  >
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
+                    <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
+                    <div style={{ fontFamily: "Playfair Display", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
+                      <span style={{ color: "white" }}>{s.num}</span>
+                      <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
+                    </div>
+                    <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
+                    <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
+                <div>
+                  <p style={{ color: "white", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.3rem" }}>Ready to become part of the story?</p>
+                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>Join thousands of champions already on the journey.</p>
+                </div>
+                <button onClick={() => navigate("booking")} className="btn-primary" style={{ whiteSpace: "nowrap" }}>
+                  Book a Session &rarr;
+                </button>
+              </div>
+            </div>
+          </section>
 
           {/* ABOUT US */}
           <section id="about-us" className="home-section" style={{ background: "white" }}>
@@ -779,7 +744,6 @@ export default function App() {
       {/* ── CEO ── */}
       {view === "ceo" && (
         <>
-          {/* CLEAN NAVY HEADER — no background image */}
           <div style={{ background: "#0A1128", padding: "120px 2rem 4rem", textAlign: "center" }}>
             <div className="section-label" style={{ justifyContent: "center", color: "#F4D03F", marginBottom: "1rem" }}>Visioneer &amp; Founder</div>
             <h1 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
@@ -808,10 +772,8 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* DEGREES & CERTIFICATIONS */}
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
                     <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
-
                     {degrees.map((d, i) => (
                       <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
                         <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
@@ -819,9 +781,7 @@ export default function App() {
                         <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
                       </div>
                     ))}
-
                     <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
-
                     {certifications.map((c, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
                         <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
@@ -838,59 +798,31 @@ export default function App() {
                 <div>
                   <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
                   <h2 style={{ fontFamily: "Playfair Display", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
-
                   <div style={{ fontSize: "1.05rem", color: "#444", lineHeight: 1.9 }}>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.
-                    </p>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.
-                    </p>
-
+                    <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.</p>
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
                       &ldquo;I had to make the hardest decision of my life: leave engineering at 500 level and start music all over again from 100 level. That decision became the doorway to my purpose.&rdquo;
                     </blockquote>
-
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Journey to Purpose</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      Jerry&apos;s story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a &ldquo;serious&rdquo; path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.
-                    </p>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions&apos; Leadership Global was born out of that tension.
-                    </p>
-
+                    <p style={{ marginBottom: "1.5rem" }}>Jerry&apos;s story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a &ldquo;serious&rdquo; path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions&apos; Leadership Global was born out of that tension.</p>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Musicologist</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.
-                    </p>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan — covering music composition, theory, songwriting, piano literature, and psychology.
-                    </p>
-
+                    <p style={{ marginBottom: "1.5rem" }}>As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan — covering music composition, theory, songwriting, piano literature, and psychology.</p>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.
-                    </p>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development.
-                    </p>
-
+                    <p style={{ marginBottom: "1.5rem" }}>With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development.</p>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>Faith &amp; Church Life</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.
-                    </p>
-                    <p style={{ marginBottom: "1.5rem" }}>
-                      For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity.
-                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity.</p>
                   </div>
 
                   {/* INVITE FORM */}
                   <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
-                    <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7 }}>
-                      Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.
-                    </p>
+                    <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7 }}>Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.</p>
                     <form action={formAction} method="POST">
                       <input type="hidden" name="_subject" value="CEO Conference Invitation" />
                       <input type="text" name="Conference_Name" placeholder="Name of Conference / Event" className="contact-input" required />
