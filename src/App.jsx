@@ -416,12 +416,12 @@ const blogPosts = [
 ];
 
 const coreValues = [
-  { icon: "\uD83C\uDFAF", title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
-  { icon: "\uD83D\uDD04", title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
-  { icon: "\uD83D\uDC51", title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
-  { icon: "\uD83C\uDF1F", title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
-  { icon: "\uD83C\uDF0D", title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
-  { icon: "\uD83C\uDFDB", title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+  {title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
+  {title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
+  { title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
+  {title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
+  {title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
+  {title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
 ];
 
 const degrees = [
@@ -624,13 +624,13 @@ export default function App() {
                 </div>
                 <div>
                   <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: 28, marginBottom: "1.5rem" }}>
-                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>\uD83C\uDF0D</div>
+                    
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
                     <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.</p>
                   </div>
                   <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
-                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>\uD83C\uDFAF</div>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
+                   
+                   <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
                     <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.</p>
                   </div>
                 </div>
