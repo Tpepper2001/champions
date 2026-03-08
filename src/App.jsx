@@ -455,10 +455,10 @@ const events = [
 ];
 
 const statItems = [
-  { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "\u{1F4C5}" },
-  { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "\u{1F331}" },
-  { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "\u{1F91D}" },
-  { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "\u{1F9ED}" },
+  { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "\uD83D\uDCC5" },
+  { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "\uD83C\uDF31" },
+  { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "\uD83E\uDD1D" },
+  { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "\uD83E\uDDED" },
 ];
 
 export default function App() {
