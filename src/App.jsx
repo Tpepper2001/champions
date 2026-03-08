@@ -576,22 +576,73 @@ export default function App() {
             </div>
           </div>
 
-          {/* STATS */}
-          <section className="stats-section">
-            <div className="stats-grid">
-              {[
-                { num: "2", suffix: "+", label: "Years of Impact" },
-                { num: "1K", suffix: "+", label: "Lives Transformed" },
-                { num: "6", suffix: "", label: "Core Team Members" },
-                { num: "6", suffix: "", label: "Core Values" },
-              ].map((s, i) => (
-                <div key={i} className="stat-item">
-                  <div className="stat-number">{s.num}<span>{s.suffix}</span></div>
-                  <div className="stat-label">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+         {/* STATS */}
+<section style={{ background: "#0A1128", padding: "6rem 2rem", position: "relative", overflow: "hidden" }}>
+  {/* decorative blobs */}
+  <div style={{ position: "absolute", top: "-80px", left: "-80px", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(244,208,63,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+  <div style={{ position: "absolute", bottom: "-60px", right: "-60px", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(200,107,86,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+  <div style={{ maxWidth: 1200px, margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+    {/* heading */}
+    <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+      <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center", marginBottom: "0.8rem" }}>Our Impact So Far</div>
+      <h2 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 900, lineHeight: 1.1 }}>
+        Every Number Tells<br /><em style={{ fontStyle: "italic", color: "#F4D03F" }}>a Story</em>
+      </h2>
+    </div>
+
+    {/* stat cards */}
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
+      {[
+        { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "📅" },
+        { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "🌱" },
+        { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "🤝" },
+        { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "🧭" },
+      ].map((s, i) => (
+        <div key={i} style={{
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 24,
+          padding: "2.5rem 2rem",
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+          transition: "transform 0.3s, background 0.3s",
+          cursor: "default",
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          {/* top accent line */}
+          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
+
+          <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
+
+          <div style={{ fontFamily: "Playfair Display", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
+            <span style={{ color: "white" }}>{s.num}</span>
+            <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
+          </div>
+
+          <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
+          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
+        </div>
+      ))}
+    </div>
+
+    {/* bottom CTA strip */}
+    <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
+      <div>
+        <p style={{ color: "white", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.3rem" }}>Ready to become part of the story?</p>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>Join thousands of champions already on the journey.</p>
+      </div>
+      <button onClick={() => navigate("booking")} className="btn-primary" style={{ whiteSpace: "nowrap" }}>
+        Book a Session &rarr;
+      </button>
+    </div>
+
+  </div>
+</section>
 
           {/* ABOUT US */}
           <section id="about-us" className="home-section" style={{ background: "white" }}>
