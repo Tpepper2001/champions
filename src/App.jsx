@@ -347,7 +347,7 @@ const styles = `
     border-top: 4px solid var(--gold); position: relative;
   }
   .testimonial-card::before {
-    content: '\201C'; font-family: 'Playfair Display', serif;
+    content: '\\201C'; font-family: 'Playfair Display', serif;
     font-size: 5rem; color: var(--gold); opacity: 0.3;
     position: absolute; top: -0.5rem; left: 1.5rem;
     line-height: 1;
