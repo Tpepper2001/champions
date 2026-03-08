@@ -49,24 +49,11 @@ const styles = `
     33%      { transform: translate(30px,-30px) scale(1.05); }
     66%      { transform: translate(-20px,20px) scale(0.95); }
   }
-  @keyframes shimmer {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  @keyframes pulse-ring {
-    0% { transform: scale(1); opacity: 0.4; }
-    100% { transform: scale(1.6); opacity: 0; }
-  }
   @keyframes marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
-  @keyframes countUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 
-  /* NAVBAR */
   .navbar {
     position: fixed; top: 0; width: 100%;
     background: rgba(255,255,255,0.97);
@@ -77,9 +64,7 @@ const styles = `
     animation: slideDown 0.6s ease-out;
     transition: box-shadow 0.3s;
   }
-  .navbar.scrolled {
-    box-shadow: 0 4px 30px rgba(0,0,0,0.08);
-  }
+  .navbar.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
   .nav-container {
     max-width: 1400px; margin: 0 auto;
     display: flex; justify-content: space-between; align-items: center;
@@ -88,8 +73,7 @@ const styles = `
   .logo {
     display: flex; align-items: center; gap: 0.8rem;
     font-weight: 700; font-size: 1.05rem; color: #0A1128;
-    text-decoration: none; cursor: pointer;
-    transition: opacity 0.2s;
+    text-decoration: none; cursor: pointer; transition: opacity 0.2s;
   }
   .logo:hover { opacity: 0.85; }
   .logo-img {
@@ -124,15 +108,13 @@ const styles = `
   .nav-book-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 20px rgba(200,107,86,0.5) !important; }
   .nav-book-btn::after { display: none !important; }
 
-  /* HAMBURGER */
   .hamburger {
     display: none; flex-direction: column; gap: 5px; cursor: pointer;
     padding: 8px; background: none; border: none; z-index: 1100;
   }
   .hamburger span {
     display: block; width: 24px; height: 2px;
-    background: #0A1128; border-radius: 2px;
-    transition: all 0.3s ease;
+    background: #0A1128; border-radius: 2px; transition: all 0.3s ease;
   }
   .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
@@ -157,7 +139,6 @@ const styles = `
     font-size: 1rem !important; font-family: 'DM Sans', sans-serif !important;
   }
 
-  /* HERO */
   .hero {
     position: relative; min-height: 100vh;
     display: flex; align-items: center; overflow: hidden;
@@ -171,16 +152,10 @@ const styles = `
     background-size: cover; background-position: center;
     animation: float 30s ease-in-out infinite;
   }
-  .hero-bg::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 70% 50%, rgba(244,208,63,0.08) 0%, transparent 60%);
-  }
   .hero-content {
     position: relative; z-index: 2;
     max-width: 1400px; margin: 0 auto;
-    padding: 0 2rem; width: 100%;
-    padding-top: 100px;
+    padding: 0 2rem; width: 100%; padding-top: 100px;
     animation: fadeInUp 1s ease 0.2s both;
   }
   .hero-eyebrow {
@@ -188,16 +163,14 @@ const styles = `
     color: var(--gold); letter-spacing: 3px; font-weight: 600;
     font-size: 0.8rem; margin-bottom: 1.8rem; text-transform: uppercase;
   }
-  .hero-eyebrow::before {
-    content: ''; width: 32px; height: 2px; background: var(--gold);
-  }
+  .hero-eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--gold); }
   .hero-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(3.2rem, 8vw, 6rem); font-weight: 900; color: white;
     line-height: 1.02; margin-bottom: 1.8rem; max-width: 820px;
   }
   .hero-title em {
-    font-style: italic; color: var(--gold);
+    font-style: italic;
     background: linear-gradient(135deg, #F4D03F, #f0b429);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -236,14 +209,10 @@ const styles = `
     animation: fadeInUp 1.5s 1.5s infinite;
   }
 
-  /* MARQUEE STRIP */
-  .marquee-strip {
-    background: var(--navy); padding: 1rem 0; overflow: hidden;
-  }
+  .marquee-strip { background: var(--navy); padding: 1rem 0; overflow: hidden; }
   .marquee-inner {
     display: flex; gap: 4rem; white-space: nowrap;
-    animation: marquee 20s linear infinite;
-    width: max-content;
+    animation: marquee 20s linear infinite; width: max-content;
   }
   .marquee-item {
     color: rgba(255,255,255,0.5); font-size: 0.8rem;
@@ -251,26 +220,19 @@ const styles = `
   }
   .marquee-dot { color: var(--gold); }
 
-  /* STATS */
-  .stats-section {
-    background: white;
-    padding: 5rem 2rem;
-  }
+  .stats-section { background: white; padding: 5rem 2rem; }
   .stats-grid {
     max-width: 1000px; margin: 0 auto;
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
-    text-align: center;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center;
   }
   .stat-item { padding: 2rem 1rem; }
   .stat-number {
     font-family: 'Playfair Display', serif; font-size: 3.5rem;
-    font-weight: 900; color: var(--navy); line-height: 1;
-    margin-bottom: 0.5rem;
+    font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 0.5rem;
   }
   .stat-number span { color: var(--terracotta); }
   .stat-label { font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; color: #888; font-weight: 600; }
 
-  /* SECTIONS */
   .page-padding { padding: 10rem 2rem 5rem 2rem; min-height: 80vh; }
   .home-section { padding: 7rem 2rem; }
   .section-container { max-width: 1400px; margin: 0 auto; position: relative; }
@@ -288,25 +250,35 @@ const styles = `
     font-weight: 900; color: #0A1128; margin-bottom: 1rem; line-height: 1.1;
   }
 
-  /* ABOUT */
   .about-quote {
     border-left: 4px solid var(--gold); padding-left: 1.5rem;
-    font-family: 'Playfair Display', serif; font-size: 1.3rem;
-    font-style: italic; color: var(--navy); line-height: 1.5;
-    margin: 2rem 0;
-  }
-  .about-mandate-card {
-    background: linear-gradient(135deg, var(--navy), #1a2a5e);
-    color: white; padding: 2.5rem; border-radius: 25px;
-    position: relative; overflow: hidden;
-  }
-  .about-mandate-card::before {
-    content: '"'; position: absolute; top: -1rem; right: 1rem;
-    font-family: 'Playfair Display', serif; font-size: 8rem;
-    color: rgba(244,208,63,0.1); line-height: 1;
+    font-family: 'Playfair Display', serif; font-size: 1.25rem;
+    font-style: italic; color: var(--navy); line-height: 1.6; margin: 2rem 0;
   }
 
-  /* TEAM */
+  .pillar-card {
+    background: white; border-radius: 20px; padding: 2.5rem 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    border-top: 4px solid var(--gold);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .pillar-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+  .pillar-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+  .value-card {
+    background: white; border-radius: 16px; padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    display: flex; align-items: flex-start; gap: 1rem;
+    transition: transform 0.3s;
+  }
+  .value-card:hover { transform: translateY(-3px); }
+  .value-icon {
+    width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), #1a2a5e);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+  }
+
   .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
   .team-card {
     background: white; border-radius: 24px; padding: 2.5rem 2rem;
@@ -314,20 +286,14 @@ const styles = `
     transition: transform 0.3s, box-shadow 0.3s; border: 1px solid rgba(0,0,0,0.04);
   }
   .team-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
-  .team-avatar-wrap {
-    position: relative; width: 90px; height: 90px; margin-bottom: 1.5rem;
-  }
-  .team-avatar {
-    width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
-    border: 3px solid rgba(200,107,86,0.2);
-  }
+  .team-avatar-wrap { position: relative; width: 90px; height: 90px; margin-bottom: 1.5rem; }
+  .team-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(200,107,86,0.2); }
   .team-avatar-ring {
     position: absolute; inset: -6px; border-radius: 50%;
     border: 2px dashed rgba(200,107,86,0.3);
     animation: float 8s ease-in-out infinite;
   }
 
-  /* BLOG */
   .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
   .blog-card {
     border-radius: 24px; overflow: hidden; background: white;
@@ -339,29 +305,12 @@ const styles = `
   .blog-card:hover .blog-img { transform: scale(1.04); }
   .blog-img-wrap { overflow: hidden; }
 
-  /* TESTIMONIALS */
-  .testimonial-track { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-  .testimonial-card {
-    background: white; border-radius: 24px; padding: 2.5rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    border-top: 4px solid var(--gold); position: relative;
-  }
-  .testimonial-card::before {
-    content: '\\201C'; font-family: 'Playfair Display', serif;
-    font-size: 5rem; color: var(--gold); opacity: 0.3;
-    position: absolute; top: -0.5rem; left: 1.5rem;
-    line-height: 1;
-  }
-
-  /* VIDEO */
   .video-wrapper {
     max-width: 1000px; margin: 0 auto; border-radius: 24px; overflow: hidden;
     aspect-ratio: 16/9; background: #000;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
-    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3); position: relative;
   }
 
-  /* FORMS */
   .contact-input {
     width: 100%; padding: 1.1rem 1.3rem; background: #fff;
     border: 1.5px solid #e8e8e8; border-radius: 12px; margin-bottom: 1rem;
@@ -391,18 +340,15 @@ const styles = `
   }
   .btn-submit-terracotta:hover { box-shadow: 0 8px 30px rgba(200,107,86,0.5); }
 
-  /* EVENTS */
   .event-card {
     background: white; border-radius: 24px; overflow: hidden;
     box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: flex; flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column;
   }
   .event-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
   .event-date-badge {
     background: linear-gradient(135deg, var(--navy), #1a2a5e);
-    color: white; padding: 1.5rem 2rem;
-    display: flex; align-items: center; gap: 1rem;
+    color: white; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem;
   }
   .event-day { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; line-height: 1; }
   .event-month-year { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
@@ -415,17 +361,15 @@ const styles = `
   }
   .event-register-btn:hover { background: var(--navy); color: white; }
 
-  /* CEO PAGE */
   .ceo-hero-banner {
-    height: 420px;
+    min-height: 420px;
     background: linear-gradient(rgba(10,17,40,0.85), rgba(10,17,40,0.85)),
                 url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000');
     background-size: cover; background-position: center;
     display: flex; align-items: flex-end; padding-bottom: 4rem;
-    justify-content: center; text-align: center;
+    justify-content: center; text-align: center; padding-top: 120px;
   }
 
-  /* BLOG ARTICLE */
   .article-content { font-size: 1.1rem; line-height: 1.9; color: #333; }
   .article-content p { margin-bottom: 1.5rem; }
   .article-content h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin: 2.5rem 0 1rem; }
@@ -436,20 +380,14 @@ const styles = `
     font-size: 1.2rem; margin: 2rem 0;
   }
 
-  /* FOOTER */
-  .footer {
-    background: #050a18; color: white; padding: 5rem 2rem 3rem;
-    position: relative; overflow: hidden;
-  }
+  .footer { background: #050a18; color: white; padding: 5rem 2rem 3rem; position: relative; overflow: hidden; }
   .footer::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--gold), var(--terracotta), transparent);
   }
   .footer-grid {
     max-width: 1400px; margin: 0 auto;
-    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem;
-    margin-bottom: 4rem;
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem;
   }
   .footer-bottom {
     max-width: 1400px; margin: 0 auto;
@@ -457,9 +395,8 @@ const styles = `
     padding-top: 2rem; text-align: center;
   }
 
-  /* RESPONSIVE */
   @media (max-width: 992px) {
-    .team-grid, .blog-grid, .testimonial-track { grid-template-columns: 1fr 1fr; }
+    .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; }
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
     .hero-title { font-size: 3.5rem; }
@@ -468,7 +405,7 @@ const styles = `
     .navbar { position: sticky; top: 0; }
     .nav-links { display: none; }
     .hamburger { display: flex; }
-    .team-grid, .blog-grid, .testimonial-track { grid-template-columns: 1fr !important; }
+    .team-grid, .blog-grid { grid-template-columns: 1fr !important; }
     .stats-grid { grid-template-columns: repeat(2,1fr); gap: 1rem; }
     .hero-title { font-size: 2.8rem; }
     .page-padding { padding: 5rem 1.2rem 3rem; }
@@ -503,32 +440,39 @@ const blogPosts = [
     category: "Leadership",
     excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision.",
     readTime: "5 min read",
-    fullContent: `
-      Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality — those who are deliberate about every decision, every word, and every action.
+    fullContent: `Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.
 
-      True leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.
+True leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.
 
-      Intentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organizations by modeling the behavior they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.
+Intentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organizations by modeling the behavior they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.
 
-      One of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.
+One of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.
 
-      As you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.
+As you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.
 
-      Champions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions.
-    `
+Champions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions.`
   },
 ];
 
-const testimonials = [
-  { name: "Adaeze Okonkwo", role: "Purpose Coaching Attendee", text: "Champions' Leadership Global completely changed my perspective. Jerry's sessions helped me see my life's purpose with crystal clarity. I left with a roadmap I never had before." },
-  { name: "Emmanuel Taiwo", role: "Leadership Bootcamp Graduate", text: "The bootcamp was transformational. The team is exceptional — they don't just teach leadership, they model it. I am now leading my team with a whole new confidence." },
-  { name: "Fatima Al-Hassan", role: "Webinar Participant", text: "I attended the Purpose Webinar from Abuja and it was worth every second. The insights shared were practical, deep, and immediately applicable. Truly a world-class experience." },
+const pillars = [
+  { icon: "🎯", title: "Purpose Discovery", desc: "We help individuals uncover the unique reason they exist — their God-given assignment on earth. Without purpose, life is reduced to mere existence. We believe every person carries a distinct mandate, and our role is to help them find it." },
+  { icon: "🌱", title: "Personal Development", desc: "Discovery is only the beginning. We equip individuals with the tools, mindset, and disciplines needed to grow into their purpose. True development is holistic — spirit, soul, and body — and that is the standard we hold." },
+  { icon: "👑", title: "Leadership Excellence", desc: "We raise leaders who lead from character, not position. Our programmes cultivate servant-hearted, values-driven leaders who can navigate complexity, inspire teams, and leave a legacy that outlasts their tenure." },
+];
+
+const coreValues = [
+  { icon: "✝️", title: "Faith", desc: "Every programme and platform is grounded in a sincere faith in God and the authority of Scripture." },
+  { icon: "🔥", title: "Passion", desc: "We approach every engagement with wholehearted energy and genuine care for the people we serve." },
+  { icon: "💡", title: "Intentionality", desc: "Nothing about our work is accidental. We are deliberate in our design, delivery, and discipleship." },
+  { icon: "🤝", title: "Integrity", desc: "We say what we mean and do what we say. Our credibility is our most guarded asset." },
+  { icon: "🌍", title: "Impact", desc: "We measure success not by attendance numbers but by the transformed lives that ripple out into communities." },
+  { icon: "🏆", title: "Excellence", desc: "We raise the bar in everything we do because the people we serve and the God we represent deserve nothing less." },
 ];
 
 const events = [
   { day: "15", month: "APR", year: "2026", title: "Leadership Bootcamp", loc: "OAU Auditorium, Ile-Ife", desc: "An intensive two-day bootcamp on purpose-driven leadership for students and young professionals.", tag: "Physical" },
   { day: "22", month: "MAY", year: "2026", title: "Purpose Webinar", loc: "Online (Zoom)", desc: "A powerful online seminar exploring identity, purpose, and how to align your life with your calling.", tag: "Virtual" },
-  { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD — Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
+  { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD \u2014 Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
 ];
 
 export default function App() {
@@ -537,16 +481,14 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const formAction = "https://formspree.io/f/mqeykgyy";
-  const contactInfoText = "championscorner27@gmail.com  ·  +234 906 414 4546";
+  const contactInfoText = "championscorner27@gmail.com \u00B7 +234 906 414 4546";
 
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = styles;
     document.head.appendChild(style);
-
     const handleScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       document.head.removeChild(style);
       window.removeEventListener("scroll", handleScroll);
@@ -575,7 +517,7 @@ export default function App() {
         <div className="nav-container">
           <div className="logo" onClick={() => navigate("home")}>
             <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" className="logo-img" />
-            <span>Champions' Leadership Global</span>
+            <span>Champions&apos; Leadership Global</span>
           </div>
           <ul className="nav-links">
             {navItems.map(({ label, key }) => (
@@ -601,7 +543,7 @@ export default function App() {
         <a href="#!" className="mobile-book-btn" onClick={e => { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
       </div>
 
-      {/* ─── HOME ─── */}
+      {/* ── HOME ── */}
       {view === "home" && (
         <>
           {/* HERO */}
@@ -616,11 +558,11 @@ export default function App() {
               </h1>
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
               <div className="hero-cta-row">
-                <button className="btn-primary" onClick={() => { const el = document.getElementById('about-us'); el?.scrollIntoView({ behavior: 'smooth' }); }}>
+                <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); el?.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
                 </button>
                 <button className="btn-outline" onClick={() => navigate("booking")}>
-                  Book a Session →
+                  Book a Session &rarr;
                 </button>
               </div>
             </div>
@@ -634,7 +576,7 @@ export default function App() {
           <div className="marquee-strip">
             <div className="marquee-inner">
               {Array(6).fill(["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"]).flat().map((t, i) => (
-                <span key={i} className="marquee-item">{t} <span className="marquee-dot">✦</span> </span>
+                <span key={i} className="marquee-item">{t} <span className="marquee-dot">&bull;</span> </span>
               ))}
             </div>
           </div>
@@ -656,89 +598,99 @@ export default function App() {
             </div>
           </section>
 
-          {/* ABOUT */}
+          {/* ABOUT US — FULL */}
           <section id="about-us" className="home-section" style={{ background: "white" }}>
             <div className="section-container">
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center" }}>
-                <div>
-                  <div className="section-label">Our Story</div>
-                  <h2 className="section-title" style={{ textAlign: "left", marginBottom: "1.5rem" }}>About Champions'<br />Leadership Global</h2>
-                  <p style={{ fontSize: "1.05rem", color: "#555", marginBottom: "1.5rem", lineHeight: 1.8 }}>
-                    Champions' Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development.
-                  </p>
-                  <p style={{ fontSize: "1.05rem", color: "#555", marginBottom: "1.5rem", lineHeight: 1.8 }}>
-                    We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey.
-                  </p>
+              <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+                <div className="section-label">Our Story</div>
+                <h2 className="section-title">About Champions&apos; Leadership Global</h2>
+              </div>
+
+              {/* Intro block */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "5rem" }}>
+                <div style={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.9 }}>
+                  <p style={{ marginBottom: "1.5rem" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
+                  <p style={{ marginBottom: "1.5rem" }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our work is rooted in the conviction that the world&apos;s greatest problems are not structural — they are leadership problems, and leadership problems are ultimately people problems.</p>
+                  <p style={{ marginBottom: "1.5rem" }}>Founded out of a personal experience of purpose discovery, Champions&apos; Leadership Global was born to serve as a catalyst — a space where people encounter the truth about themselves, are equipped for their life&apos;s work, and are connected to a community of like-minded champions.</p>
                   <blockquote className="about-quote">
                     Transforming people is the best way to transform the world, because the world is first a people, which eventually makes the place.
                   </blockquote>
                 </div>
                 <div>
-                  <div className="about-mandate-card">
-                    <div className="section-label" style={{ color: colors.gold, marginBottom: "1.5rem" }}>Our Mandate</div>
+                  <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: "28px", marginBottom: "1.5rem" }}>
+                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🌍</div>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
                     <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>
-                      Our mandate cuts across hosting conferences, seminars, workshops, bootcamps, and other innovative educational platforms for raising the leaders of this generation and the next.
+                      A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.
                     </p>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginTop: "2rem" }}>
-                      {["Conferences", "Bootcamps", "Workshops", "Coaching"].map(item => (
-                        <div key={item} style={{ background: "rgba(255,255,255,0.08)", borderRadius: "10px", padding: "0.8rem 1rem", fontSize: "0.85rem", color: colors.gold, fontWeight: 600, textAlign: "center" }}>
-                          {item}
-                        </div>
-                      ))}
+                  </div>
+                  <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: "28px", border: "1px solid rgba(0,0,0,0.06)" }}>
+                    <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🎯</div>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
+                    <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>
+                      To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* What We Do */}
+              <div style={{ marginBottom: "1rem" }}>
+                <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+                  <div className="section-label">What We Do</div>
+                  <h3 style={{ fontFamily: "Playfair Display", fontSize: "2.2rem", fontWeight: 900, color: "#0A1128" }}>Our Three Pillars</h3>
+                  <p style={{ maxWidth: 580, margin: "1rem auto 0", color: "#666", lineHeight: 1.7 }}>Everything we do flows through three interconnected areas of focus that form the backbone of our work.</p>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
+                  {pillars.map((p, i) => (
+                    <div key={i} className="pillar-card">
+                      <div className="pillar-icon">{p.icon}</div>
+                      <h4 style={{ fontFamily: "Playfair Display", fontSize: "1.35rem", color: "#0A1128", marginBottom: "1rem" }}>{p.title}</h4>
+                      <p style={{ fontSize: "0.95rem", color: "#555", lineHeight: 1.8 }}>{p.desc}</p>
                     </div>
-                  </div>
-                  <div style={{ marginTop: "1.5rem", padding: "1.5rem 2rem", background: colors.cream, borderRadius: "20px", display: "flex", alignItems: "center", gap: "1rem" }}>
-                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: colors.gold, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", flexShrink: 0 }}>🎯</div>
-                    <p style={{ fontSize: "0.95rem", color: "#555" }}>
-                      <strong style={{ color: colors.navy }}>Our Vision:</strong> A generation of leaders defined by purpose, character, and lasting impact.
-                    </p>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* CEO VIDEO */}
-          <section className="home-section" style={{ background: colors.navy }}>
+          {/* CORE VALUES */}
+          <section className="home-section" style={{ background: "#FFF8F0" }}>
             <div className="section-container">
               <div className="section-header">
-                <div className="section-label" style={{ color: colors.gold }}>A Personal Note</div>
+                <div className="section-label">What We Stand For</div>
+                <h2 className="section-title">Our Core Values</h2>
+                <p style={{ maxWidth: 560, margin: "0 auto", color: "#666", lineHeight: 1.7 }}>These values are not aspirations — they are the daily operating system of everyone who bears the Champions&apos; Leadership Global name.</p>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
+                {coreValues.map((v, i) => (
+                  <div key={i} className="value-card">
+                    <div className="value-icon">{v.icon}</div>
+                    <div>
+                      <h4 style={{ fontFamily: "Playfair Display", fontSize: "1.1rem", color: "#0A1128", marginBottom: "0.4rem" }}>{v.title}</h4>
+                      <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.7 }}>{v.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CEO VIDEO */}
+          <section className="home-section" style={{ background: "#0A1128" }}>
+            <div className="section-container">
+              <div className="section-header">
+                <div className="section-label" style={{ color: "#F4D03F" }}>A Personal Note</div>
                 <h2 className="section-title" style={{ color: "white" }}>Our CEO says Welcome</h2>
-                <p style={{ color: "rgba(255,255,255,0.6)", maxWidth: 500, margin: "0 auto" }}>Hear directly from Jerry Oyedele, founder of Champions' Leadership Global</p>
+                <p style={{ color: "rgba(255,255,255,0.6)", maxWidth: 500, margin: "0 auto" }}>Hear directly from Jerry Oyedele, founder of Champions&apos; Leadership Global</p>
               </div>
               <div className="video-wrapper">
                 <iframe width="100%" height="100%" src="https://www.youtube.com/embed/S_8q0h4-QNo" title="CEO Welcome Video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
-                <button onClick={() => navigate("ceo")} style={{ background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "0.9rem 2rem", borderRadius: "50px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", fontSize: "0.95rem" }}
-                  onMouseEnter={e => { e.target.style.borderColor = colors.gold; e.target.style.color = colors.gold; }}
-                  onMouseLeave={e => { e.target.style.borderColor = "rgba(255,255,255,0.3)"; e.target.style.color = "white"; }}>
-                  Read Full Bio →
+                <button onClick={() => navigate("ceo")} style={{ background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "0.9rem 2rem", borderRadius: "50px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", fontSize: "0.95rem" }}>
+                  Read Full Bio &rarr;
                 </button>
-              </div>
-            </div>
-          </section>
-
-          {/* TESTIMONIALS */}
-          <section className="home-section" style={{ background: colors.cream }}>
-            <div className="section-container">
-              <div className="section-header">
-                <div className="section-label">What People Say</div>
-                <h2 className="section-title">Voices of Transformation</h2>
-              </div>
-              <div className="testimonial-track">
-                {testimonials.map((t, i) => (
-                  <div key={i} className="testimonial-card">
-                    <p style={{ fontSize: "1rem", lineHeight: 1.8, color: "#444", marginBottom: "1.5rem", paddingTop: "2rem" }}>{t.text}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
-                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.navy}, ${colors.terracotta})`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: "1.1rem" }}>{t.name[0]}</div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: colors.navy, fontSize: "0.95rem" }}>{t.name}</div>
-                        <div style={{ fontSize: "0.8rem", color: colors.terracotta, fontWeight: 600 }}>{t.role}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </section>
@@ -757,14 +709,14 @@ export default function App() {
                   </div>
                   <div style={{ padding: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
                     <div style={{ display: "flex", gap: "0.8rem", marginBottom: "1rem", alignItems: "center" }}>
-                      <span style={{ background: colors.cream, color: colors.terracotta, padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{blogPosts[0].category}</span>
+                      <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{blogPosts[0].category}</span>
                       <span style={{ color: "#aaa", fontSize: "0.8rem" }}>{blogPosts[0].readTime}</span>
                     </div>
-                    <div style={{ color: colors.terracotta, fontWeight: 700, fontSize: "0.85rem" }}>{blogPosts[0].date}</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", margin: "0.8rem 0", color: colors.navy }}>{blogPosts[0].title}</h3>
+                    <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.85rem" }}>{blogPosts[0].date}</div>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", margin: "0.8rem 0", color: "#0A1128" }}>{blogPosts[0].title}</h3>
                     <p style={{ opacity: 0.75, marginBottom: "1.8rem", lineHeight: 1.7 }}>{blogPosts[0].excerpt}</p>
                     <button onClick={() => { setSelectedPost(blogPosts[0]); navigate("blog"); }}
-                      style={{ background: colors.navy, color: "white", padding: "0.9rem 1.8rem", borderRadius: 10, border: "none", fontWeight: 700, cursor: "pointer", alignSelf: "flex-start", fontFamily: "inherit", transition: "background 0.2s" }}>
+                      style={{ background: "#0A1128", color: "white", padding: "0.9rem 1.8rem", borderRadius: 10, border: "none", fontWeight: 700, cursor: "pointer", alignSelf: "flex-start", fontFamily: "inherit" }}>
                       Read Full Article
                     </button>
                   </div>
@@ -774,12 +726,12 @@ export default function App() {
           </section>
 
           {/* CONTACT */}
-          <section id="contact" className="home-section" style={{ background: colors.cream }}>
+          <section id="contact" className="home-section" style={{ background: "#FFF8F0" }}>
             <div className="section-container">
               <div className="section-header">
                 <div className="section-label">Connect</div>
                 <h2 className="section-title">Contact Us</h2>
-                <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Have a question, collaboration idea, or just want to reach out? We'd love to hear from you.</p>
+                <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Have a question, collaboration idea, or just want to reach out? We would love to hear from you.</p>
               </div>
               <div style={{ maxWidth: 800, margin: "0 auto", background: "white", padding: "3.5rem", borderRadius: 30, boxShadow: "0 10px 50px rgba(0,0,0,0.07)" }}>
                 <form action={formAction} method="POST">
@@ -798,49 +750,106 @@ export default function App() {
         </>
       )}
 
-      {/* ─── CEO ─── */}
+      {/* ── CEO ── */}
       {view === "ceo" && (
         <>
-          <div className="ceo-hero-banner" style={{ paddingTop: 100 }}>
+          <div className="ceo-hero-banner">
             <div style={{ padding: "0 2rem", textAlign: "center" }}>
-              <div className="section-label" style={{ justifyContent: "center", color: colors.gold, marginBottom: "1rem" }}>Visioneer & Founder</div>
+              <div className="section-label" style={{ justifyContent: "center", color: "#F4D03F", marginBottom: "1rem" }}>Visioneer &amp; Founder</div>
               <h1 style={{ fontFamily: "Playfair Display", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
-                Meet <em style={{ fontStyle: "italic", color: colors.gold }}>Jerry Oyedele</em>
+                Meet <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Jerry Oyedele</em>
               </h1>
-              <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem", letterSpacing: "1px" }}>Leading with Purpose and Passion</p>
+              <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem" }}>Leading with Purpose and Passion</p>
             </div>
           </div>
-          <section className="page-padding" style={{ marginTop: "-60px", background: "white" }}>
+
+          <section className="page-padding" style={{ background: "white", marginTop: "-40px" }}>
             <div className="section-container">
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "4rem", alignItems: "start" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "5rem", alignItems: "start" }}>
+
+                {/* Sticky sidebar */}
                 <div style={{ position: "sticky", top: "120px" }}>
                   <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.12)" }}>
                     <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: "100%", display: "block" }} />
                   </div>
-                  <div style={{ marginTop: "1.5rem", padding: "2rem", background: colors.navy, color: "white", borderRadius: 20 }}>
+                  <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#0A1128", color: "white", borderRadius: 20 }}>
                     <h3 style={{ fontFamily: "Playfair Display", fontSize: "2rem", marginBottom: "0.3rem" }}>Jerry Oyedele</h3>
-                    <p style={{ color: colors.gold, fontWeight: 600, marginBottom: "1rem" }}>Founder, Champions' Leadership Global</p>
+                    <p style={{ color: "#F4D03F", fontWeight: 600, marginBottom: "1.2rem" }}>Founder &amp; CEO, Champions&apos; Leadership Global</p>
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {["Speaker", "Musicologist", "Mentor", "Author"].map(tag => (
+                      {["Public Speaker", "Musicologist", "Mentor", "Choir Leader", "Educator"].map(tag => (
                         <span key={tag} style={{ background: "rgba(255,255,255,0.1)", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 600 }}>{tag}</span>
                       ))}
                     </div>
                   </div>
+                  {/* Credentials */}
+                  <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
+                    <h4 style={{ fontFamily: "Playfair Display", fontSize: "1rem", color: "#0A1128", marginBottom: "1rem" }}>Certifications &amp; Institutions</h4>
+                    {["University of Edinburgh", "National University of Singapore", "University of Michigan", "Yale University"].map(inst => (
+                      <div key={inst} style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
+                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#C86B56", flexShrink: 0 }} />
+                        <span style={{ fontSize: "0.88rem", color: "#444" }}>{inst}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Full bio */}
                 <div>
+                  <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
+                  <h2 style={{ fontFamily: "Playfair Display", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
+
                   <div style={{ fontSize: "1.05rem", color: "#444", lineHeight: 1.9 }}>
-                    <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a sought-after public speaker with over a decade of experience, a musicologist with over 300 music compositions, and a mentor to many. He is the founder of <strong style={{ color: colors.navy }}>Champions' Leadership Global</strong>, a leadership brand that focuses on purpose discovery, development, and delivery.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>He is currently a post-graduate student of the department of music, Obafemi Awolowo University, Ile-Ife, Osun State.</p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.
+                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      He is currently a post-graduate student in the Department of Music at Obafemi Awolowo University, Ile-Ife, Osun State, where he continues to deepen his academic and creative formation.
+                    </p>
+
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
-                      "My journey into purpose started when I had to take a bold step — leaving engineering at 500 level to study music from 100 level."
+                      &ldquo;I had to make the hardest decision of my life: leave engineering at 500 level and start music all over again from 100 level. That decision became the doorway to my purpose.&rdquo;
                     </blockquote>
-                    <p style={{ marginBottom: "1.5rem" }}>As a musicologist, Jerry has over two decades of experience in music and is a seasoned composer with over 300 works in the last seven years. He has obtained certificate courses from the University of Edinburgh, National University of Singapore, University of Michigan, and Yale University, among others.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>He is also the founder of <strong style={{ color: colors.navy }}>Jebion Music</strong>, a music brand that seeks to reveal the light of the glorious gospel through the music of the kingdom — and a committed worker in the vineyard of God as a choir leader in his denomination.</p>
+
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Journey to Purpose</h3>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      Jerry&apos;s story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a &ldquo;serious&rdquo; path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.
+                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions&apos; Leadership Global was born out of that tension.
+                    </p>
+
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Musicologist</h3>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.
+                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses in music theory, history, and production from world-class institutions including the University of Edinburgh, the National University of Singapore, the University of Michigan, and Yale University.
+                    </p>
+
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.
+                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development.
+                    </p>
+
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>Faith &amp; Church Life</h3>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.
+                    </p>
+                    <p style={{ marginBottom: "1.5rem" }}>
+                      For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity.
+                    </p>
                   </div>
 
-                  <div style={{ marginTop: "3rem", padding: "3rem", background: colors.cream, borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
-                    <div className="section-label" style={{ marginBottom: "1.5rem", justifyContent: "flex-start" }}>Book an Invitation</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "1.5rem", color: colors.navy }}>Invite Jerry to Speak</h3>
+                  {/* Invite Jerry form */}
+                  <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
+                    <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
+                    <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7 }}>
+                      Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.
+                    </p>
                     <form action={formAction} method="POST">
                       <input type="hidden" name="_subject" value="CEO Conference Invitation" />
                       <input type="text" name="Conference_Name" placeholder="Name of Conference / Event" className="contact-input" required />
@@ -858,15 +867,16 @@ export default function App() {
                     </form>
                   </div>
                 </div>
+
               </div>
             </div>
           </section>
         </>
       )}
 
-      {/* ─── BOOKING ─── */}
+      {/* ── BOOKING ── */}
       {view === "booking" && (
-        <section className="page-padding" style={{ background: `linear-gradient(135deg, rgba(255,248,240,0.97) 0%, rgba(255,248,240,0.92) 100%), url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000')`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <section className="page-padding" style={{ background: "linear-gradient(135deg, rgba(255,248,240,0.97) 0%, rgba(255,248,240,0.92) 100%), url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <div className="section-container">
             <div className="section-header">
               <div className="section-label">Begin Your Journey</div>
@@ -897,14 +907,14 @@ export default function App() {
         </section>
       )}
 
-      {/* ─── EVENTS ─── */}
+      {/* ── EVENTS ── */}
       {view === "events" && (
-        <section className="page-padding" style={{ background: colors.cream }}>
+        <section className="page-padding" style={{ background: "#FFF8F0" }}>
           <div className="section-container">
             <div className="section-header">
-              <div className="section-label">Programs & Conferences</div>
+              <div className="section-label">Programs &amp; Conferences</div>
               <h2 className="section-title">Upcoming Events</h2>
-              <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Join us at our upcoming programs and be part of a movement raising the next generation of champions.</p>
+              <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Join us at our upcoming programmes and be part of a movement raising the next generation of champions.</p>
             </div>
             <div className="team-grid">
               {events.map((e, i) => (
@@ -915,12 +925,12 @@ export default function App() {
                       <div className="event-month-year">{e.month} {e.year}</div>
                     </div>
                     <div style={{ marginLeft: "auto" }}>
-                      <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? colors.lightBlue : colors.gold, padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
+                      <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
                     </div>
                   </div>
                   <div className="event-body">
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.4rem", marginBottom: "0.5rem", color: colors.navy }}>{e.title}</h3>
-                    <p style={{ color: colors.terracotta, fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
+                    <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>&#128205; {e.loc}</p>
                     <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7 }}>{e.desc}</p>
                   </div>
                   <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
@@ -931,7 +941,7 @@ export default function App() {
         </section>
       )}
 
-      {/* ─── TEAM ─── */}
+      {/* ── TEAM ── */}
       {view === "team" && (
         <section className="page-padding" style={{ background: "white" }}>
           <div className="section-container">
@@ -947,11 +957,11 @@ export default function App() {
                     <img src={member.photo} alt={member.name} className="team-avatar" />
                     <div className="team-avatar-ring" />
                   </div>
-                  <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.25rem", marginBottom: "0.4rem", color: colors.navy }}>{member.name}</h3>
-                  <div style={{ color: colors.terracotta, fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
+                  <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.25rem", marginBottom: "0.4rem", color: "#0A1128" }}>{member.name}</h3>
+                  <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
                   <p style={{ fontSize: "0.93rem", color: "#666", flexGrow: 1, lineHeight: 1.7 }}>{member.bio}</p>
                   {member.linkedin && (
-                    <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: colors.navy, fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: colors.cream, borderRadius: 20, transition: "background 0.2s" }}>
+                    <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#0A1128", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: "#FFF8F0", borderRadius: 20 }}>
                       <LinkedInIcon /> Connect on LinkedIn
                     </a>
                   )}
@@ -962,12 +972,12 @@ export default function App() {
         </section>
       )}
 
-      {/* ─── BLOG ─── */}
+      {/* ── BLOG LIST ── */}
       {view === "blog" && !selectedPost && (
-        <section className="page-padding" style={{ background: colors.cream }}>
+        <section className="page-padding" style={{ background: "#FFF8F0" }}>
           <div className="section-container">
             <div className="section-header">
-              <div className="section-label">Insights & Wisdom</div>
+              <div className="section-label">Insights &amp; Wisdom</div>
               <h2 className="section-title">Leadership Blog</h2>
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Practical wisdom, purpose-driven insights, and leadership truths for the champion in you.</p>
             </div>
@@ -979,13 +989,13 @@ export default function App() {
                   </div>
                   <div style={{ padding: "1.8rem" }}>
                     <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", marginBottom: "0.8rem" }}>
-                      <span style={{ background: colors.cream, color: colors.terracotta, padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
+                      <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
                       <span style={{ color: "#aaa", fontSize: "0.78rem" }}>{post.readTime}</span>
                     </div>
-                    <div style={{ color: colors.terracotta, fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
-                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.35rem", marginBottom: "0.8rem", color: colors.navy }}>{post.title}</h3>
+                    <div style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
+                    <h3 style={{ fontFamily: "Playfair Display", fontSize: "1.35rem", marginBottom: "0.8rem", color: "#0A1128" }}>{post.title}</h3>
                     <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1.2rem", lineHeight: 1.7 }}>{post.excerpt}</p>
-                    <span style={{ color: colors.navy, fontWeight: 800, fontSize: "0.88rem" }}>Read Article →</span>
+                    <span style={{ color: "#0A1128", fontWeight: 800, fontSize: "0.88rem" }}>Read Article &rarr;</span>
                   </div>
                 </div>
               ))}
@@ -994,19 +1004,20 @@ export default function App() {
         </section>
       )}
 
+      {/* ── BLOG ARTICLE ── */}
       {view === "blog" && selectedPost && (
         <section className="page-padding" style={{ background: "white" }}>
           <div className="section-container">
             <div style={{ maxWidth: 780, margin: "0 auto" }}>
-              <button onClick={() => setSelectedPost(null)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.terracotta, fontWeight: 700, marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "inherit", fontSize: "0.9rem", padding: 0 }}>
-                ← Back to Blog
+              <button onClick={() => setSelectedPost(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C86B56", fontWeight: 700, marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "inherit", fontSize: "0.9rem", padding: 0 }}>
+                &larr; Back to Blog
               </button>
               <div style={{ display: "flex", gap: "0.8rem", marginBottom: "1.5rem", alignItems: "center" }}>
-                <span style={{ background: colors.cream, color: colors.terracotta, padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{selectedPost.category}</span>
+                <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{selectedPost.category}</span>
                 <span style={{ color: "#aaa", fontSize: "0.8rem" }}>{selectedPost.readTime}</span>
-                <span style={{ color: "#aaa", fontSize: "0.8rem" }}>· {selectedPost.date}</span>
+                <span style={{ color: "#aaa", fontSize: "0.8rem" }}>&middot; {selectedPost.date}</span>
               </div>
-              <h1 style={{ fontFamily: "Playfair Display", fontSize: "clamp(2rem, 5vw, 3.5rem)", color: colors.navy, lineHeight: 1.1, marginBottom: "2rem" }}>{selectedPost.title}</h1>
+              <h1 style={{ fontFamily: "Playfair Display", fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#0A1128", lineHeight: 1.1, marginBottom: "2rem" }}>{selectedPost.title}</h1>
               <div style={{ borderRadius: 20, overflow: "hidden", marginBottom: "3rem", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" }}>
                 <img src={selectedPost.img} alt={selectedPost.title} style={{ width: "100%", height: 380, objectFit: "cover", display: "block" }} />
               </div>
@@ -1015,9 +1026,9 @@ export default function App() {
                   <p key={i}>{para.trim()}</p>
                 ))}
               </div>
-              <div style={{ marginTop: "4rem", padding: "2.5rem", background: colors.cream, borderRadius: 20, textAlign: "center" }}>
-                <p style={{ fontWeight: 700, color: colors.navy, marginBottom: "1rem" }}>Ready to start your leadership journey?</p>
-                <button onClick={() => navigate("booking")} className="btn-primary" style={{ display: "inline-block" }}>Book a Session</button>
+              <div style={{ marginTop: "4rem", padding: "2.5rem", background: "#FFF8F0", borderRadius: 20, textAlign: "center" }}>
+                <p style={{ fontWeight: 700, color: "#0A1128", marginBottom: "1rem" }}>Ready to start your leadership journey?</p>
+                <button onClick={() => navigate("booking")} className="btn-primary">Book a Session</button>
               </div>
             </div>
           </div>
@@ -1030,27 +1041,26 @@ export default function App() {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
               <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png" alt="CLG Logo" style={{ width: 60, height: 60, borderRadius: "50%", background: "white", padding: 4 }} />
-              <span style={{ fontFamily: "Playfair Display", fontSize: "1.2rem" }}>Champions' Leadership Global</span>
+              <span style={{ fontFamily: "Playfair Display", fontSize: "1.2rem" }}>Champions&apos; Leadership Global</span>
             </div>
             <p style={{ opacity: 0.55, fontSize: "0.9rem", lineHeight: 1.8, maxWidth: 340 }}>Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
           </div>
           <div>
-            <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: colors.gold }}>Navigation</h4>
+            <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Navigation</h4>
             {[["Home","home"],["Meet the CEO","ceo"],["Events","events"],["Team","team"],["Blog","blog"],["Book a Session","booking"]].map(([label, key]) => (
               <div key={key} style={{ marginBottom: "0.8rem" }}>
-                <a href="#!" onClick={e => { e.preventDefault(); navigate(key); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", transition: "color 0.2s", cursor: "pointer" }}
-                  onMouseEnter={e => e.target.style.color = "white"} onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.6)"}>{label}</a>
+                <a href="#!" onClick={e => { e.preventDefault(); navigate(key); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", cursor: "pointer" }}>{label}</a>
               </div>
             ))}
           </div>
           <div>
-            <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: colors.gold }}>Contact</h4>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "0.8rem" }}>📧 championscorner27@gmail.com</p>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "2rem" }}>📞 +234 906 414 4546</p>
+            <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Contact</h4>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "0.8rem" }}>&#128231; championscorner27@gmail.com</p>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "2rem" }}>&#128222; +234 906 414 4546</p>
           </div>
         </div>
         <div className="footer-bottom">
-          <p style={{ opacity: 0.35, fontSize: "0.85rem" }}>© 2026 Champions' Leadership Global. All rights reserved.</p>
+          <p style={{ opacity: 0.35, fontSize: "0.85rem" }}>&copy; 2026 Champions&apos; Leadership Global. All rights reserved.</p>
         </div>
       </footer>
     </div>
