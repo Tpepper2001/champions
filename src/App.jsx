@@ -43,6 +43,15 @@ const styles = `
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
+  @keyframes starPop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes reviewSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   .navbar {
     position: fixed; top: 0; width: 100%;
@@ -351,6 +360,104 @@ const styles = `
     font-size: 1.2rem; margin: 2rem 0;
   }
 
+  /* ── REVIEWS ─────────────────────────────────────────────── */
+  .reviews-section { padding: 7rem 2rem; background: #0A1128; position: relative; overflow: hidden; }
+  .reviews-section::before {
+    content: '\u201C'; position: absolute; top: -2rem; left: 2rem;
+    font-family: 'Playfair Display', serif; font-size: 18rem; color: rgba(244,208,63,0.05);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem; margin-bottom: 3rem;
+  }
+  .review-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px; padding: 2rem; position: relative; overflow: hidden;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .review-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.09); }
+  .review-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #F4D03F, #C86B56);
+  }
+  .review-stars { display: flex; gap: 3px; margin-bottom: 1rem; }
+  .review-star { color: #F4D03F; font-size: 1rem; }
+  .review-text {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+  .review-author { display: flex; align-items: center; gap: 0.8rem; }
+  .review-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #C86B56, #F4D03F);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem; color: white; flex-shrink: 0;
+  }
+  .review-name { color: white; font-weight: 700; font-size: 0.9rem; }
+  .review-role { color: rgba(255,255,255,0.45); font-size: 0.78rem; }
+  .review-new { animation: reviewSlide 0.4s ease; }
+
+  .review-form-wrap {
+    max-width: 680px; margin: 0 auto;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px; padding: 2.5rem;
+  }
+  .review-form-title {
+    font-family: 'Playfair Display', serif; color: white;
+    font-size: 1.6rem; margin-bottom: 0.4rem;
+  }
+  .review-form-sub { color: rgba(255,255,255,0.5); font-size: 0.88rem; margin-bottom: 1.8rem; }
+  .review-input {
+    width: 100%; padding: 0.95rem 1.2rem;
+    background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 12px; margin-bottom: 1rem; font-family: inherit; font-size: 0.93rem;
+    color: white; transition: border-color 0.2s;
+  }
+  .review-input:focus { border-color: #F4D03F; outline: none; }
+  .review-input::placeholder { color: rgba(255,255,255,0.3); }
+  .star-selector { display: flex; gap: 6px; margin-bottom: 1rem; cursor: pointer; }
+  .star-btn {
+    font-size: 1.6rem; background: none; border: none; cursor: pointer;
+    transition: transform 0.15s; line-height: 1; padding: 0;
+  }
+  .star-btn:hover { transform: scale(1.2); }
+  .star-active { color: #F4D03F; }
+  .star-inactive { color: rgba(255,255,255,0.2); }
+  .btn-review-submit {
+    width: 100%; padding: 1rem; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #F4D03F, #e8c020);
+    color: #0A1128; font-weight: 800; cursor: pointer; font-size: 0.95rem;
+    font-family: inherit; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(244,208,63,0.3);
+  }
+  .btn-review-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(244,208,63,0.45); }
+  .btn-review-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .review-success {
+    text-align: center; padding: 2rem; color: #F4D03F;
+    font-family: 'Playfair Display', serif; font-size: 1.2rem;
+  }
+
+  /* ── BOOKING HERO ─────────────────────────────────────────── */
+  .booking-hero {
+    position: relative; min-height: 380px;
+    display: flex; align-items: flex-end;
+    overflow: hidden; background: #0A1128;
+    padding: 0 2rem 0;
+  }
+  .booking-hero-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to bottom, rgba(10,17,40,0.55) 0%, rgba(10,17,40,0.75) 60%, rgba(10,17,40,0.97) 100%),
+      url('https://images.unsplash.com/photo-1573497491765-dccce02b29df?auto=format&fit=crop&q=80&w=2000');
+    background-size: cover; background-position: center 30%;
+  }
+  .booking-hero-content {
+    position: relative; z-index: 2; width: 100%; max-width: 1400px;
+    margin: 0 auto; padding: 120px 0 4rem; text-align: center;
+  }
+
   .footer { background: #050a18; color: white; padding: 5rem 2rem 3rem; position: relative; overflow: hidden; }
   .footer::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -385,6 +492,9 @@ const styles = `
     .hero-cta-row button { width: 100%; }
     .nav-container { padding: 0.5rem 1.2rem; }
     .ceo-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .reviews-section { padding: 4rem 1.2rem; }
+    .review-form-wrap { padding: 1.8rem; }
+    .booking-hero { min-height: 300px; }
   }
 `;
 
@@ -425,7 +535,7 @@ const coreValues = [
 ];
 
 const degrees = [
-  { degree: "B.A. Music \u2014 Second Class Upper", school: "Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria", status: "Completed" },
+  { degree: "B.A. Music — Second Class Upper", school: "Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria", status: "Completed" },
   { degree: "M.A. Music", school: "Obafemi Awolowo University, Ile-Ife, Osun State, Nigeria", status: "Ongoing" },
 ];
 
@@ -441,15 +551,194 @@ const certifications = [
 const events = [
   { day: "15", month: "APR", year: "2026", title: "Leadership Bootcamp", loc: "OAU Auditorium, Ile-Ife", desc: "An intensive two-day bootcamp on purpose-driven leadership for students and young professionals.", tag: "Physical" },
   { day: "22", month: "MAY", year: "2026", title: "Purpose Webinar", loc: "Online (Zoom)", desc: "A powerful online seminar exploring identity, purpose, and how to align your life with your calling.", tag: "Virtual" },
-  { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD \u2014 Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
+  { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD — Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
 ];
 
 const statItems = [
-  { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "\uD83D\uDCC5" },
-  { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "\uD83C\uDF31" },
-  { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "\uD83E\uDD1D" },
-  { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "\uD83E\uDDED" },
+  { num: "2", suffix: "+", label: "Years of Impact", desc: "Years of raising transformational leaders", icon: "📅" },
+  { num: "1K", suffix: "+", label: "Lives Transformed", desc: "Individuals impacted through our programmes", icon: "🌱" },
+  { num: "6", suffix: "", label: "Core Team Members", desc: "Dedicated champions driving the vision", icon: "🤝" },
+  { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "🧭" },
 ];
+
+// ── DEMO REVIEWS ──────────────────────────────────────────────
+const demoReviews = [
+  {
+    id: 1,
+    name: "Adaeze Nwosu",
+    role: "Final Year Student, UI",
+    rating: 5,
+    text: "Champions' Leadership Global completely changed how I see my future. The session I attended helped me understand that purpose is not something you stumble upon — it is something you pursue. I left with a clear direction and a burning sense of conviction."
+  },
+  {
+    id: 2,
+    name: "Emeka Okonkwo",
+    role: "Young Professional, Lagos",
+    rating: 5,
+    text: "I was at a crossroads in my career and almost gave up on my dreams. After Jerry's coaching session, I realized I was not lost — I was just preparing. That shift in perspective was everything. Highly recommend CLG to anyone serious about their journey."
+  },
+  {
+    id: 3,
+    name: "Fatimah Bello",
+    role: "Corps Member, Abuja",
+    rating: 5,
+    text: "The Champions Conference was one of the most powerful events I have ever attended. Every speaker, every session felt tailor-made for where I was in life. I walked out with new clarity, new connections, and new courage."
+  },
+  {
+    id: 4,
+    name: "Taiwo Adeleke",
+    role: "Entrepreneur, Ibadan",
+    rating: 5,
+    text: "What sets CLG apart is the depth. This is not just motivation — it is transformation. They go beyond the surface and help you do the real work of understanding who you are and why you are here. Incredibly grateful."
+  },
+  {
+    id: 5,
+    name: "Chidinma Obi",
+    role: "Postgraduate Student, OAU",
+    rating: 5,
+    text: "I followed CLG online for months before attending a live session, and the content always resonated. Meeting the team in person only confirmed that these are people who genuinely believe in what they do. You feel it in every interaction."
+  },
+  {
+    id: 6,
+    name: "Seun Afolabi",
+    role: "Leadership Trainer, Ondo",
+    rating: 5,
+    text: "As someone who works in leadership development myself, I was impressed by the rigour and warmth CLG brings to this work. Jerry has a unique gift for making complex ideas about identity and purpose feel immediate and personal. Exceptional."
+  },
+];
+
+// ── REVIEWS SECTION COMPONENT ─────────────────────────────────
+function ReviewsSection() {
+  const [reviews, setReviews] = useState(demoReviews);
+  const [form, setForm] = useState({ name: "", role: "", text: "", rating: 5 });
+  const [hoverStar, setHoverStar] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.text.trim()) return;
+    setSubmitting(true);
+    setTimeout(() => {
+      const newReview = {
+        id: Date.now(),
+        name: form.name.trim(),
+        role: form.role.trim() || "Community Member",
+        rating: form.rating,
+        text: form.text.trim(),
+        isNew: true,
+      };
+      setReviews(prev => [newReview, ...prev]);
+      setSubmitted(true);
+      setSubmitting(false);
+    }, 600);
+  };
+
+  const initials = (name) => name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+
+  const avgRating = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
+
+  return (
+    <section className="reviews-section">
+      <div className="section-container">
+        <div className="section-header">
+          <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center" }}>Community Voices</div>
+          <h2 className="section-title" style={{ color: "white" }}>
+            What Champions <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Are Saying</em>
+          </h2>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.8rem", marginTop: "0.5rem" }}>
+            <div style={{ display: "flex", gap: "3px" }}>
+              {[1,2,3,4,5].map(s => (
+                <span key={s} style={{ color: "#F4D03F", fontSize: "1.1rem" }}>★</span>
+              ))}
+            </div>
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem" }}>
+              {avgRating} average · {reviews.length} reviews
+            </span>
+          </div>
+        </div>
+
+        <div className="reviews-grid">
+          {reviews.map((r) => (
+            <div key={r.id} className={"review-card" + (r.isNew ? " review-new" : "")}>
+              <div className="review-stars">
+                {[1,2,3,4,5].map(s => (
+                  <span key={s} className="review-star">{s <= r.rating ? "★" : "☆"}</span>
+                ))}
+              </div>
+              <p className="review-text">"{r.text}"</p>
+              <div className="review-author">
+                <div className="review-avatar">{initials(r.name)}</div>
+                <div>
+                  <div className="review-name">{r.name}</div>
+                  <div className="review-role">{r.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* REVIEW FORM */}
+        <div className="review-form-wrap">
+          {submitted ? (
+            <div className="review-success">
+              <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🎉</div>
+              <div>Thank you for sharing your story, Champion!</div>
+              <div style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", fontFamily: "DM Sans, sans-serif", marginTop: "0.5rem", fontStyle: "normal" }}>
+                Your review has been added to the wall above.
+              </div>
+              <button
+                onClick={() => { setSubmitted(false); setForm({ name: "", role: "", text: "", rating: 5 }); }}
+                style={{ marginTop: "1.5rem", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)", padding: "0.6rem 1.5rem", borderRadius: 20, cursor: "pointer", fontFamily: "inherit", fontSize: "0.85rem" }}
+              >
+                Write another review
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <h3 className="review-form-title">Share Your Experience</h3>
+              <p className="review-form-sub">Has CLG impacted your journey? We'd love to hear from you.</p>
+
+              {/* Star picker */}
+              <div style={{ marginBottom: "0.5rem" }}>
+                <label style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.82rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>Your Rating</label>
+              </div>
+              <div className="star-selector" onMouseLeave={() => setHoverStar(0)}>
+                {[1,2,3,4,5].map(s => (
+                  <button
+                    key={s} type="button"
+                    className={"star-btn " + (s <= (hoverStar || form.rating) ? "star-active" : "star-inactive")}
+                    onMouseEnter={() => setHoverStar(s)}
+                    onClick={() => setForm(f => ({ ...f, rating: s }))}
+                  >★</button>
+                ))}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <input
+                  className="review-input" placeholder="Your Full Name" required
+                  value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                />
+                <input
+                  className="review-input" placeholder="Role / City (optional)"
+                  value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
+                />
+              </div>
+              <textarea
+                className="review-input" placeholder="Tell us how CLG impacted your journey…"
+                style={{ height: 120, resize: "none" }} required
+                value={form.text} onChange={e => setForm(f => ({ ...f, text: e.target.value }))}
+              />
+              <button type="submit" className="btn-review-submit" disabled={submitting}>
+                {submitting ? "Posting…" : "Post My Review ✦"}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function App() {
   const [view, setView] = useState("home");
@@ -457,7 +746,7 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const formAction = "https://formspree.io/f/mqeykgyy";
-  const contactInfoText = "championscorner27@gmail.com \u00B7 +234 906 414 4546";
+  const contactInfoText = "championscorner27@gmail.com · +234 906 414 4546";
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -624,13 +913,11 @@ export default function App() {
                 </div>
                 <div>
                   <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: 28, marginBottom: "1.5rem" }}>
-                    
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
                     <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.</p>
                   </div>
                   <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
-                   
-                   <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
                     <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.</p>
                   </div>
                 </div>
@@ -680,6 +967,9 @@ export default function App() {
               </div>
             </div>
           </section>
+
+          {/* ── REVIEWS ── */}
+          <ReviewsSection />
 
           {/* BLOG PREVIEW */}
           <section className="home-section" style={{ background: "white" }}>
@@ -750,8 +1040,6 @@ export default function App() {
           <section className="page-padding" style={{ background: "white", marginTop: "-40px" }}>
             <div className="section-container">
               <div className="ceo-grid">
-
-                {/* SIDEBAR */}
                 <div>
                   <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.12)" }}>
                     <img src="https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260306-WA0029.jpg" alt="Jerry Oyedele" style={{ width: "100%", display: "block" }} />
@@ -790,8 +1078,6 @@ export default function App() {
                     })}
                   </div>
                 </div>
-
-                {/* BIO */}
                 <div>
                   <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
                   <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
@@ -835,7 +1121,6 @@ export default function App() {
                     </form>
                   </div>
                 </div>
-
               </div>
             </div>
           </section>
@@ -844,13 +1129,23 @@ export default function App() {
 
       {/* BOOKING */}
       {view === "booking" && (
-        <section className="page-padding" style={{ background: "#FFF8F0" }}>
-          <div className="section-container">
-            <div className="section-header">
-              <div className="section-label">Begin Your Journey</div>
-              <h2 className="section-title">Book a Session</h2>
-              <p style={{ maxWidth: 560, margin: "0 auto", color: "#666", lineHeight: 1.7 }}>Step into a collaborative environment designed to help you discover purpose, resolve identity questions, and refine your leadership edge.</p>
+        <div>
+          {/* BOOKING HERO */}
+          <div className="booking-hero">
+            <div className="booking-hero-bg" />
+            <div className="booking-hero-content">
+              <div className="section-label" style={{ color: "#F4D03F", justifyContent: "center", marginBottom: "1rem" }}>Begin Your Journey</div>
+              <h1 style={{ fontFamily: "Playfair Display, serif", color: "white", fontSize: "clamp(2.2rem, 5vw, 4rem)", lineHeight: 1.1, marginBottom: "1rem" }}>
+                Book a <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Session</em>
+              </h1>
+              <p style={{ color: "rgba(255,255,255,0.75)", maxWidth: 540, margin: "0 auto", fontSize: "1.05rem", lineHeight: 1.7 }}>
+                Step into a collaborative environment designed to help you discover purpose, resolve identity questions, and refine your leadership edge.
+              </p>
             </div>
+          </div>
+
+          {/* BOOKING FORM */}
+          <section style={{ background: "#FFF8F0", padding: "5rem 2rem" }}>
             <div style={{ maxWidth: 580, margin: "0 auto", background: "white", padding: "3.5rem", borderRadius: 28, boxShadow: "0 30px 80px rgba(0,0,0,0.1)" }}>
               <form action={formAction} method="POST">
                 <input type="hidden" name="_subject" value="New Coaching Request" />
@@ -871,8 +1166,8 @@ export default function App() {
                 <span className="form-feedback-text">{contactInfoText}</span>
               </form>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       )}
 
       {/* EVENTS */}
@@ -899,7 +1194,7 @@ export default function App() {
                     </div>
                     <div className="event-body">
                       <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
-                      <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>&#128205; {e.loc}</p>
+                      <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
                       <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7 }}>{e.desc}</p>
                     </div>
                     <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
@@ -1031,8 +1326,8 @@ export default function App() {
           </div>
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Contact</h4>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "0.8rem" }}>&#128231; championscorner27@gmail.com</p>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "2rem" }}>&#128222; +234 906 414 4546</p>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "0.8rem" }}>✉ championscorner27@gmail.com</p>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem", marginBottom: "2rem" }}>📞 +234 906 414 4546</p>
           </div>
         </div>
         <div className="footer-bottom">
