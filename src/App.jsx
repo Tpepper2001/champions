@@ -450,8 +450,8 @@ const styles = `
     position: absolute; inset: 0;
     background-image:
       linear-gradient(to bottom, rgba(10,17,40,0.55) 0%, rgba(10,17,40,0.75) 60%, rgba(10,17,40,0.97) 100%),
-      url('https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=2000');
-    background-size: cover; background-position: center 30%;
+      url('https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&q=80&w=2000');
+    background-size: cover; background-position: center center;
   }
   .booking-hero-content {
     position: relative; z-index: 2; width: 100%; max-width: 1400px;
