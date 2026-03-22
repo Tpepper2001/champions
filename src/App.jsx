@@ -958,7 +958,7 @@ export default function App() {
                 <p style={{ color: "rgba(255,255,255,0.6)", maxWidth: 500, margin: "0 auto" }}>Hear directly from Jerry Oyedele, founder of Champions&apos; Leadership Global</p>
               </div>
               <div className="video-wrapper">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/S_8q0h4-QNo" title="CEO Welcome Video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/jAco6NX4I1k" title="CEO Welcome Video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
                 <button onClick={() => navigate("ceo")} style={{ background: "transparent", border: "2px solid rgba(255,255,255,0.3)", color: "white", padding: "0.9rem 2rem", borderRadius: 50, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", fontSize: "0.95rem" }}>
