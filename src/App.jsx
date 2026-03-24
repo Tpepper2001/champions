@@ -856,12 +856,41 @@ function ReviewsSection() {
 }
 
 export default function App() {
-  const [view, setView] = useState("home");
+  // ── ROUTING: read initial page from URL hash ──────────────────
+  const getViewFromHash = () => {
+    const hash = window.location.hash.replace("#", "").split("/")[0];
+    const valid = ["home", "ceo", "events", "team", "blog", "booking"];
+    return valid.includes(hash) ? hash : "home";
+  };
+
+  const getSlugFromHash = () => {
+    const parts = window.location.hash.replace("#", "").split("/");
+    return parts[1] || null;
+  };
+
+  const [view, setView] = useState(getViewFromHash);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(() => {
+    const slug = getSlugFromHash();
+    if (slug) return blogPosts.find(p => p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug) || null;
+    return null;
+  });
   const formAction = "https://formspree.io/f/mqeykgyy";
   const contactInfoText = "championscorner27@gmail.com · +234 906 414 4546";
+
+  // ── Sync URL hash → view when user presses back/forward ───────
+  useEffect(() => {
+    const onHashChange = () => {
+      const v = getViewFromHash();
+      const slug = getSlugFromHash();
+      setView(v);
+      setSelectedPost(slug ? blogPosts.find(p => p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug) || null : null);
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -875,10 +904,16 @@ export default function App() {
     };
   }, []);
 
-  const navigate = (v) => {
+  const navigate = (v, post = null) => {
     setView(v);
     setMenuOpen(false);
-    setSelectedPost(null);
+    setSelectedPost(post);
+    if (post) {
+      const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      window.location.hash = `${v}/${slug}`;
+    } else {
+      window.location.hash = v === "home" ? "" : v;
+    }
     window.scrollTo(0, 0);
   };
 
@@ -1112,7 +1147,7 @@ export default function App() {
                     <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.85rem" }}>{blogPosts[0].date}</div>
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", margin: "0.8rem 0", color: "#0A1128" }}>{blogPosts[0].title}</h3>
                     <p style={{ opacity: 0.75, marginBottom: "1.8rem", lineHeight: 1.7, textAlign: "justify" }}>{blogPosts[0].excerpt}</p>
-                    <button onClick={() => { setSelectedPost(blogPosts[0]); navigate("blog"); }}
+                    <button onClick={() => navigate("blog", blogPosts[0])}
                       style={{ background: "#0A1128", color: "white", padding: "0.9rem 1.8rem", borderRadius: 10, border: "none", fontWeight: 700, cursor: "pointer", alignSelf: "flex-start", fontFamily: "inherit" }}>
                       Read Full Article
                     </button>
@@ -1409,7 +1444,7 @@ export default function App() {
             </div>
             <div className="blog-grid">
               {blogPosts.map((post, i) => (
-                <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => setSelectedPost(post)}>
+                <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => navigate("blog", post)}>
                   <div className="blog-img-wrap">
                     <img src={post.img} alt={post.title} className="blog-img" />
                   </div>
@@ -1435,7 +1470,7 @@ export default function App() {
         <section className="page-padding" style={{ background: "white" }}>
           <div className="section-container">
             <div style={{ maxWidth: 780, margin: "0 auto" }}>
-              <button onClick={() => setSelectedPost(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#C86B56", fontWeight: 700, marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "inherit", fontSize: "0.9rem", padding: 0 }}>
+              <button onClick={() => navigate("blog")} style={{ background: "none", border: "none", cursor: "pointer", color: "#C86B56", fontWeight: 700, marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "inherit", fontSize: "0.9rem", padding: 0 }}>
                 &larr; Back to Blog
               </button>
               <div style={{ display: "flex", gap: "0.8rem", marginBottom: "1.5rem", alignItems: "center" }}>
