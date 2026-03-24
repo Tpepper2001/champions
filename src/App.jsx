@@ -350,14 +350,15 @@ const styles = `
     align-items: start;
   }
 
-  .article-content { font-size: 1.1rem; line-height: 1.9; color: #333; }
-  .article-content p { margin-bottom: 1.5rem; }
-  .article-content h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin: 2.5rem 0 1rem; }
+  .article-content { font-size: 1.1rem; line-height: 1.9; color: #333; text-align: justify; }
+  .article-content p { margin-bottom: 1.5rem; text-align: justify; }
+  .article-content h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin: 2.5rem 0 1rem; text-align: left; }
+  .article-content h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); margin: 2rem 0 0.8rem; text-align: left; }
   .article-content blockquote {
     border-left: 4px solid var(--gold); padding: 1rem 1.5rem;
     background: var(--cream); border-radius: 0 12px 12px 0;
     font-family: 'Playfair Display', serif; font-style: italic;
-    font-size: 1.2rem; margin: 2rem 0;
+    font-size: 1.2rem; margin: 2rem 0; text-align: left;
   }
 
   /* ── REVIEWS ─────────────────────────────────────────────── */
@@ -386,7 +387,7 @@ const styles = `
   .review-text {
     font-family: 'Playfair Display', serif; font-style: italic;
     color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.75;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem; text-align: justify;
   }
   .review-author { display: flex; align-items: center; gap: 0.8rem; }
   .review-avatar {
@@ -473,6 +474,9 @@ const styles = `
     padding-top: 2rem; text-align: center;
   }
 
+  /* Block-justify all body text */
+  p, .about-text p, .bio-text p { text-align: justify; }
+
   @media (max-width: 992px) {
     .team-grid, .blog-grid { grid-template-columns: 1fr 1fr; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
@@ -521,17 +525,110 @@ const blogPosts = [
     category: "Leadership",
     excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision.",
     readTime: "5 min read",
-    fullContent: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.\n\nTrue leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.\n\nIntentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organizations by modeling the behavior they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.\n\nOne of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.\n\nAs you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.\n\nChampions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions."
+    fullContent: `Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.
+
+True leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.
+
+Intentional leaders don't just react to circumstances — they create them. They set the tone for their teams and organisations by modelling the behaviour they wish to see. They invest in people not because it's convenient, but because they genuinely believe in the potential of every individual they encounter.
+
+One of the greatest hallmarks of intentional leadership is the capacity to listen. Not just to respond, but to truly hear. The world is full of leaders who love to talk, but champions are those who understand that wisdom often comes from the voices around them.
+
+As you step into your leadership journey today, ask yourself: Am I leading on purpose? Am I adding value to those around me? Am I building people, or simply using them? The answers to these questions will define the kind of leader you become — and the kind of legacy you leave behind.
+
+Champions' Leadership Global exists to raise exactly this kind of leader: intentional, impactful, and enduring. The world doesn't need more bosses. It needs more champions.`
+  },
+  {
+    title: "Growth is Intentional: Becoming Better on Purpose",
+    img: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800",
+    date: "Mar 10, 2026",
+    category: "Personal Development",
+    excerpt: "Growth does not happen by chance — it happens by choice. Real growth requires intention, consistent action, and the willingness to step beyond what is comfortable.",
+    readTime: "6 min read",
+    fullContent: `Everyone wants to grow. We want to become better, do more, and achieve greater things. But wanting growth and actually growing are two very different things.
+
+Growth does not happen by chance — it happens by choice. It is easy to assume that with time, things will automatically improve. But real growth requires intention. It requires conscious effort, consistent action, and the willingness to step beyond what is comfortable.
+
+## Understanding Intentional Growth
+
+Intentional growth is the decision to take responsibility for your personal development. It means you do not leave your life to chance or circumstances. Instead, you actively pursue improvement in your mindset, skills, habits, and character. Growth begins when you become aware of where you are and take deliberate steps toward where you want to be.
+
+## The Difference Between Wishing and Growing
+
+Many people remain in the cycle of wishing: "I want to be better." "I want to succeed." "I want to grow." But growth requires more than desire — it requires discipline. It shows up in the small, consistent actions you take daily: choosing learning over distraction, choosing discipline over convenience, choosing progress over perfection. These choices, though small, compound over time and produce real transformation.
+
+## Stepping Beyond Your Comfort Zone
+
+Growth and comfort rarely exist in the same space. To grow, you must be willing to stretch yourself — to try, to fail, to learn, and to try again. This process may feel uncomfortable, but it is necessary. Every level of growth requires a new version of you.
+
+## The Role of Environment
+
+Your environment plays a significant role in your growth journey. When you surround yourself with people who are committed to growth, you are more likely to stay accountable, inspired, and focused. The right environment challenges you, supports you, and pushes you toward becoming your best self.
+
+## A Community That Supports Your Growth
+
+At Champions' Leadership Global, we believe growth should be intentional and supported. We provide a platform where individuals are equipped with the right mindset, guidance, and community to grow into leaders who make meaningful impact. Through mentorship, leadership development, and purposeful conversations, we help you stay committed to your growth journey.
+
+Growth is not accidental — it is a result of the decisions you make every day. If you are ready to stop wishing for growth and start living it, the decision begins with you.`
+  },
+  {
+    title: "The Power of Self-Leadership: Leading Yourself Before Others",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
+    date: "Mar 17, 2026",
+    category: "Leadership",
+    excerpt: "Before leading others, you must first learn to lead yourself. Self-leadership is the foundation of true, authentic, and lasting influence.",
+    readTime: "7 min read",
+    fullContent: `Have you ever set goals for yourself and struggled to stay consistent? Maybe you started with excitement, full of motivation and clarity, but somewhere along the way, discipline became difficult and consistency faded. It is a common experience — and it reveals something important: before leading others, you must first learn to lead yourself.
+
+Self-leadership is the foundation of true leadership. It is the ability to take responsibility for your actions, manage your emotions, stay committed to your goals, and direct your life with intention. Without self-leadership, influence becomes shallow. But with it, leadership becomes authentic and impactful.
+
+## What is Self-Leadership?
+
+Self-leadership is the practice of intentionally guiding your thoughts, behaviours, and decisions toward growth and purpose. It means showing up for yourself even when it is difficult. It means choosing discipline over convenience. It means taking ownership of your life instead of waiting for change. When you lead yourself effectively, you build the capacity to lead others with clarity, confidence, and integrity.
+
+## Key Traits of Self-Leaders
+
+Self-leadership is not a talent reserved for a few — it is a skill that can be developed. Discipline means doing what needs to be done, even when you don't feel like it. Accountability means taking responsibility for your choices and outcomes. Emotional Intelligence means understanding and managing your emotions effectively. Clarity means knowing your values, goals, and direction. These traits shape not only your personal growth but also how others experience your leadership.
+
+## Why Self-Leadership Matters
+
+Many people desire influence, impact, and success, but overlook the inner work required to sustain it. Self-leadership builds consistency. It strengthens resilience in difficult moments. It creates alignment between who you are and what you do. When you are able to lead yourself, you become someone others can trust, follow, and learn from.
+
+## You Don't Have to Do It Alone
+
+While self-leadership begins with personal responsibility, growth is accelerated in the right environment. Being part of a community of growth-driven individuals provides accountability, encouragement, and guidance. Mentors and like-minded peers help you stay focused and committed, especially when the journey becomes challenging.
+
+At Champions' Leadership Global, we are passionate about raising individuals who lead with clarity, discipline, and purpose. We provide the environment, mentorship, and resources needed to help you develop self-leadership and grow into a leader who makes meaningful impact.
+
+Leadership does not begin when others follow you. It begins the moment you choose to lead yourself.`
+  },
+  {
+    title: "Your Purpose: The Compass That Guides Your Life",
+    img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800",
+    date: "Mar 21, 2026",
+    category: "Purpose",
+    excerpt: "Purpose is the inner compass that gives direction to your life — your unique function on earth and the contribution you are meant to make in the world.",
+    readTime: "5 min read",
+    fullContent: `Have you ever tried to walk a path you were unfamiliar with without a guide or a compass? The experience can be confusing, discouraging, and uncertain. Life can feel the same way when it is lived without purpose.
+
+Purpose is the inner compass that gives direction to your life. It can be simply described as your unique function on earth — the reason for your existence and the contribution you are meant to make in the world. When you understand your purpose, your identity becomes clearer and your path becomes more meaningful.
+
+Just as a compass guides a traveller, purpose guides your decisions, growth, and impact. To keep your purpose alive, it is important to stay aligned with your Vision — seeing the future you are working toward; your Mission — understanding the work you are called to do; your Goals — taking intentional steps forward; and Determination — remaining committed despite challenges.
+
+Another key part of living purposefully is community. No meaningful journey is meant to be walked alone. Surrounding yourself with like-minded individuals and mentors provides encouragement, guidance, and accountability.
+
+At Champions' Leadership Global, we are committed to helping individuals discover their purpose, develop leadership capacity, and grow into people who create meaningful impact in their communities and beyond. If you are seeking clarity about your purpose and direction for growth, we invite you to book a discovery call with our team. Our experienced mentors are ready to guide and support you on your journey toward purposeful leadership and all-round development.
+
+Your purpose can become the compass that guides your life.`
   },
 ];
 
 const coreValues = [
-  {title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
-  {title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
+  { title: "Purpose", desc: "We believe every individual carries a God-given assignment. Our work begins where purpose is discovered — and we will not rest until every person we serve finds theirs." },
+  { title: "Personal Transformation", desc: "We are committed to the inside-out work of change. Real transformation is not cosmetic — it reshapes thinking, behaviour, and character from the core." },
   { title: "Leadership", desc: "We raise leaders defined by character, not title. Every programme we run is ultimately a leadership development encounter." },
-  {title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
-  {title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
-  {title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
+  { title: "Influence", desc: "We equip people to carry weight in their spheres — family, career, community, and beyond. Influence is the currency of true leadership." },
+  { title: "Global Impact", desc: "Our vision does not stop at borders. We are raising a generation of champions whose impact will be felt across nations and generations." },
+  { title: "Legacy", desc: "We build for the long term. Everything we do is designed to outlast us — raising leaders whose lives, decisions, and values echo into the next generation." },
 ];
 
 const degrees = [
@@ -561,49 +658,35 @@ const statItems = [
   { num: "6", suffix: "", label: "Core Values", desc: "Principles guiding everything we do", icon: "🧭" },
 ];
 
-// ── DEMO REVIEWS ──────────────────────────────────────────────
+// ── REAL REVIEWS ──────────────────────────────────────────────
 const demoReviews = [
   {
     id: 1,
-    name: "Adaeze Nwosu",
-    role: "Final Year Student, UI",
+    name: "Joseph Lilian Amanda",
+    role: "Lagos",
     rating: 5,
-    text: "Champions' Leadership Global completely changed how I see my future. The session I attended helped me understand that purpose is not something you stumble upon — it is something you pursue. I left with a clear direction and a burning sense of conviction."
+    text: "Before CLG, leadership to me was just about the position and taking the lion's share. The Champions' Leadership Global impact gave me a better way to look at leadership — I can now tell you who I am in just three words: self-awareness. I know it is not just about living a million years on earth; the question is what am I leaving behind? What impact am I making? Who am I carrying along with me? Trust me, it was impactful. I am super happy I did not miss this opportunity."
   },
   {
     id: 2,
-    name: "Emeka Okonkwo",
-    role: "Young Professional, Lagos",
+    name: "Nseobong Promise",
+    role: "Calabar",
     rating: 5,
-    text: "I was at a crossroads in my career and almost gave up on my dreams. After Jerry's coaching session, I realized I was not lost — I was just preparing. That shift in perspective was everything. Highly recommend CLG to anyone serious about their journey."
+    text: "Champions' Leadership Global has impacted me in many ways through its programmes, boot camps, and enlightening sessions. I have gained clarity on issues that have to do with vision and purpose, and I have also witnessed self-transformation in ways I did not expect."
   },
   {
     id: 3,
-    name: "Fatimah Bello",
-    role: "Corps Member, Abuja",
+    name: "Daniel",
+    role: "Ile-Ife",
     rating: 5,
-    text: "The Champions Conference was one of the most powerful events I have ever attended. Every speaker, every session felt tailor-made for where I was in life. I walked out with new clarity, new connections, and new courage."
+    text: "This year in January 2026, I learnt how to manage my time properly from the first webinar of the year. That single session changed how I approach my days and my responsibilities."
   },
   {
     id: 4,
-    name: "Taiwo Adeleke",
-    role: "Entrepreneur, Ibadan",
+    name: "Oyeleye Deborah",
+    role: "Osun State",
     rating: 5,
-    text: "What sets CLG apart is the depth. This is not just motivation — it is transformation. They go beyond the surface and help you do the real work of understanding who you are and why you are here. Incredibly grateful."
-  },
-  {
-    id: 5,
-    name: "Chidinma Obi",
-    role: "Postgraduate Student, OAU",
-    rating: 5,
-    text: "I followed CLG online for months before attending a live session, and the content always resonated. Meeting the team in person only confirmed that these are people who genuinely believe in what they do. You feel it in every interaction."
-  },
-  {
-    id: 6,
-    name: "Seun Afolabi",
-    role: "Leadership Trainer, Ondo",
-    rating: 5,
-    text: "As someone who works in leadership development myself, I was impressed by the rigour and warmth CLG brings to this work. Jerry has a unique gift for making complex ideas about identity and purpose feel immediate and personal. Exceptional."
+    text: "I attended the last leadership boot camp organised by Champions' Leadership Global and it was a real eye-opener to a lot of things I thought I knew, especially handling situations as a leader. I have learnt so much from the conferences and webinars that have been held. Special thanks to the convener and committee — keep up the good work."
   },
 ];
 
@@ -635,7 +718,6 @@ function ReviewsSection() {
   };
 
   const initials = (name) => name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-
   const avgRating = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
 
   return (
@@ -648,9 +730,7 @@ function ReviewsSection() {
           </h2>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.8rem", marginTop: "0.5rem" }}>
             <div style={{ display: "flex", gap: "3px" }}>
-              {[1,2,3,4,5].map(s => (
-                <span key={s} style={{ color: "#F4D03F", fontSize: "1.1rem" }}>★</span>
-              ))}
+              {[1,2,3,4,5].map(s => <span key={s} style={{ color: "#F4D03F", fontSize: "1.1rem" }}>★</span>)}
             </div>
             <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem" }}>
               {avgRating} average · {reviews.length} reviews
@@ -698,8 +778,6 @@ function ReviewsSection() {
             <form onSubmit={handleSubmit}>
               <h3 className="review-form-title">Share Your Experience</h3>
               <p className="review-form-sub">Has CLG impacted your journey? We'd love to hear from you.</p>
-
-              {/* Star picker */}
               <div style={{ marginBottom: "0.5rem" }}>
                 <label style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.82rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>Your Rating</label>
               </div>
@@ -713,16 +791,9 @@ function ReviewsSection() {
                   >★</button>
                 ))}
               </div>
-
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <input
-                  className="review-input" placeholder="Your Full Name" required
-                  value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                />
-                <input
-                  className="review-input" placeholder="Role / City (optional)"
-                  value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                />
+                <input className="review-input" placeholder="Your Full Name" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                <input className="review-input" placeholder="Role / City (optional)" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} />
               </div>
               <textarea
                 className="review-input" placeholder="Tell us how CLG impacted your journey…"
@@ -775,6 +846,20 @@ export default function App() {
     { label: "Blog", key: "blog" },
   ];
 
+  // Parse article content with headings support
+  const renderArticleContent = (content) => {
+    return content.trim().split("\n\n").map((block, i) => {
+      const trimmed = block.trim();
+      if (trimmed.startsWith("## ")) {
+        return <h2 key={i}>{trimmed.replace("## ", "")}</h2>;
+      }
+      if (trimmed.startsWith("### ")) {
+        return <h3 key={i}>{trimmed.replace("### ", "")}</h3>;
+      }
+      return <p key={i}>{trimmed}</p>;
+    });
+  };
+
   return (
     <div>
       {/* NAVBAR */}
@@ -785,15 +870,13 @@ export default function App() {
             <span>Champions&apos; Leadership Global</span>
           </div>
           <ul className="nav-links">
-            {navItems.map(function(item) {
-              return (
-                <li key={item.key}>
-                  <a href="#!" className={view === item.key ? "active" : ""} onClick={function(e) { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
-                </li>
-              );
-            })}
+            {navItems.map(item => (
+              <li key={item.key}>
+                <a href="#!" className={view === item.key ? "active" : ""} onClick={e => { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
+              </li>
+            ))}
             <li>
-              <a href="#!" className={"nav-book-btn" + (view === "booking" ? " active" : "")} onClick={function(e) { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
+              <a href="#!" className={"nav-book-btn" + (view === "booking" ? " active" : "")} onClick={e => { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
             </li>
           </ul>
           <button className={"hamburger" + (menuOpen ? " open" : "")} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
@@ -804,12 +887,10 @@ export default function App() {
 
       {/* MOBILE MENU */}
       <div className={"mobile-menu" + (menuOpen ? " open" : "")}>
-        {navItems.map(function(item) {
-          return (
-            <a key={item.key} href="#!" className={view === item.key ? "active" : ""} onClick={function(e) { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
-          );
-        })}
-        <a href="#!" className="mobile-book-btn" onClick={function(e) { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
+        {navItems.map(item => (
+          <a key={item.key} href="#!" className={view === item.key ? "active" : ""} onClick={e => { e.preventDefault(); navigate(item.key); }}>{item.label}</a>
+        ))}
+        <a href="#!" className="mobile-book-btn" onClick={e => { e.preventDefault(); navigate("booking"); }}>Book a Session</a>
       </div>
 
       {/* HOME */}
@@ -828,7 +909,7 @@ export default function App() {
               <p className="hero-sub">Empowering individuals to discover their purpose and lead with lasting, generational impact.</p>
               <p className="hero-quote">&ldquo;You can choose your actions; not consequences&rdquo; &mdash; Jerry Oyedele</p>
               <div className="hero-cta-row">
-                <button className="btn-primary" onClick={function() { var el = document.getElementById("about-us"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
+                <button className="btn-primary" onClick={() => { const el = document.getElementById("about-us"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}>
                   Explore Our Mission
                 </button>
                 <button className="btn-outline" onClick={() => navigate("booking")}>
@@ -846,9 +927,9 @@ export default function App() {
           <div className="marquee-strip">
             <div className="marquee-inner">
               {["Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation",
-                "Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"].map(function(t, i) {
-                return <span key={i} className="marquee-item">{t} <span className="marquee-dot">&bull;</span> </span>;
-              })}
+                "Purpose Discovery", "Leadership Development", "Intentional Living", "Character Formation", "Champions Conference", "Personal Transformation"].map((t, i) => (
+                <span key={i} className="marquee-item">{t} <span className="marquee-dot">&bull;</span> </span>
+              ))}
             </div>
           </div>
 
@@ -864,24 +945,22 @@ export default function App() {
                 </h2>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
-                {statItems.map(function(s, i) {
-                  return (
-                    <div key={i}
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "2.5rem 2rem", textAlign: "center", position: "relative", overflow: "hidden", transition: "transform 0.3s, background 0.3s", cursor: "default" }}
-                      onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                      onMouseLeave={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                    >
-                      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
-                      <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
-                      <div style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
-                        <span style={{ color: "white" }}>{s.num}</span>
-                        <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
-                      </div>
-                      <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
-                      <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
+                {statItems.map((s, i) => (
+                  <div key={i}
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "2.5rem 2rem", textAlign: "center", position: "relative", overflow: "hidden", transition: "transform 0.3s, background 0.3s", cursor: "default" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  >
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 3, background: i % 2 === 0 ? "linear-gradient(90deg, #F4D03F, #e8c020)" : "linear-gradient(90deg, #C86B56, #a8553f)", borderRadius: "0 0 4px 4px" }} />
+                    <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{s.icon}</div>
+                    <div style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(3rem, 6vw, 4rem)", fontWeight: 900, lineHeight: 1, marginBottom: "0.4rem" }}>
+                      <span style={{ color: "white" }}>{s.num}</span>
+                      <span style={{ color: i % 2 === 0 ? "#F4D03F" : "#C86B56" }}>{s.suffix}</span>
                     </div>
-                  );
-                })}
+                    <div style={{ color: "white", fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.6rem", letterSpacing: "0.5px" }}>{s.label}</div>
+                    <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.6 }}>{s.desc}</div>
+                  </div>
+                ))}
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
                 <div>
@@ -904,9 +983,9 @@ export default function App() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "4rem", alignItems: "center", marginBottom: "2rem" }}>
                 <div style={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.9 }}>
-                  <p style={{ marginBottom: "1.5rem" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
-                  <p style={{ marginBottom: "1.5rem" }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our work is rooted in the conviction that the world&apos;s greatest problems are not structural — they are leadership problems, and leadership problems are ultimately people problems.</p>
-                  <p style={{ marginBottom: "1.5rem" }}>Founded out of a personal experience of purpose discovery, Champions&apos; Leadership Global was born to serve as a catalyst — a space where people encounter the truth about themselves, are equipped for their life&apos;s work, and are connected to a community of like-minded champions.</p>
+                  <p style={{ marginBottom: "1.5rem", textAlign: "justify" }}>Champions&apos; Leadership Global is a brand deeply committed to the themes of purpose, leadership, and personal development. We exist to raise a generation of individuals who are not merely successful in the world&apos;s eyes but are truly fulfilled in their God-given assignment.</p>
+                  <p style={{ marginBottom: "1.5rem", textAlign: "justify" }}>We believe that everyone has the potential and responsibility to live out their purpose, and we aim to inspire and enlighten individuals on this journey. Our work is rooted in the conviction that the world&apos;s greatest problems are not structural — they are leadership problems, and leadership problems are ultimately people problems.</p>
+                  <p style={{ marginBottom: "1.5rem", textAlign: "justify" }}>Founded out of a personal experience of purpose discovery, Champions&apos; Leadership Global was born to serve as a catalyst — a space where people encounter the truth about themselves, are equipped for their life&apos;s work, and are connected to a community of like-minded champions.</p>
                   <blockquote className="about-quote">
                     Transforming people is the best way to transform the world, because the world is first a people, which eventually makes the place.
                   </blockquote>
@@ -914,11 +993,11 @@ export default function App() {
                 <div>
                   <div style={{ background: "linear-gradient(135deg, #0A1128, #1a2a5e)", color: "white", padding: "3rem", borderRadius: 28, marginBottom: "1.5rem" }}>
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#F4D03F" }}>Our Vision</h3>
-                    <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem" }}>A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.</p>
+                    <p style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.8, fontSize: "1.05rem", textAlign: "justify" }}>A world where every individual walks in the full expression of their God-given purpose — leading families, organisations, communities, and nations with wisdom, integrity, and lasting impact.</p>
                   </div>
                   <div style={{ background: "#FFF8F0", padding: "2.5rem", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.5rem", marginBottom: "1rem", color: "#0A1128" }}>Our Mission</h3>
-                    <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem" }}>To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.</p>
+                    <p style={{ color: "#555", lineHeight: 1.8, fontSize: "1.05rem", textAlign: "justify" }}>To discover, develop, and deploy transformational leaders through intentional programmes, platforms, and partnerships that foster purpose, character, and excellence in every sphere of life.</p>
                   </div>
                 </div>
               </div>
@@ -931,20 +1010,18 @@ export default function App() {
               <div className="section-header">
                 <div className="section-label">What We Stand For</div>
                 <h2 className="section-title">Our Core Values</h2>
-                <p style={{ maxWidth: 560, margin: "0 auto", color: "#666", lineHeight: 1.7 }}>These values are not aspirations — they are the daily operating system of everyone who bears the Champions&apos; Leadership Global name.</p>
+                <p style={{ maxWidth: 560, margin: "0 auto", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>These values are not aspirations — they are the daily operating system of everyone who bears the Champions&apos; Leadership Global name.</p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
-                {coreValues.map(function(v, i) {
-                  return (
-                    <div key={i} className="value-card">
-                      <div className="value-icon">{v.icon}</div>
-                      <div>
-                        <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.1rem", color: "#0A1128", marginBottom: "0.4rem" }}>{v.title}</h4>
-                        <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.7 }}>{v.desc}</p>
-                      </div>
+                {coreValues.map((v, i) => (
+                  <div key={i} className="value-card">
+                    <div className="value-icon" />
+                    <div>
+                      <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.1rem", color: "#0A1128", marginBottom: "0.4rem" }}>{v.title}</h4>
+                      <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>{v.desc}</p>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -968,7 +1045,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* ── REVIEWS ── */}
+          {/* REVIEWS */}
           <ReviewsSection />
 
           {/* BLOG PREVIEW */}
@@ -990,8 +1067,8 @@ export default function App() {
                     </div>
                     <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.85rem" }}>{blogPosts[0].date}</div>
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", margin: "0.8rem 0", color: "#0A1128" }}>{blogPosts[0].title}</h3>
-                    <p style={{ opacity: 0.75, marginBottom: "1.8rem", lineHeight: 1.7 }}>{blogPosts[0].excerpt}</p>
-                    <button onClick={function() { setSelectedPost(blogPosts[0]); navigate("blog"); }}
+                    <p style={{ opacity: 0.75, marginBottom: "1.8rem", lineHeight: 1.7, textAlign: "justify" }}>{blogPosts[0].excerpt}</p>
+                    <button onClick={() => { setSelectedPost(blogPosts[0]); navigate("blog"); }}
                       style={{ background: "#0A1128", color: "white", padding: "0.9rem 1.8rem", borderRadius: 10, border: "none", fontWeight: 700, cursor: "pointer", alignSelf: "flex-start", fontFamily: "inherit" }}>
                       Read Full Article
                     </button>
@@ -1048,62 +1125,73 @@ export default function App() {
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "2rem", marginBottom: "0.3rem" }}>Jerry Oyedele</h3>
                     <p style={{ color: "#F4D03F", fontWeight: 600, marginBottom: "1.2rem" }}>Founder &amp; CEO, Champions&apos; Leadership Global</p>
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {["Public Speaker", "Musicologist", "Mentor", "Choir Leader", "Educator"].map(function(tag) {
-                        return <span key={tag} style={{ background: "rgba(255,255,255,0.1)", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 600 }}>{tag}</span>;
-                      })}
+                      {["Public Speaker", "Musicologist", "Mentor", "Choir Leader", "Educator"].map(tag => (
+                        <span key={tag} style={{ background: "rgba(255,255,255,0.1)", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 600 }}>{tag}</span>
+                      ))}
                     </div>
                   </div>
                   <div style={{ marginTop: "1.5rem", padding: "2rem", background: "#FFF8F0", borderRadius: 20 }}>
                     <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1rem", color: "#0A1128", marginBottom: "1.5rem" }}>Academic Qualifications</h4>
-                    {degrees.map(function(d, i) {
-                      return (
-                        <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
-                          <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
-                          <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.4rem" }}>{d.school}</div>
-                          <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
-                        </div>
-                      );
-                    })}
+                    {degrees.map((d, i) => (
+                      <div key={i} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: i < degrees.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none" }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0A1128", marginBottom: "0.2rem" }}>{d.degree}</div>
+                        <div style={{ fontSize: "0.82rem", color: "#666", marginBottom: "0.4rem" }}>{d.school}</div>
+                        <span style={{ background: d.status === "Ongoing" ? "rgba(200,107,86,0.12)" : "rgba(10,17,40,0.08)", color: d.status === "Ongoing" ? "#C86B56" : "#0A1128", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 20 }}>{d.status}</span>
+                      </div>
+                    ))}
                     <h4 style={{ fontFamily: "Playfair Display, serif", fontSize: "1rem", color: "#0A1128", margin: "1.5rem 0 1rem" }}>Certifications</h4>
-                    {certifications.map(function(c, i) {
-                      return (
-                        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
-                          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
-                          <div>
-                            <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
-                            <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
-                          </div>
+                    {certifications.map((c, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "0.9rem" }}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#C86B56", flexShrink: 0, marginTop: "0.35rem" }} />
+                        <div>
+                          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.4, marginBottom: "0.15rem" }}>{c.cert}</div>
+                          <div style={{ fontSize: "0.78rem", color: "#888" }}>{c.school}</div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div>
                   <div className="section-label" style={{ marginBottom: "0.5rem", justifyContent: "flex-start" }}>Biography</div>
                   <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: "2.5rem", color: "#0A1128", marginBottom: "2rem", lineHeight: 1.2 }}>A Life Defined<br />by Purpose</h2>
                   <div style={{ fontSize: "1.05rem", color: "#444", lineHeight: 1.9 }}>
-                    <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one&apos;s God-given purpose against all odds. He is the founder of <strong style={{ color: "#0A1128" }}>Champions&apos; Leadership Global</strong>, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, a gospel music brand committed to releasing the sound of the Kingdom.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.</p>
+                    {[
+                      "Jerry Oyedele is a sought-after public speaker, musicologist, and mentor whose life is a living testimony of what it means to step into one's God-given purpose against all odds. He is the founder of Champions' Leadership Global, a leadership brand dedicated to purpose discovery, personal development, and leadership excellence — and the founder of Jebion Music, a gospel music brand committed to releasing the sound of the Kingdom.",
+                      "He holds a Bachelor of Arts in Music (Second Class Upper) from Obafemi Awolowo University, Ile-Ife, and is currently pursuing a Master of Arts in Music at the same institution, where he continues to deepen his academic and creative formation.",
+                    ].map((text, i) => (
+                      <p key={i} style={{ marginBottom: "1.5rem", textAlign: "justify" }}>{text}</p>
+                    ))}
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
                       &ldquo;I had to make the hardest decision of my life: leave engineering at 500 level and start music all over again from 100 level. That decision became the doorway to my purpose.&rdquo;
                     </blockquote>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Journey to Purpose</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>Jerry&apos;s story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a &ldquo;serious&rdquo; path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions&apos; Leadership Global was born out of that tension.</p>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Musicologist</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>Through <strong style={{ color: "#0A1128" }}>Jebion Music</strong>, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan.</p>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>The Speaker &amp; Mentor</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development.</p>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>Faith &amp; Church Life</h3>
-                    <p style={{ marginBottom: "1.5rem" }}>Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.</p>
-                    <p style={{ marginBottom: "1.5rem" }}>For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity.</p>
+                    {[
+                      { heading: "The Journey to Purpose", paras: [
+                        "Jerry's story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a \"serious\" path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.",
+                        "From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions' Leadership Global was born out of that tension."
+                      ]},
+                      { heading: "The Musicologist", paras: [
+                        "As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.",
+                        "Through Jebion Music, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan."
+                      ]},
+                      { heading: "The Speaker & Mentor", paras: [
+                        "With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.",
+                        "As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development."
+                      ]},
+                      { heading: "Faith & Church Life", paras: [
+                        "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.",
+                        "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity."
+                      ]},
+                    ].map(({ heading, paras }, hi) => (
+                      <div key={hi}>
+                        <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>{heading}</h3>
+                        {paras.map((p, pi) => <p key={pi} style={{ marginBottom: "1.5rem", textAlign: "justify" }}>{p}</p>)}
+                      </div>
+                    ))}
                   </div>
                   <div style={{ marginTop: "3.5rem", padding: "3rem", background: "#FFF8F0", borderRadius: 28, border: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="section-label" style={{ justifyContent: "flex-start", marginBottom: "0.5rem" }}>Invitations</div>
                     <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.8rem", marginBottom: "0.5rem", color: "#0A1128" }}>Invite Jerry to Speak</h3>
-                    <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7 }}>Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.</p>
+                    <p style={{ color: "#777", fontSize: "0.95rem", marginBottom: "2rem", lineHeight: 1.7, textAlign: "justify" }}>Jerry is available for conferences, summits, university programmes, church events, and corporate leadership sessions. Fill the form below and our team will be in touch within 48 hours.</p>
                     <form action={formAction} method="POST">
                       <input type="hidden" name="_subject" value="CEO Conference Invitation" />
                       <input type="text" name="Conference_Name" placeholder="Name of Conference / Event" className="contact-input" required />
@@ -1130,7 +1218,6 @@ export default function App() {
       {/* BOOKING */}
       {view === "booking" && (
         <div>
-          {/* BOOKING HERO */}
           <div className="booking-hero">
             <div className="booking-hero-bg" />
             <div className="booking-hero-content">
@@ -1138,13 +1225,11 @@ export default function App() {
               <h1 style={{ fontFamily: "Playfair Display, serif", color: "white", fontSize: "clamp(2.2rem, 5vw, 4rem)", lineHeight: 1.1, marginBottom: "1rem" }}>
                 Book a <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Session</em>
               </h1>
-              <p style={{ color: "rgba(255,255,255,0.75)", maxWidth: 540, margin: "0 auto", fontSize: "1.05rem", lineHeight: 1.7 }}>
+              <p style={{ color: "rgba(255,255,255,0.75)", maxWidth: 540, margin: "0 auto", fontSize: "1.05rem", lineHeight: 1.7, textAlign: "justify" }}>
                 Step into a collaborative environment designed to help you discover purpose, resolve identity questions, and refine your leadership edge.
               </p>
             </div>
           </div>
-
-          {/* BOOKING FORM */}
           <section style={{ background: "#FFF8F0", padding: "5rem 2rem" }}>
             <div style={{ maxWidth: 580, margin: "0 auto", background: "white", padding: "3.5rem", borderRadius: 28, boxShadow: "0 30px 80px rgba(0,0,0,0.1)" }}>
               <form action={formAction} method="POST">
@@ -1180,27 +1265,25 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Join us at our upcoming programmes and be part of a movement raising the next generation of champions.</p>
             </div>
             <div className="team-grid">
-              {events.map(function(e, i) {
-                return (
-                  <div key={i} className="event-card">
-                    <div className="event-date-badge">
-                      <div>
-                        <div className="event-day">{e.day}</div>
-                        <div className="event-month-year">{e.month} {e.year}</div>
-                      </div>
-                      <div style={{ marginLeft: "auto" }}>
-                        <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
-                      </div>
+              {events.map((e, i) => (
+                <div key={i} className="event-card">
+                  <div className="event-date-badge">
+                    <div>
+                      <div className="event-day">{e.day}</div>
+                      <div className="event-month-year">{e.month} {e.year}</div>
                     </div>
-                    <div className="event-body">
-                      <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
-                      <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
-                      <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7 }}>{e.desc}</p>
+                    <div style={{ marginLeft: "auto" }}>
+                      <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
                     </div>
-                    <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
                   </div>
-                );
-              })}
+                  <div className="event-body">
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
+                    <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
+                    <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>{e.desc}</p>
+                  </div>
+                  <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1216,24 +1299,22 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>A passionate, purpose-driven team committed to raising transformational leaders.</p>
             </div>
             <div className="team-grid">
-              {teamMembers.map(function(member, i) {
-                return (
-                  <div key={i} className="team-card">
-                    <div className="team-avatar-wrap">
-                      <img src={member.photo} alt={member.name} className="team-avatar" />
-                      <div className="team-avatar-ring" />
-                    </div>
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.25rem", marginBottom: "0.4rem", color: "#0A1128" }}>{member.name}</h3>
-                    <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
-                    <p style={{ fontSize: "0.93rem", color: "#666", flexGrow: 1, lineHeight: 1.7 }}>{member.bio}</p>
-                    {member.linkedin && (
-                      <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#0A1128", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: "#FFF8F0", borderRadius: 20 }}>
-                        <LinkedInIcon /> Connect on LinkedIn
-                      </a>
-                    )}
+              {teamMembers.map((member, i) => (
+                <div key={i} className="team-card">
+                  <div className="team-avatar-wrap">
+                    <img src={member.photo} alt={member.name} className="team-avatar" />
+                    <div className="team-avatar-ring" />
                   </div>
-                );
-              })}
+                  <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.25rem", marginBottom: "0.4rem", color: "#0A1128" }}>{member.name}</h3>
+                  <div style={{ color: "#C86B56", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "1rem" }}>{member.designation}</div>
+                  <p style={{ fontSize: "0.93rem", color: "#666", flexGrow: 1, lineHeight: 1.7, textAlign: "justify" }}>{member.bio}</p>
+                  {member.linkedin && (
+                    <a href={member.linkedin} target="_blank" rel="noreferrer" style={{ marginTop: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", color: "#0A1128", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none", padding: "0.5rem 1rem", background: "#FFF8F0", borderRadius: 20 }}>
+                      <LinkedInIcon /> Connect on LinkedIn
+                    </a>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1249,25 +1330,23 @@ export default function App() {
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Practical wisdom, purpose-driven insights, and leadership truths for the champion in you.</p>
             </div>
             <div className="blog-grid">
-              {blogPosts.map(function(post, i) {
-                return (
-                  <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => setSelectedPost(post)}>
-                    <div className="blog-img-wrap">
-                      <img src={post.img} alt={post.title} className="blog-img" />
-                    </div>
-                    <div style={{ padding: "1.8rem" }}>
-                      <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", marginBottom: "0.8rem" }}>
-                        <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
-                        <span style={{ color: "#aaa", fontSize: "0.78rem" }}>{post.readTime}</span>
-                      </div>
-                      <div style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
-                      <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.35rem", marginBottom: "0.8rem", color: "#0A1128" }}>{post.title}</h3>
-                      <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1.2rem", lineHeight: 1.7 }}>{post.excerpt}</p>
-                      <span style={{ color: "#0A1128", fontWeight: 800, fontSize: "0.88rem" }}>Read Article &rarr;</span>
-                    </div>
+              {blogPosts.map((post, i) => (
+                <div key={i} className="blog-card" style={{ cursor: "pointer" }} onClick={() => setSelectedPost(post)}>
+                  <div className="blog-img-wrap">
+                    <img src={post.img} alt={post.title} className="blog-img" />
                   </div>
-                );
-              })}
+                  <div style={{ padding: "1.8rem" }}>
+                    <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", marginBottom: "0.8rem" }}>
+                      <span style={{ background: "#FFF8F0", color: "#C86B56", padding: "0.2rem 0.7rem", borderRadius: 20, fontSize: "0.72rem", fontWeight: 700 }}>{post.category}</span>
+                      <span style={{ color: "#aaa", fontSize: "0.78rem" }}>{post.readTime}</span>
+                    </div>
+                    <div style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem" }}>{post.date}</div>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.35rem", marginBottom: "0.8rem", color: "#0A1128" }}>{post.title}</h3>
+                    <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1.2rem", lineHeight: 1.7, textAlign: "justify" }}>{post.excerpt}</p>
+                    <span style={{ color: "#0A1128", fontWeight: 800, fontSize: "0.88rem" }}>Read Article &rarr;</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1291,9 +1370,7 @@ export default function App() {
                 <img src={selectedPost.img} alt={selectedPost.title} style={{ width: "100%", height: 380, objectFit: "cover", display: "block" }} />
               </div>
               <div className="article-content">
-                {selectedPost.fullContent.trim().split("\n\n").map(function(para, i) {
-                  return <p key={i}>{para.trim()}</p>;
-                })}
+                {renderArticleContent(selectedPost.fullContent)}
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem", background: "#FFF8F0", borderRadius: 20, textAlign: "center" }}>
                 <p style={{ fontWeight: 700, color: "#0A1128", marginBottom: "1rem" }}>Ready to start your leadership journey?</p>
@@ -1316,13 +1393,11 @@ export default function App() {
           </div>
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Navigation</h4>
-            {[["Home","home"],["Meet the CEO","ceo"],["Events","events"],["Team","team"],["Blog","blog"],["Book a Session","booking"]].map(function(item) {
-              return (
-                <div key={item[1]} style={{ marginBottom: "0.8rem" }}>
-                  <a href="#!" onClick={function(e) { e.preventDefault(); navigate(item[1]); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", cursor: "pointer" }}>{item[0]}</a>
-                </div>
-              );
-            })}
+            {[["Home","home"],["Meet the CEO","ceo"],["Events","events"],["Team","team"],["Blog","blog"],["Book a Session","booking"]].map(item => (
+              <div key={item[1]} style={{ marginBottom: "0.8rem" }}>
+                <a href="#!" onClick={e => { e.preventDefault(); navigate(item[1]); }} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.9rem", cursor: "pointer" }}>{item[0]}</a>
+              </div>
+            ))}
           </div>
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: "1.5rem", fontSize: "0.85rem", letterSpacing: "2px", textTransform: "uppercase", color: "#F4D03F" }}>Contact</h4>
