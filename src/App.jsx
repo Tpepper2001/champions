@@ -654,9 +654,38 @@ const certifications = [
 ];
 
 const events = [
-  { day: "15", month: "APR", year: "2026", title: "Leadership Bootcamp", loc: "OAU Auditorium, Ile-Ife", desc: "An intensive two-day bootcamp on purpose-driven leadership for students and young professionals.", tag: "Physical" },
-  { day: "22", month: "MAY", year: "2026", title: "Purpose Webinar", loc: "Online (Zoom)", desc: "A powerful online seminar exploring identity, purpose, and how to align your life with your calling.", tag: "Virtual" },
-  { day: "14", month: "JUN", year: "2026", title: "Champions Conference", loc: "TBD — Lagos", desc: "Our flagship annual conference bringing together leaders, thinkers, and change-makers from across Nigeria.", tag: "Physical" },
+  {
+    quarter: "Q2 2026",
+    title: "Kingdom Creative Conference 1.0",
+    theme: "BEZALEEL: The Spirit of Wisdom & Understanding",
+    loc: "Online (Virtual)",
+    desc: "An inaugural conference exploring creativity, calling, and the Spirit of wisdom — where faith and excellence meet to unlock the creative potential God has placed in every believer.",
+    tags: ["Virtual"],
+  },
+  {
+    quarter: "Q3 2026",
+    title: "Champions Conference 2.0",
+    theme: "RECALIBRATE: Setting Your Mind",
+    loc: "OAU, Ile-Ife",
+    desc: "Our flagship annual conference returns — challenging leaders to reset their thinking, realign their purpose, and step into a new season with clarity and conviction.",
+    tags: ["Physical", "Virtual"],
+  },
+  {
+    quarter: "Q3 2026",
+    title: "Certificate Course in Leadership",
+    theme: "2026 Cohort",
+    loc: "Physical & Virtual",
+    desc: "A structured, practical leadership training programme designed to equip participants with the mindset, tools, and character needed to lead effectively in every sphere of life.",
+    tags: ["Physical", "Virtual"],
+  },
+  {
+    quarter: "DEC 2026",
+    title: "Retrospect 1.0",
+    theme: "HOW FAR AND HOW WELL: Looking Back at 2026",
+    loc: "Online (Virtual)",
+    desc: "A reflective year-end gathering to look back at 2026 with honesty and gratitude — celebrating growth, acknowledging lessons, and setting our hearts towards the year ahead.",
+    tags: ["Virtual"],
+  },
 ];
 
 const statItems = [
@@ -1279,22 +1308,25 @@ export default function App() {
               <h2 className="section-title">Upcoming Events</h2>
               <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>Join us at our upcoming programmes and be part of a movement raising the next generation of champions.</p>
             </div>
-            <div className="team-grid">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem", maxWidth: 900, margin: "0 auto" }}>
               {events.map((e, i) => (
                 <div key={i} className="event-card">
                   <div className="event-date-badge">
-                    <div>
-                      <div className="event-day">{e.day}</div>
-                      <div className="event-month-year">{e.month} {e.year}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "2px", opacity: 0.6, marginBottom: "0.3rem" }}>Upcoming</div>
+                      <div className="event-day" style={{ fontSize: "1.6rem", letterSpacing: "1px" }}>{e.quarter}</div>
                     </div>
-                    <div style={{ marginLeft: "auto" }}>
-                      <span style={{ background: e.tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: e.tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.3rem 0.8rem", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700 }}>{e.tag}</span>
+                    <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                      {e.tags.map(tag => (
+                        <span key={tag} style={{ background: tag === "Virtual" ? "rgba(168,218,220,0.3)" : "rgba(244,208,63,0.25)", color: tag === "Virtual" ? "#A8DADC" : "#F4D03F", padding: "0.25rem 0.7rem", borderRadius: 20, fontSize: "0.7rem", fontWeight: 700 }}>{tag}</span>
+                      ))}
                     </div>
                   </div>
                   <div className="event-body">
-                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.4rem", marginBottom: "0.5rem", color: "#0A1128" }}>{e.title}</h3>
-                    <p style={{ color: "#C86B56", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
-                    <p style={{ fontSize: "0.95rem", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>{e.desc}</p>
+                    <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.3rem", marginBottom: "0.3rem", color: "#0A1128", lineHeight: 1.2 }}>{e.title}</h3>
+                    <p style={{ color: "#C86B56", fontSize: "0.82rem", fontWeight: 700, marginBottom: "0.5rem", fontStyle: "italic" }}>&ldquo;{e.theme}&rdquo;</p>
+                    <p style={{ color: "#888", fontSize: "0.82rem", fontWeight: 600, marginBottom: "1rem" }}>📍 {e.loc}</p>
+                    <p style={{ fontSize: "0.92rem", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>{e.desc}</p>
                   </div>
                   <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
                 </div>
