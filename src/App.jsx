@@ -525,6 +525,8 @@ const blogPosts = [
     category: "Leadership",
     excerpt: "Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision.",
     readTime: "5 min read",
+    ctaHeading: "Ready to lead with intention and impact?",
+    ctaSub: "Book a session and begin building the leader you were made to be.",
     fullContent: `Leadership is more than just a position; it is a conscious decision to influence and guide others towards a shared vision. In a world full of noise and distraction, the most impactful leaders are those who lead with intentionality.
 
 True leadership begins from within. Before you can lead others, you must first learn to lead yourself. This means understanding your values, your purpose, and your non-negotiables. It means having the discipline to do what is right even when no one is watching.
@@ -544,6 +546,8 @@ Champions' Leadership Global exists to raise exactly this kind of leader: intent
     category: "Personal Development",
     excerpt: "Growth does not happen by chance — it happens by choice. Real growth requires intention, consistent action, and the willingness to step beyond what is comfortable.",
     readTime: "6 min read",
+    ctaHeading: "Ready to grow with intention and purpose?",
+    ctaSub: "Book a session and take deliberate steps toward the best version of yourself.",
     fullContent: `Everyone wants to grow. We want to become better, do more, and achieve greater things. But wanting growth and actually growing are two very different things.
 
 Growth does not happen by chance — it happens by choice. It is easy to assume that with time, things will automatically improve. But real growth requires intention. It requires conscious effort, consistent action, and the willingness to step beyond what is comfortable.
@@ -577,6 +581,8 @@ Growth is not accidental — it is a result of the decisions you make every day.
     category: "Leadership",
     excerpt: "Before leading others, you must first learn to lead yourself. Self-leadership is the foundation of true, authentic, and lasting influence.",
     readTime: "7 min read",
+    ctaHeading: "Ready to master the art of leading yourself?",
+    ctaSub: "Book a session and build the discipline, clarity, and character of a true leader.",
     fullContent: `Have you ever set goals for yourself and struggled to stay consistent? Maybe you started with excitement, full of motivation and clarity, but somewhere along the way, discipline became difficult and consistency faded. It is a common experience — and it reveals something important: before leading others, you must first learn to lead yourself.
 
 Self-leadership is the foundation of true leadership. It is the ability to take responsibility for your actions, manage your emotions, stay committed to your goals, and direct your life with intention. Without self-leadership, influence becomes shallow. But with it, leadership becomes authentic and impactful.
@@ -608,6 +614,8 @@ Leadership does not begin when others follow you. It begins the moment you choos
     category: "Purpose",
     excerpt: "Purpose is the inner compass that gives direction to your life — your unique function on earth and the contribution you are meant to make in the world.",
     readTime: "5 min read",
+    ctaHeading: "Ready to discover and deploy your purpose?",
+    ctaSub: "Book a clarity session and find the compass that will guide the rest of your life.",
     fullContent: `Have you ever tried to walk a path you were unfamiliar with without a guide or a compass? The experience can be confusing, discouraging, and uncertain. Life can feel the same way when it is lived without purpose.
 
 Purpose is the inner compass that gives direction to your life. It can be simply described as your unique function on earth — the reason for your existence and the contribution you are meant to make in the world. When you understand your purpose, your identity becomes clearer and your path becomes more meaningful.
@@ -687,6 +695,13 @@ const demoReviews = [
     role: "Osun State",
     rating: 5,
     text: "I attended the last leadership boot camp organised by Champions' Leadership Global and it was a real eye-opener to a lot of things I thought I knew, especially handling situations as a leader. I have learnt so much from the conferences and webinars that have been held. Special thanks to the convener and committee — keep up the good work."
+  },
+  {
+    id: 5,
+    name: "Kayode Emmanuel",
+    role: "Lagos",
+    rating: 5,
+    text: "Champions' Leadership Global has impacted me positively in the way of my thinking and reasoning about life and decision making."
   },
 ];
 
@@ -964,8 +979,8 @@ export default function App() {
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem 3rem", background: "rgba(244,208,63,0.06)", border: "1px solid rgba(244,208,63,0.15)", borderRadius: 20, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1.5rem" }}>
                 <div>
-                  <p style={{ color: "white", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.3rem" }}>Ready to become part of the story?</p>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>Join thousands of champions already on the journey.</p>
+                  <p style={{ color: "white", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.3rem" }}>Need clarity on purpose, identity, and leadership?</p>
+                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>Join others who have unlocked their potential.</p>
                 </div>
                 <button onClick={() => navigate("booking")} className="btn-primary" style={{ whiteSpace: "nowrap" }}>
                   Book a Session &rarr;
@@ -1111,7 +1126,7 @@ export default function App() {
             <h1 style={{ fontFamily: "Playfair Display, serif", color: "white", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1 }}>
               Meet <em style={{ fontStyle: "italic", color: "#F4D03F" }}>Jerry Oyedele</em>
             </h1>
-            <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem" }}>Leading with Purpose and Passion</p>
+            <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "1rem", fontSize: "1.05rem", textAlign: "center" }}>Leading with Purpose and Passion</p>
           </div>
 
           <section className="page-padding" style={{ background: "white", marginTop: "-40px" }}>
@@ -1373,7 +1388,12 @@ export default function App() {
                 {renderArticleContent(selectedPost.fullContent)}
               </div>
               <div style={{ marginTop: "4rem", padding: "2.5rem", background: "#FFF8F0", borderRadius: 20, textAlign: "center" }}>
-                <p style={{ fontWeight: 700, color: "#0A1128", marginBottom: "1rem" }}>Ready to start your leadership journey?</p>
+                <p style={{ fontWeight: 700, color: "#0A1128", marginBottom: "0.5rem", textAlign: "center" }}>
+                  {selectedPost.ctaHeading || "Ready to start your leadership journey?"}
+                </p>
+                <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1.2rem", textAlign: "center" }}>
+                  {selectedPost.ctaSub || "Book a clarity session and take the next step."}
+                </p>
                 <button onClick={() => navigate("booking")} className="btn-primary">Book a Session</button>
               </div>
             </div>
