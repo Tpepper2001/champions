@@ -510,7 +510,7 @@ const LinkedInIcon = () => (
 
 const teamMembers = [
   { name: "James Oluwapelumi Olatunbosun", designation: "Program Director", bio: "James is a science communicator and Engineering Physics student at OAU. He is committed to seeing young people thrive in career and character.", linkedin: "https://www.linkedin.com/in/james-olatunbosun", photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260221-WA0000.jpg" },
-  { name: "Ogbaudu Oghenefegor Believe", designation: "Corp Member", bio: "A faith-based writer and founder of GAP INITIATIVE — an NGO empowering youth to discover their gifts and purpose.", linkedin: null, photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260221-WA0001.jpg" },
+  { name: "Ogbaudu Oghenefegor Believe", designation: "Content Writer", bio: "A faith-based writer and founder of GAP INITIATIVE — an NGO empowering youth to discover their gifts and purpose.", linkedin: null, photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260221-WA0001.jpg" },
   { name: "Oluwatoyin Oluwabukola Yakubu", designation: "Head, Content", bio: "Oluwatoyin is passionate about helping people find healing from trauma and depression through honest conversations.", linkedin: "https://www.linkedin.com/in/oluwatoyin-yakubu-a2b1b6258", photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260221-WA0005.jpg" },
   { name: "Joseph Temitope Deborah", designation: "Community Manager", bio: "A communication advocate and leadership enthusiast passionate about purpose discovery and building impactful leaders.", linkedin: "https://www.linkedin.com/in/temitope-deborah-joseph-b24580227", photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260304-WA0015.jpg" },
   { name: "Promise Nseobong", designation: "Human Resource", bio: "An accounting student and creative voice running a YouTube channel on motivation and spoken-word poetry.", linkedin: "https://www.linkedin.com/in/nseobong-promise-02498a338", photo: "https://ijsr.org.ng/wp-content/uploads/2026/03/IMG-20260221-WA0006.jpg" },
@@ -651,6 +651,45 @@ const certifications = [
   { cert: "Introduction to Psychology", school: "Yale University" },
   { cert: "Songwriting: Writing the Lyrics", school: "Berklee College of Music" },
   { cert: "Exploring Piano Literature: The Piano Sonata", school: "University of Michigan" },
+];
+
+const pastEvents = [
+  {
+    quarter: "NOV 2024",
+    title: "Champions Conference 1.0",
+    theme: "TRANSFORMATION: Change | Evolve",
+    loc: "Google Meet (Virtual)",
+    desc: "Our inaugural flagship conference — a groundbreaking gathering designed to inspire participants to become the best version of themselves through mind transformation, personal evolution, and lasting change.",
+    tags: ["Virtual", "Free"],
+    dates: "15–16 Nov, 2024",
+  },
+  {
+    quarter: "FEB 2025",
+    title: "Love & Patriotism",
+    theme: "A Tool for National Development",
+    loc: "Telegram",
+    desc: "A Champions' Corner Exploits 365 February Special exploring how love and patriotism can be harnessed as tools for driving meaningful national development.",
+    tags: ["Virtual"],
+    dates: "11 Feb, 2025",
+  },
+  {
+    quarter: "FEB 2026",
+    title: "Value & Value Systems Masterclass",
+    theme: "The Hidden Framework That Shapes Your Destiny",
+    loc: "Facebook Live (@Jerry Oyedele)",
+    desc: "A Purpose Leadership Development Masterclass diving deep into how values influence choices and outcomes, building values that sustain growth, aligning purpose with principles, and breaking cycles through value change.",
+    tags: ["Virtual", "Free"],
+    dates: "13–14 Feb, 2026",
+  },
+  {
+    quarter: "MAR 2026",
+    title: "3-Day Leadership Bootcamp",
+    theme: "3 Days. 6 Core Pillars. One Defining Shift.",
+    loc: "Google Meet (Virtual)",
+    desc: "A transformative 3-day bootcamp covering self-awareness, purpose discovery, basics of leadership, personal transformation, leadership development, and influence — followed by one month of personal mentorship.",
+    tags: ["Virtual", "Paid"],
+    dates: "18–20 Mar, 2026",
+  },
 ];
 
 const events = [
@@ -1366,6 +1405,38 @@ export default function App() {
                   <button className="event-register-btn" onClick={() => navigate("booking")}>Register Interest</button>
                 </div>
               ))}
+            </div>
+
+            {/* PAST EVENTS */}
+            <div style={{ marginTop: "6rem" }}>
+              <div className="section-header" style={{ marginBottom: "2.5rem" }}>
+                <div className="section-label">Our History</div>
+                <h2 className="section-title" style={{ fontSize: "clamp(1.6rem, 4vw, 2.4rem)" }}>Past Events</h2>
+                <p style={{ maxWidth: 500, margin: "0 auto", color: "#666" }}>A record of the programmes, masterclasses, and conferences that have shaped our journey so far.</p>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem", maxWidth: 1100, margin: "0 auto" }}>
+                {pastEvents.map((e, i) => (
+                  <div key={i} style={{ background: "white", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 18px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", opacity: 0.9 }}>
+                    <div style={{ background: "linear-gradient(135deg, #3a3a4a, #555568)", color: "white", padding: "1.2rem 1.6rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "2px", opacity: 0.55, marginBottom: "0.2rem" }}>Completed</div>
+                        <div style={{ fontFamily: "Playfair Display, serif", fontSize: "1rem", fontWeight: 700, letterSpacing: "0.5px" }}>{e.dates}</div>
+                      </div>
+                      <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        {e.tags.map(tag => (
+                          <span key={tag} style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", padding: "0.2rem 0.6rem", borderRadius: 20, fontSize: "0.65rem", fontWeight: 700 }}>{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ padding: "1.5rem 1.6rem", flex: 1 }}>
+                      <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.15rem", marginBottom: "0.3rem", color: "#0A1128", lineHeight: 1.2 }}>{e.title}</h3>
+                      <p style={{ color: "#C86B56", fontSize: "0.78rem", fontWeight: 700, marginBottom: "0.5rem", fontStyle: "italic" }}>&ldquo;{e.theme}&rdquo;</p>
+                      <p style={{ color: "#aaa", fontSize: "0.78rem", fontWeight: 600, marginBottom: "0.8rem" }}>📍 {e.loc}</p>
+                      <p style={{ fontSize: "0.88rem", color: "#666", lineHeight: 1.7, textAlign: "justify" }}>{e.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
