@@ -690,6 +690,24 @@ const pastEvents = [
     tags: ["Virtual", "Paid"],
     dates: "18–20 Mar, 2026",
   },
+  {
+    quarter: "MAR 2025",
+    title: "Next Generation Conference",
+    theme: "The Power of Vision",
+    loc: "Telegram Page",
+    desc: "A Champions' Corner conference exploring the power of vision for the next generation — featuring speakers Jerry Oyedele (Founder, Champions' Corner), Afoluwa Oyegbile (Creative Director, Aphoenix), and Tolu Ayowole (CEO, Tap Music Africa).",
+    tags: ["Virtual", "Free"],
+    dates: "25 Mar, 2025",
+  },
+  {
+    quarter: "JUN 2025",
+    title: "Redefining Failure Bootcamp",
+    theme: "A 2-Day Virtual Bootcamp",
+    loc: "Telegram (Virtual)",
+    desc: "A Champions Leadership Academy 2-day virtual bootcamp tackling overcoming the feeling and fear of failure, why failure is important, failing forward, and fixed vs growth mindset.",
+    tags: ["Virtual"],
+    dates: "10–11 Jun, 2025",
+  },
 ];
 
 const events = [
