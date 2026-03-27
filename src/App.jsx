@@ -1310,12 +1310,13 @@ export default function App() {
                         "Through Jebion Music, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan."
                       ]},
                       { heading: "The Speaker & Mentor", paras: [
-                        "With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and corporate audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.",
+                        "With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and various audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.",
                         "As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development."
                       ]},
                       { heading: "Faith & Church Life", paras: [
-                        "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word, with a burden to see the body of Christ walk in maturity, purpose, and power.",
-                        "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a Sunday choir rehearsal, is an altar where lives can be shaped for eternity."
+                        "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word.
+                      ",
+                        "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a choir rehearsal, is an altar where lives can be shaped for eternity."
                       ]},
                     ].map(({ heading, paras }, hi) => (
                       <div key={hi}>
