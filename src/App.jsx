@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+mport { useEffect, useState } from "react";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap');
@@ -912,6 +912,38 @@ function ReviewsSection() {
   );
 }
 
+// ── CEO biography sections (extracted to fix the build error) ──
+const bioSections = [
+  {
+    heading: "The Journey to Purpose",
+    paras: [
+      "Jerry's story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a \"serious\" path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.",
+      "From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions' Leadership Global was born out of that tension."
+    ]
+  },
+  {
+    heading: "The Musicologist",
+    paras: [
+      "As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.",
+      "Through Jebion Music, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan."
+    ]
+  },
+  {
+    heading: "The Speaker & Mentor",
+    paras: [
+      "With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and various audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.",
+      "As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development."
+    ]
+  },
+  {
+    heading: "Faith & Church Life",
+    paras: [
+      "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word.",
+      "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a choir rehearsal, is an altar where lives can be shaped for eternity."
+    ]
+  },
+];
+
 export default function App() {
   // ── ROUTING: read initial page from URL hash ──────────────────
   const getViewFromHash = () => {
@@ -1300,26 +1332,7 @@ export default function App() {
                     <blockquote className="about-quote" style={{ margin: "2rem 0" }}>
                       &ldquo;I had to make the hardest decision of my life: leave engineering at 500 level and start music all over again from 100 level. That decision became the doorway to my purpose.&rdquo;
                     </blockquote>
-                    {[
-                      { heading: "The Journey to Purpose", paras: [
-                        "Jerry's story is not a conventional one. After years in the Engineering faculty at OAU, he felt a deep, undeniable pull toward music — a field he had loved all his life but never considered a \"serious\" path. The decision to leave and start over from 100 level was met with questions, doubts, and social pressure. But that radical act of obedience became the seed of everything he now leads.",
-                        "From that moment of surrender, Jerry began to understand purpose not as a destination but as a daily commitment to becoming who you were made to be. His personal journey gave him language for what millions experience: the tension between the life others expect and the life your soul craves. Champions' Leadership Global was born out of that tension."
-                      ]},
-                      { heading: "The Musicologist", paras: [
-                        "As a musicologist, Jerry brings over two decades of lived experience in music to his academic and creative pursuits. He is a prolific composer with over 300 original works produced in the last seven years alone — spanning choral, contemporary gospel, and orchestral forms. His compositions are not merely artistic expressions; they are spiritual declarations crafted to minister to the heart and glorify God.",
-                        "Through Jebion Music, Jerry is building a legacy of sacred music that bridges the gap between excellence and anointing. To ground his practice further, he has pursued certificate courses from world-class institutions including the National University of Singapore, Yale University, the University of Edinburgh, Berklee College of Music, and the University of Michigan."
-                      ]},
-                      { heading: "The Speaker & Mentor", paras: [
-                        "With over a decade on the public speaking circuit, Jerry has addressed students, professionals, church congregations, and various audiences across Nigeria. His messages are characterised by clarity, depth, and a rare ability to make abstract ideas about purpose feel immediately personal and actionable.",
-                        "As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development."
-                      ]},
-                    { heading: "Faith & Church Life", paras: [
-    "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word.",
-    "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a choir rehearsal, is an altar where lives can be shaped for eternity."
-  ]},
-                        "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a choir rehearsal, is an altar where lives can be shaped for eternity."
-                      ]},
-                    ].map(({ heading, paras }, hi) => (
+                    {bioSections.map(({ heading, paras }, hi) => (
                       <div key={hi}>
                         <h3 style={{ fontFamily: "Playfair Display, serif", fontSize: "1.6rem", color: "#0A1128", margin: "2.5rem 0 1rem" }}>{heading}</h3>
                         {paras.map((p, pi) => <p key={pi} style={{ marginBottom: "1.5rem", textAlign: "justify" }}>{p}</p>)}
@@ -1492,7 +1505,6 @@ export default function App() {
 
             {/* VOLUNTEER BANNER */}
             <div style={{ marginTop: "5rem", background: "linear-gradient(135deg, #0A1128, #1a2a5e)", borderRadius: 28, padding: "4rem 3rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
-              {/* decorative circles */}
               <div style={{ position: "absolute", top: "-60px", right: "-60px", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(244,208,63,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
               <div style={{ position: "absolute", bottom: "-40px", left: "-40px", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(200,107,86,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
               <div style={{ position: "relative", zIndex: 1 }}>
@@ -1555,7 +1567,6 @@ export default function App() {
           </div>
         </section>
       )}
-
       {/* BLOG ARTICLE */}
       {view === "blog" && selectedPost && (
         <section className="page-padding" style={{ background: "white" }}>
