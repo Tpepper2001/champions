@@ -1314,8 +1314,8 @@ export default function App() {
                         "As a mentor, Jerry works one-on-one and in group settings with young people navigating identity crises, career transitions, and leadership challenges. His approach is not merely motivational — it is transformational, drawing from Scripture, personal experience, and a rich understanding of human development."
                       ]},
                       { heading: "Faith & Church Life", paras: [
-                        "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word.
-                      ",
+                        "Jerry Oyedele is a committed worker in the vineyard of God. He serves as a choir leader in his local church denomination, using music as a vehicle for worship and intercession. He is also recognised as a gifted teacher of the Word."
+                     ]},
                         "For Jerry, there is no separation between ministry and mission — every platform he occupies, whether a university auditorium, a conference hall, or a choir rehearsal, is an altar where lives can be shaped for eternity."
                       ]},
                     ].map(({ heading, paras }, hi) => (
