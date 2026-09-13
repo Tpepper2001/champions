@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isValidSiteContent(data) {
+      return data.keys().hasAll(['contentJson', 'updatedAt']) &&
+             data.keys().size() == 2 &&
+             data.contentJson is string &&
+             data.contentJson.size() > 0 &&
+             data.contentJson.size() <= 1048576 &&
+             data.updatedAt is string &&
+             data.updatedAt.size() > 0 &&
+             data.updatedAt.size() <= 64;
+    }
+
+    match /site_settings/{settingId} {
+      allow read: if isValidId(settingId);
+      allow create, update: if isValidId(settingId) && isValidSiteContent(request.resource.data);
+      allow delete: if false;
+    }
+  }
+}

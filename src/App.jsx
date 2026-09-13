@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { defaultSiteData } from "./defaultSiteData";
 import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
+import {
+  saveSiteDataToFirebase,
+  loadSiteDataFromFirebase,
+  subscribeSiteData,
+  testConnection,
+} from "./firebase";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap');
@@ -693,29 +699,27 @@ const isManagerRoute = (val) => {
   if (!val) return false;
   const decoded = decodeURIComponent(val).toLowerCase().trim();
   return (
-    decoded === "/web manager" ||
-    decoded === "web manager" ||
+    decoded === "/websitemanager" ||
+    decoded === "websitemanager" ||
+    decoded === "/website-manager" ||
+    decoded === "website-manager" ||
     decoded === "/web-manager" ||
     decoded === "web-manager" ||
-    decoded === "/webmanager" ||
-    decoded === "webmanager" ||
-    decoded === "/manager" ||
-    decoded === "manager" ||
-    decoded === "/admin" ||
-    decoded === "admin"
+    decoded === "/web manager" ||
+    decoded === "web manager"
   );
 };
 
 const getViewFromLocation = () => {
   if (typeof window === "undefined") return "home";
 
-  // 1. Check pathname (e.g., /web manager or /web-manager)
+  // 1. Check pathname (e.g., /websitemanager)
   const pathname = window.location.pathname;
   if (isManagerRoute(pathname)) {
     return "manager";
   }
 
-  // 2. Check hash
+  // 2. Check hash (e.g., #websitemanager)
   const rawHash = window.location.hash.replace("#", "").split("/")[0];
   if (isManagerRoute(rawHash)) {
     return "manager";
@@ -762,7 +766,7 @@ export default function App() {
 
   const [siteData, setSiteData] = useState(loadInitialData);
 
-  // Synchronize site data updates and persist to localStorage
+  // Synchronize site data updates
   const handleSiteDataChange = (newData) => {
     setSiteData(newData);
     try {
@@ -772,20 +776,57 @@ export default function App() {
     }
   };
 
-  const handleSaveSiteData = () => {
+  // Save to Firebase Firestore database
+  const handleSaveSiteData = async () => {
     try {
       localStorage.setItem("clg_site_content_v1", JSON.stringify(siteData));
-    } catch (e) {
-      console.error("Manual save failed:", e);
+    } catch (e) {}
+    const result = await saveSiteDataToFirebase(siteData);
+    if (!result.success) {
+      console.error("Firebase save failed:", result.error);
+      throw result.error;
     }
   };
 
-  const handleResetSiteData = () => {
+  // Reset to original defaults in Firebase Firestore
+  const handleResetSiteData = async () => {
     setSiteData(defaultSiteData);
     try {
       localStorage.removeItem("clg_site_content_v1");
     } catch (e) {}
+    await saveSiteDataToFirebase(defaultSiteData);
   };
+
+  // Connect and synchronize with Firebase Firestore
+  useEffect(() => {
+    testConnection();
+
+    // Initial load from Firebase Firestore
+    loadSiteDataFromFirebase().then((cloudData) => {
+      if (cloudData && typeof cloudData === "object") {
+        setSiteData(cloudData);
+        try {
+          localStorage.setItem("clg_site_content_v1", JSON.stringify(cloudData));
+        } catch (e) {}
+      }
+    });
+
+    // Real-time synchronization
+    const unsubscribe = subscribeSiteData((cloudData) => {
+      if (cloudData && typeof cloudData === "object") {
+        setSiteData(cloudData);
+        try {
+          localStorage.setItem("clg_site_content_v1", JSON.stringify(cloudData));
+        } catch (e) {}
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   // ── AUTHENTICATION ───────────────
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -866,9 +907,9 @@ export default function App() {
     setSelectedPost(post);
     if (v === "manager") {
       try {
-        window.history.pushState(null, "", "/web-manager");
+        window.history.pushState(null, "", "/websitemanager");
       } catch (e) {
-        window.location.hash = "web-manager";
+        window.location.hash = "websitemanager";
       }
     } else if (post) {
       const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -951,49 +992,6 @@ export default function App() {
 
   return (
     <div>
-      {/* FLOATING MANAGER DASHBOARD BUTTON */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 9999,
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => navigate("manager")}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "#0A1128",
-            color: "#F4D03F",
-            border: "2px solid #F4D03F",
-            padding: "10px 18px",
-            borderRadius: "50px",
-            fontWeight: "800",
-            fontSize: "0.85rem",
-            boxShadow: "0 8px 30px rgba(10,17,40,0.5)",
-            cursor: "pointer",
-            fontFamily: "DM Sans, sans-serif",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.05)";
-            e.currentTarget.style.background = "#14214d";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.background = "#0A1128";
-          }}
-          title="Open Website Manager Dashboard to edit text and pictures"
-        >
-          <span style={{ fontSize: "1.1rem" }}>⚙️</span>
-          <span>Website Manager</span>
-        </button>
-      </div>
-
       {/* NAVBAR */}
       <nav className={"navbar" + (scrolled ? " scrolled" : "")}>
         <div className="nav-container">
@@ -1027,16 +1025,6 @@ export default function App() {
               >
                 Book a Session
               </a>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="nav-manager-btn"
-                onClick={() => navigate("manager")}
-                title="Edit all website text and pictures"
-              >
-                <span>⚙️</span> Edit Site
-              </button>
             </li>
           </ul>
           <button
@@ -1075,16 +1063,6 @@ export default function App() {
           }}
         >
           Book a Session
-        </a>
-        <a
-          href="#!"
-          className="mobile-manager-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("manager");
-          }}
-        >
-          ⚙️ Website Manager
         </a>
       </div>
 
@@ -2842,7 +2820,6 @@ export default function App() {
               ["Team", "team"],
               ["Blog", "blog"],
               ["Book a Session", "booking"],
-              ["Website Manager", "manager"],
             ].map((item) => (
               <div key={item[1]} style={{ marginBottom: "0.8rem" }}>
                 <a
@@ -2852,14 +2829,13 @@ export default function App() {
                     navigate(item[1]);
                   }}
                   style={{
-                    color: item[1] === "manager" ? "#F4D03F" : "rgba(255,255,255,0.6)",
-                    fontWeight: item[1] === "manager" ? "700" : "normal",
+                    color: "rgba(255,255,255,0.6)",
+                    fontWeight: "normal",
                     textDecoration: "none",
                     fontSize: "0.9rem",
                     cursor: "pointer",
                   }}
                 >
-                  {item[1] === "manager" ? "⚙️ " : ""}
                   {item[0]}
                 </a>
               </div>
