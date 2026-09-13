@@ -1,0 +1,15 @@
+{
+  "short_name": "CLG",
+  "name": "Champions' Leadership Global",
+  "icons": [
+    {
+      "src": "https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0A1128",
+  "background_color": "#FFF8F0"
+}

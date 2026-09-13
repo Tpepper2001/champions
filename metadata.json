@@ -1,0 +1,8 @@
+{
+  "name": "Champions' Leadership Global",
+  "description": "A purpose and leadership development platform founded by Jerry Oyedele, raising transformational leaders through coaching, conferences, and community.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
