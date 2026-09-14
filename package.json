@@ -18,8 +18,8 @@
     "tailwindcss": "^3.3.5"
   },
   "scripts": {
-    "dev": "PORT=3000 HOST=0.0.0.0 DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_PORT=0 ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "start": "PORT=3000 HOST=0.0.0.0 DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_PORT=0 ESLINT_NO_DEV_ERRORS=true react-scripts start",
+    "dev": "PORT=3000 HOST=0.0.0.0 DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_PORT=0 ESLINT_NO_DEV_ERRORS=true DISABLE_ESLINT_PLUGIN=true FAST_REFRESH=false react-scripts start",
+    "start": "PORT=3000 HOST=0.0.0.0 DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_PORT=0 ESLINT_NO_DEV_ERRORS=true DISABLE_ESLINT_PLUGIN=true FAST_REFRESH=false react-scripts start",
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "lint": "eslint src --ext .js,.jsx",
     "test": "react-scripts test",
