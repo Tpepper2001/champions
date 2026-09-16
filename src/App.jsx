@@ -3,11 +3,11 @@ import { defaultSiteData } from "./defaultSiteData";
 import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
 import {
-  saveSiteDataToFirebase,
-  loadSiteDataFromFirebase,
+  saveSiteData,
+  loadSiteData,
   subscribeSiteData,
   testConnection,
-} from "./firebase";
+} from "./supabase";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap');
@@ -792,33 +792,33 @@ export default function App() {
     }
   };
 
-  // Save to Firebase Firestore database
+  // Save to Supabase
   const handleSaveSiteData = async () => {
     try {
       localStorage.setItem("clg_site_content_v1", JSON.stringify(siteData));
     } catch (e) {}
-    const result = await saveSiteDataToFirebase(siteData);
+    const result = await saveSiteData(siteData);
     if (!result.success) {
-      console.error("Firebase save failed:", result.error);
+      console.error("Supabase save failed:", result.error);
       throw result.error;
     }
   };
 
-  // Reset to original defaults in Firebase Firestore
+  // Reset to original defaults in Supabase
   const handleResetSiteData = async () => {
     setSiteData(defaultSiteData);
     try {
       localStorage.removeItem("clg_site_content_v1");
     } catch (e) {}
-    await saveSiteDataToFirebase(defaultSiteData);
+    await saveSiteData(defaultSiteData);
   };
 
-  // Connect and synchronize with Firebase Firestore
+  // Connect and synchronize with Supabase
   useEffect(() => {
     testConnection();
 
-    // Initial load from Firebase Firestore
-    loadSiteDataFromFirebase().then((cloudData) => {
+    // Initial load from Supabase
+    loadSiteData().then((cloudData) => {
       if (cloudData && typeof cloudData === "object") {
         setSiteData(cloudData);
         try {
