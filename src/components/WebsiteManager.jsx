@@ -127,11 +127,11 @@ export default function WebsiteManager({
               </h1>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Firebase Database
+                Supabase Database
               </span>
             </div>
             <p className="text-xs text-slate-400 hidden sm:block">
-              Live Cloud CMS • Changes sync across all devices via Firebase Firestore
+              Live Cloud CMS • Changes sync across all devices via Supabase
             </p>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function WebsiteManager({
       {saveToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-emerald-500 text-slate-950 px-5 py-3 rounded-2xl shadow-2xl font-bold flex items-center gap-2 text-sm animate-bounce">
           <CheckCircle2 className="w-5 h-5" />
-          Changes published & saved to Firebase Database!
+          Changes published & saved to Supabase Database!
         </div>
       )}
 
