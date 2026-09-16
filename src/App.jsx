@@ -698,33 +698,49 @@ function ReviewsSection({ reviewsData, onAddReview }) {
 const isManagerRoute = (val) => {
   if (!val) return false;
   const decoded = decodeURIComponent(val).toLowerCase().trim();
+  const clean = decoded
+    .replace(/^#+/, "")
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "")
+    .split("?")[0]
+    .split("#")[0];
+
   return (
-    decoded === "/websitemanager" ||
-    decoded === "websitemanager" ||
-    decoded === "/website-manager" ||
-    decoded === "website-manager" ||
-    decoded === "/web-manager" ||
-    decoded === "web-manager" ||
-    decoded === "/web manager" ||
-    decoded === "web manager"
+    clean === "websitemanager" ||
+    clean === "website-manager" ||
+    clean === "web-manager" ||
+    clean === "webmanager" ||
+    clean === "manager" ||
+    clean === "admin"
   );
 };
 
 const getViewFromLocation = () => {
   if (typeof window === "undefined") return "home";
 
-  // 1. Check pathname (e.g., /websitemanager)
-  const pathname = window.location.pathname;
-  if (isManagerRoute(pathname)) {
+  // 1. Check pathname (e.g., /websitemanager or /websitemanager/)
+  if (isManagerRoute(window.location.pathname)) {
     return "manager";
   }
 
-  // 2. Check hash (e.g., #websitemanager)
-  const rawHash = window.location.hash.replace("#", "").split("/")[0];
-  if (isManagerRoute(rawHash)) {
+  // 2. Check hash (e.g., #websitemanager or #/websitemanager)
+  if (isManagerRoute(window.location.hash)) {
     return "manager";
   }
 
+  // 3. Check search parameters (e.g. ?page=websitemanager or ?admin or ?manager)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("admin") || params.has("manager") || params.has("websitemanager")) {
+      return "manager";
+    }
+    const qp = params.get("page") || params.get("view") || params.get("route");
+    if (qp && isManagerRoute(qp)) {
+      return "manager";
+    }
+  } catch (e) {}
+
+  const rawHash = window.location.hash.replace(/^#\/?/, "").split("/")[0];
   const valid = ["home", "ceo", "events", "team", "blog", "booking"];
   return valid.includes(rawHash) ? rawHash : "home";
 };
@@ -895,9 +911,20 @@ export default function App() {
     document.head.appendChild(style);
     const handleScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handleScroll);
+
+    const handleKeyDown = (e) => {
+      // Shortcut Ctrl+Shift+M or Cmd+Shift+M to open Website Manager
+      if ((e.ctrlKey || e.metaKey) && (e.key === "m" || e.key === "M") && e.shiftKey) {
+        e.preventDefault();
+        navigate("manager");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.head.removeChild(style);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -2888,8 +2915,28 @@ export default function App() {
             </a>
           </div>
         </div>
-        <div className="footer-bottom">
-          <p style={{ opacity: 0.35, fontSize: "0.85rem" }}>{branding.copyrightText}</p>
+        <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+          <p style={{ opacity: 0.4, fontSize: "0.85rem" }}>{branding.copyrightText}</p>
+          <a
+            href="/websitemanager"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("manager");
+            }}
+            style={{
+              opacity: 0.3,
+              fontSize: "0.78rem",
+              color: "rgba(255,255,255,0.7)",
+              textDecoration: "none",
+              cursor: "pointer",
+              transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.3")}
+            title="Website Manager Login (or press Ctrl+Shift+M)"
+          >
+            🔒 Staff Login
+          </a>
         </div>
       </footer>
     </div>

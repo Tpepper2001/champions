@@ -14,13 +14,15 @@ export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
     setIsLoading(true);
 
     setTimeout(() => {
-      // Required credentials: Username = Admin, Password = Pass
-      if (username.trim() === "Admin" && password === "Pass") {
+      // Required credentials: Username = Admin (or admin), Password = Pass (or pass)
+      const u = username.trim().toLowerCase();
+      const p = password.trim();
+      if (u === "admin" && (p === "Pass" || p === "pass")) {
         setIsLoading(false);
         onLoginSuccess();
       } else {
         setIsLoading(false);
-        setError("Invalid username or password. Please check your credentials.");
+        setError("Invalid username or password. Please use Admin / Pass.");
       }
     }, 300);
   };
