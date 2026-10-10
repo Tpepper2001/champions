@@ -4,6 +4,7 @@ import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
 import StaffMailPortal from "./components/StaffMailPortal";
 import ErrorBoundary from "./components/ErrorBoundary";
+import Footer from "./components/Footer";
 import {
   saveSiteData,
   loadSiteData,
