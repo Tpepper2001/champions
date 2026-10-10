@@ -33,6 +33,7 @@ export default function WebsiteManager({
   onOpenMailPortal,
   initialTab = "branding",
 }) {
+  console.log("WebsiteManager rendering");
   const [activeTab, setActiveTab] = useState(initialTab);
   const [saveToast, setSaveToast] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);

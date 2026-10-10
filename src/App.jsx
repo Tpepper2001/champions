@@ -1021,8 +1021,10 @@ export default function App() {
   };
 
   // If in Website Manager mode, check authentication
+  console.log("Rendering manager view, isAuthenticated:", isAuthenticated, "view:", view);
   if (view === "manager") {
     if (!isAuthenticated) {
+      console.log("Not authenticated, rendering login");
       return (
         <AdminLogin
           onLoginSuccess={handleLoginSuccess}
@@ -1032,6 +1034,7 @@ export default function App() {
       );
     }
 
+    console.log("Authenticated, rendering WebsiteManager");
     return (
       <WebsiteManager
         data={siteData}
