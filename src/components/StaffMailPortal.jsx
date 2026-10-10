@@ -93,6 +93,12 @@ export default function StaffMailPortal({
       ? siteData.staffMail.messages
       : DEFAULT_MESSAGES;
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedInStaffAccount, setLoggedInStaffAccount] = useState(null);
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
   const [department, setDepartment] = useState("Leadership & Programs");
@@ -107,12 +113,10 @@ export default function StaffMailPortal({
   const [errorMsg, setErrorMsg] = useState("");
   const [copiedField, setCopiedField] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("create"); // "create" | "webmail" | "directory" | "config"
+  const [activeTab, setActiveTab] = useState("webmail"); // "create" | "webmail" | "directory" | "config"
 
   // Built-in Webmail state
-  const [activeMailbox, setActiveMailbox] = useState(
-    () => staffEmails[0] || DEFAULT_STAFF_EMAILS[0]
-  );
+  const [activeMailbox, setActiveMailbox] = useState(null);
   const [mailFolder, setMailFolder] = useState("inbox"); // "inbox" | "sent" | "compose"
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [composeTo, setComposeTo] = useState("");
@@ -126,6 +130,32 @@ export default function StaffMailPortal({
       .replace(/[^a-z0-9._-]/g, "")
       .replace(/\.+/g, ".")
       .replace(/^\.|\.$/g, "");
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const account = staffEmails.find(
+      (acc) =>
+        acc.username === loginUsername.toLowerCase() &&
+        acc.tempPassword === loginPassword
+    );
+
+    if (account) {
+      setIsLoggedIn(true);
+      setLoggedInStaffAccount(account);
+      setActiveMailbox(account);
+      setLoginUsername("");
+      setLoginPassword("");
+      setLoginError("");
+    } else {
+      setLoginError("Invalid username or password.");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setLoggedInStaffAccount(null);
+    setActiveMailbox(null);
+  };
 
   const handleFullNameChange = (e) => {
     const val = e.target.value;
@@ -365,6 +395,39 @@ export default function StaffMailPortal({
   const displayedMessages =
     mailFolder === "sent" ? sentMessages : inboxMessages;
 
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-8">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+          <h2 className="text-xl font-black text-white text-center">Staff Login</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Username"
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white"
+            />
+            {loginError && <p className="text-rose-400 text-xs">{loginError}</p>}
+            <button
+              type="submit"
+              className="w-full py-3 bg-amber-400 text-slate-950 font-bold rounded-xl"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
       {/* TOP BAR */}
@@ -416,6 +479,16 @@ export default function StaffMailPortal({
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition"
             >
               Website Manager
+            </button>
+          )}
+
+          {isLoggedIn && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 bg-rose-950/30 hover:bg-rose-950/50 border border-rose-900/50 transition"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Logout
             </button>
           )}
 
