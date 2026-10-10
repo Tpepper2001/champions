@@ -1079,35 +1079,45 @@ export default function App() {
     }
 
     console.log("MANAGER VIEW: Auth ok, rendering WebsiteManager");
-    return (
-      <><AppMountedIndicator />
-      <WebsiteManager
-        data={siteData}
-        onChange={handleSiteDataChange}
-        onSave={handleSaveSiteData}
-        onReset={handleResetSiteData}
-        onClose={() => navigate("home")}
-        onLogout={handleLogout}
-        onOpenMailPortal={() => navigate("mail")}
-      /></>
-    );
+    try {
+      return (
+        <><AppMountedIndicator />
+        <WebsiteManager
+          data={siteData}
+          onChange={handleSiteDataChange}
+          onSave={handleSaveSiteData}
+          onReset={handleResetSiteData}
+          onClose={() => navigate("home")}
+          onLogout={handleLogout}
+          onOpenMailPortal={() => navigate("mail")}
+        /></>
+      );
+    } catch (e) {
+      console.error("WEBSITE MANAGER RENDER ERROR:", e);
+      return <div className="text-white">Rendering error in WebsiteManager</div>;
+    }
   }
 
   // If in Staff Email Portal mode (mail.cleadglobal.org / /mail)
   if (view === "mail") {
     console.log("MAIL VIEW: Rendering StaffMailPortal");
-    return (
-      <><AppMountedIndicator />
-      <StaffMailPortal
-        siteData={siteData}
-        onUpdateSiteData={handleSiteDataChange}
-        onSaveToCloud={async (updatedData) => {
-          await saveSiteData(updatedData || siteData);
-        }}
-        onBackToSite={() => navigate("home")}
-        onOpenManager={() => navigate("manager")}
-      /></>
-    );
+    try {
+      return (
+        <><AppMountedIndicator />
+        <StaffMailPortal
+          siteData={siteData}
+          onUpdateSiteData={handleSiteDataChange}
+          onSaveToCloud={async (updatedData) => {
+            await saveSiteData(updatedData || siteData);
+          }}
+          onBackToSite={() => navigate("home")}
+          onOpenManager={() => navigate("manager")}
+        /></>
+      );
+    } catch (e) {
+      console.error("STAFF MAIL PORTAL RENDER ERROR:", e);
+      return <div className="text-white">Rendering error in StaffMailPortal</div>;
+    }
   }
 
   const {
