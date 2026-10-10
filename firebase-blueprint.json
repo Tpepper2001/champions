@@ -60,12 +60,48 @@
           "maxLength": 64
         }
       }
+    },
+    "Email": {
+      "title": "Email",
+      "description": "Inbound emails received via Resend webhooks.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "html": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "subject",
+        "receivedAt"
+      ]
     }
   },
   "firestore": {
     "/site_settings/{settingId}": {
       "schema": "SiteSetting",
       "description": "Stores the live website content document (settingId = 'main') synced across all clients."
+    },
+    "/emails/{emailId}": {
+      "schema": "Email",
+      "description": "Stores inbound emails."
     }
   }
 }

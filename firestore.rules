@@ -32,6 +32,15 @@ service cloud.firestore {
         && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
+    function isValidEmail(data) {
+      return data is map
+        && data.keys().hasAll(['from', 'to', 'subject', 'receivedAt'])
+        && data.from is string && data.from.size() <= 256
+        && data.to is string && data.to.size() <= 256
+        && data.subject is string && data.subject.size() <= 256
+        && data.receivedAt is string && data.receivedAt.size() <= 64;
+    }
+
     match /test/{docId} {
       allow get: if isValidId(docId);
     }
@@ -40,6 +49,12 @@ service cloud.firestore {
       allow get: if isValidId(settingId) && settingId == 'main';
       allow create: if isValidId(settingId) && settingId == 'main' && isValidSiteSetting(incoming());
       allow update: if isValidId(settingId) && settingId == 'main' && isValidSiteSetting(incoming());
+    }
+
+    match /emails/{emailId} {
+      // Only allow read if user is authenticated (staff). No client writes.
+      allow read: if request.auth != null;
+      allow write: if false; 
     }
   }
 }
