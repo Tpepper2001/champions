@@ -964,6 +964,7 @@ export default function App() {
   }, []);
 
   const navigate = (v, post = null) => {
+    console.log("Navigating to:", v, "post:", post);
     setView(v);
     setMenuOpen(false);
     setSelectedPost(post);
@@ -1020,11 +1021,42 @@ export default function App() {
       });
   };
 
+  const [errorUI, setErrorUI] = useState(null);
+
+  // Error boundary like functionality
+  useEffect(() => {
+    const errorHandler = (event) => {
+      setErrorUI(`Error: ${event.message || event.reason}`);
+    };
+    window.addEventListener("error", errorHandler);
+    window.addEventListener("unhandledrejection", errorHandler);
+    return () => {
+      window.removeEventListener("error", errorHandler);
+      window.removeEventListener("unhandledrejection", errorHandler);
+    };
+  }, []);
+
+  // ... existing code ...
+  if (errorUI) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-red-900 text-white">
+        <div className="bg-red-950 p-6 rounded-xl border border-red-800">
+          <h2 className="text-xl font-bold mb-2">App Error</h2>
+          <p className="font-mono">{errorUI}</p>
+          <button
+            onClick={() => { setErrorUI(null); window.location.reload(); }}
+            className="mt-4 bg-white text-red-900 px-4 py-2 rounded"
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // If in Website Manager mode, check authentication
-  console.log("Rendering manager view, isAuthenticated:", isAuthenticated, "view:", view);
   if (view === "manager") {
     if (!isAuthenticated) {
-      console.log("Not authenticated, rendering login");
       return (
         <AdminLogin
           onLoginSuccess={handleLoginSuccess}
@@ -1034,7 +1066,6 @@ export default function App() {
       );
     }
 
-    console.log("Authenticated, rendering WebsiteManager");
     return (
       <WebsiteManager
         data={siteData}
