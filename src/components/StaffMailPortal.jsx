@@ -1514,6 +1514,7 @@ export default function StaffMailPortal({
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
