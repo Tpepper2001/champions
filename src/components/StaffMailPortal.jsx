@@ -135,7 +135,8 @@ export default function StaffMailPortal({
     e.preventDefault();
     const account = staffEmails.find(
       (acc) =>
-        acc.username === loginUsername.toLowerCase() &&
+        (acc.username === loginUsername.toLowerCase() ||
+         acc.email.toLowerCase() === loginUsername.toLowerCase()) &&
         acc.tempPassword === loginPassword
     );
 
@@ -147,7 +148,7 @@ export default function StaffMailPortal({
       setLoginPassword("");
       setLoginError("");
     } else {
-      setLoginError("Invalid username or password.");
+      setLoginError("Invalid username/email or password.");
     }
   };
 
@@ -403,7 +404,7 @@ export default function StaffMailPortal({
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Username or Email"
               value={loginUsername}
               onChange={(e) => setLoginUsername(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white"
