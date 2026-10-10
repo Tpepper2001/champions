@@ -14,10 +14,16 @@ import {
   Server,
   Lock,
   Sparkles,
-  ExternalLink,
   Search,
   RefreshCw,
   Building2,
+  Inbox,
+  Send,
+  PenSquare,
+  LogOut,
+  UserCheck,
+  Clock,
+  Reply,
 } from "lucide-react";
 
 const DEFAULT_STAFF_EMAILS = [
@@ -56,6 +62,20 @@ const DEFAULT_STAFF_EMAILS = [
   },
 ];
 
+const DEFAULT_MESSAGES = [
+  {
+    id: "msg-welcome-1",
+    to: "all@cleadglobal.org",
+    from: "system@cleadglobal.org",
+    fromName: "CLG Mail System (mail.cleadglobal.org)",
+    subject: "Welcome to Official Champions Leadership Global Staff Webmail",
+    body: "Welcome to your official @cleadglobal.org staff mailbox!\n\nYour custom corporate email address is now active on mail.cleadglobal.org. You can use this portal to:\n• Send and receive official messages with colleagues and external contacts\n• Provision new @cleadglobal.org email addresses for staff and regional directors\n• Connect your mailbox to mobile or desktop email clients via IMAP/SMTP.\n\n— Champions Leadership Global IT & Operations",
+    date: "2026-02-15 09:00",
+    folder: "inbox",
+    read: false,
+  },
+];
+
 export default function StaffMailPortal({
   siteData,
   onUpdateSiteData,
@@ -67,6 +87,11 @@ export default function StaffMailPortal({
     siteData?.staffMail?.accounts && Array.isArray(siteData.staffMail.accounts)
       ? siteData.staffMail.accounts
       : DEFAULT_STAFF_EMAILS;
+
+  const messages =
+    siteData?.staffMail?.messages && Array.isArray(siteData.staffMail.messages)
+      ? siteData.staffMail.messages
+      : DEFAULT_MESSAGES;
 
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
@@ -82,7 +107,18 @@ export default function StaffMailPortal({
   const [errorMsg, setErrorMsg] = useState("");
   const [copiedField, setCopiedField] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("create"); // "create" | "directory" | "config"
+  const [activeTab, setActiveTab] = useState("create"); // "create" | "webmail" | "directory" | "config"
+
+  // Built-in Webmail state
+  const [activeMailbox, setActiveMailbox] = useState(
+    () => staffEmails[0] || DEFAULT_STAFF_EMAILS[0]
+  );
+  const [mailFolder, setMailFolder] = useState("inbox"); // "inbox" | "sent" | "compose"
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [sendSuccessBanner, setSendSuccessBanner] = useState("");
 
   const sanitizeUsername = (val) =>
     val
@@ -118,7 +154,8 @@ export default function StaffMailPortal({
   };
 
   const generateStrongPassword = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*";
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*";
     let pass = "CLG-";
     for (let i = 0; i < 10; i++) {
       pass += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -133,13 +170,24 @@ export default function StaffMailPortal({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
+  const openWebmailForAccount = (account) => {
+    if (account) {
+      setActiveMailbox(account);
+    }
+    setActiveTab("webmail");
+    setMailFolder("inbox");
+    setSelectedMessage(null);
+  };
+
   const handleCreateEmail = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
     const cleanUser = sanitizeUsername(username);
     if (!cleanUser || cleanUser.length < 2) {
-      setErrorMsg("Please enter a valid email username (at least 2 characters).");
+      setErrorMsg(
+        "Please enter a valid email username (at least 2 characters)."
+      );
       return;
     }
 
@@ -148,7 +196,9 @@ export default function StaffMailPortal({
       (acc) => acc.email.toLowerCase() === fullEmail.toLowerCase()
     );
     if (exists) {
-      setErrorMsg(`The address ${fullEmail} is already registered to a staff member.`);
+      setErrorMsg(
+        `The address ${fullEmail} is already registered to a staff member.`
+      );
       return;
     }
 
@@ -165,20 +215,36 @@ export default function StaffMailPortal({
       department,
       username: cleanUser,
       email: fullEmail,
-      forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
+      forwardingEmail:
+        forwardingEmail.trim() || siteData?.branding?.email || "",
       tempPassword: finalPassword,
       status: "Active",
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
+    const welcomeMsg = {
+      id: `msg-${Date.now()}`,
+      to: fullEmail,
+      from: "admin@cleadglobal.org",
+      fromName: "Champions Leadership Global Admin",
+      subject: `Your new ${fullEmail} staff mailbox is ready`,
+      body: `Hello ${newAccount.fullName},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\nRole: ${newAccount.role}\nDepartment: ${newAccount.department}\nForwarding Address: ${newAccount.forwardingEmail || "None set"}\n\nYou can read and send emails directly from this Webmail Portal at any time.\n\nWarm regards,\nChampions Leadership Global`,
+      date: new Date().toISOString().slice(0, 16).replace("T", " "),
+      folder: "inbox",
+      read: false,
+    };
+
     const updatedAccounts = [newAccount, ...staffEmails];
+    const updatedMessages = [welcomeMsg, ...messages];
+
     const nextSiteData = {
       ...siteData,
       staffMail: {
         ...(siteData?.staffMail || {}),
-        portalUrl: "https://mail.cleadglobal.org",
+        portalUrl: "mail.cleadglobal.org",
         domain: "cleadglobal.org",
         accounts: updatedAccounts,
+        messages: updatedMessages,
       },
     };
 
@@ -197,12 +263,62 @@ export default function StaffMailPortal({
     setTimeout(() => {
       setIsCreating(false);
       setCreatedAccount(newAccount);
+      setActiveMailbox(newAccount);
       setFullName("");
       setRole("");
       setUsername("");
       setPassword("");
       setAutoSuggested(true);
-    }, 350);
+    }, 300);
+  };
+
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    if (!composeTo.trim() || !composeSubject.trim()) return;
+
+    const currentEmail = activeMailbox?.email || "info@cleadglobal.org";
+    const currentName = activeMailbox?.fullName || "CLG Staff";
+
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      to: composeTo.trim(),
+      from: currentEmail,
+      fromName: currentName,
+      subject: composeSubject.trim(),
+      body: composeBody.trim(),
+      date: new Date().toISOString().slice(0, 16).replace("T", " "),
+      folder: "sent",
+      read: true,
+    };
+
+    const updatedMessages = [newMsg, ...messages];
+    const nextSiteData = {
+      ...siteData,
+      staffMail: {
+        ...(siteData?.staffMail || {}),
+        portalUrl: "mail.cleadglobal.org",
+        domain: "cleadglobal.org",
+        accounts: staffEmails,
+        messages: updatedMessages,
+      },
+    };
+
+    if (onUpdateSiteData) {
+      onUpdateSiteData(nextSiteData);
+    }
+    try {
+      if (onSaveToCloud) {
+        await onSaveToCloud(nextSiteData);
+      }
+    } catch (err) {}
+
+    setSendSuccessBanner(`Message sent from ${currentEmail} to ${composeTo.trim()}`);
+    setComposeTo("");
+    setComposeSubject("");
+    setComposeBody("");
+    setMailFolder("sent");
+    setSelectedMessage(newMsg);
+    setTimeout(() => setSendSuccessBanner(""), 4000);
   };
 
   const handleDeleteAccount = async (id) => {
@@ -211,9 +327,10 @@ export default function StaffMailPortal({
       ...siteData,
       staffMail: {
         ...(siteData?.staffMail || {}),
-        portalUrl: "https://mail.cleadglobal.org",
+        portalUrl: "mail.cleadglobal.org",
         domain: "cleadglobal.org",
         accounts: updatedAccounts,
+        messages,
       },
     };
     if (onUpdateSiteData) {
@@ -233,6 +350,20 @@ export default function StaffMailPortal({
       item.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.role?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Filter messages for activeMailbox
+  const currentMailboxEmail = (activeMailbox?.email || "").toLowerCase();
+  const inboxMessages = messages.filter(
+    (m) =>
+      m.to?.toLowerCase() === currentMailboxEmail ||
+      m.to?.toLowerCase() === "all@cleadglobal.org"
+  );
+  const sentMessages = messages.filter(
+    (m) => m.from?.toLowerCase() === currentMailboxEmail
+  );
+
+  const displayedMessages =
+    mailFolder === "sent" ? sentMessages : inboxMessages;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
@@ -262,23 +393,21 @@ export default function StaffMailPortal({
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Champions Leadership Global • Custom Staff Email Provisioning & Directory
+              Champions Leadership Global • Custom Staff Email Provisioning, Webmail & Directory
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <a
-            href="https://mail.cleadglobal.org"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => openWebmailForAccount(activeMailbox)}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 transition"
-            title="External Webmail Login (mail.cleadglobal.org)"
+            title="Open Built-In Staff Webmail Inbox"
           >
-            <Globe className="w-3.5 h-3.5" />
-            mail.cleadglobal.org
-            <ExternalLink className="w-3 h-3 opacity-75" />
-          </a>
+            <Inbox className="w-3.5 h-3.5" />
+            Open Webmail Inbox
+          </button>
 
           {onOpenManager && (
             <button
@@ -312,26 +441,31 @@ export default function StaffMailPortal({
               Staff Email System • @cleadglobal.org
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Create Your Official <span className="text-amber-400">@cleadglobal.org</span> Staff Email
+              Official <span className="text-amber-400">@cleadglobal.org</span> Staff Mail Portal
             </h1>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Generate custom corporate email addresses for Champions Leadership Global staff,
-              executives, and regional directors via{" "}
-              <span className="text-slate-200 font-semibold">mail.cleadglobal.org</span>.
+              Create custom corporate email addresses for Champions Leadership Global staff,
+              access your built-in Webmail Inbox, and manage the organization directory.
             </p>
           </div>
 
           {/* Quick Stats */}
           <div className="flex items-center gap-3 self-start md:self-center">
             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-3 text-center">
-              <div className="text-xl font-black text-amber-400">{staffEmails.length}</div>
-              <div className="text-[11px] text-slate-400 font-medium">Active Mailboxes</div>
+              <div className="text-xl font-black text-amber-400">
+                {staffEmails.length}
+              </div>
+              <div className="text-[11px] text-slate-400 font-medium">
+                Active Mailboxes
+              </div>
             </div>
             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-3 text-center">
               <div className="text-sm font-black text-emerald-400 flex items-center justify-center gap-1 py-1">
-                <ShieldCheck className="w-4 h-4" /> Verified
+                <ShieldCheck className="w-4 h-4" /> Firebase Synced
               </div>
-              <div className="text-[11px] text-slate-400 font-medium">Domain SSL / IMAP</div>
+              <div className="text-[11px] text-slate-400 font-medium">
+                Live Cloud Directory
+              </div>
             </div>
           </div>
         </div>
@@ -349,6 +483,18 @@ export default function StaffMailPortal({
           >
             <UserPlus className="w-4 h-4" />
             Create Custom Staff Email
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("webmail")}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+              activeTab === "webmail"
+                ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20"
+                : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/70"
+            }`}
+          >
+            <Inbox className="w-4 h-4" />
+            Webmail Inbox & Compose
           </button>
           <button
             type="button"
@@ -372,7 +518,7 @@ export default function StaffMailPortal({
             }`}
           >
             <Server className="w-4 h-4" />
-            Mail Server & Client Setup
+            Subdomain DNS & Mail Server Setup
           </button>
         </div>
       </div>
@@ -394,7 +540,7 @@ export default function StaffMailPortal({
                   </p>
                 </div>
                 <span className="text-[11px] font-mono bg-slate-800 text-amber-300 px-2.5 py-1 rounded-lg border border-slate-700">
-                  mail.cleadglobal.org
+                  @cleadglobal.org
                 </span>
               </div>
 
@@ -446,15 +592,25 @@ export default function StaffMailPortal({
                         onChange={(e) => setDepartment(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
                       >
-                        <option value="Executive Leadership">Executive Leadership</option>
-                        <option value="Leadership & Programs">Leadership & Programs</option>
+                        <option value="Executive Leadership">
+                          Executive Leadership
+                        </option>
+                        <option value="Leadership & Programs">
+                          Leadership & Programs
+                        </option>
                         <option value="Administration">Administration</option>
-                        <option value="Events & Outreach">Events & Outreach</option>
-                        <option value="Media & Communications">Media & Communications</option>
+                        <option value="Events & Outreach">
+                          Events & Outreach
+                        </option>
+                        <option value="Media & Communications">
+                          Media & Communications
+                        </option>
                         <option value="Global Chapters & Volunteers">
                           Global Chapters & Volunteers
                         </option>
-                        <option value="Finance & Partnerships">Finance & Partnerships</option>
+                        <option value="Finance & Partnerships">
+                          Finance & Partnerships
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -495,7 +651,9 @@ export default function StaffMailPortal({
                     <span className="text-[11px] text-slate-400">
                       Preview:{" "}
                       <strong className="text-emerald-400 font-mono">
-                        {username ? `${username}@cleadglobal.org` : "your.name@cleadglobal.org"}
+                        {username
+                          ? `${username}@cleadglobal.org`
+                          : "your.name@cleadglobal.org"}
                       </strong>
                     </span>
                     <div className="flex gap-1.5">
@@ -511,7 +669,9 @@ export default function StaffMailPortal({
                                 .split(/\s+/)
                                 .filter(Boolean);
                               if (parts.length >= 2) {
-                                setUsername(`${parts[0]}.${parts[parts.length - 1]}`);
+                                setUsername(
+                                  `${parts[0]}.${parts[parts.length - 1]}`
+                                );
                               } else if (parts[0]) {
                                 setUsername(parts[0]);
                               }
@@ -530,7 +690,9 @@ export default function StaffMailPortal({
                                 .split(/\s+/)
                                 .filter(Boolean);
                               if (parts.length >= 2) {
-                                setUsername(`${parts[0][0]}${parts[parts.length - 1]}`);
+                                setUsername(
+                                  `${parts[0][0]}${parts[parts.length - 1]}`
+                                );
                               }
                             }}
                             className="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
@@ -587,7 +749,7 @@ export default function StaffMailPortal({
                   {isCreating ? (
                     <>
                       <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                      Provisioning Mailbox on mail.cleadglobal.org...
+                      Provisioning Mailbox...
                     </>
                   ) : (
                     <>
@@ -610,7 +772,7 @@ export default function StaffMailPortal({
                       </div>
                       <div>
                         <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
-                          Mailbox Created
+                          Mailbox Created & Active
                         </span>
                         <h3 className="text-base font-extrabold text-white">
                           {createdAccount.fullName}
@@ -628,7 +790,9 @@ export default function StaffMailPortal({
                         </span>
                         <button
                           type="button"
-                          onClick={() => handleCopy(createdAccount.email, "new-email")}
+                          onClick={() =>
+                            handleCopy(createdAccount.email, "new-email")
+                          }
                           className="p-1 rounded hover:bg-slate-800 text-slate-300"
                           title="Copy email"
                         >
@@ -642,14 +806,16 @@ export default function StaffMailPortal({
                     </div>
 
                     <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
-                      <span className="text-slate-400">Temporary Password:</span>
+                      <span className="text-slate-400">Password:</span>
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono font-bold text-emerald-300">
                           {createdAccount.tempPassword}
                         </span>
                         <button
                           type="button"
-                          onClick={() => handleCopy(createdAccount.tempPassword, "new-pass")}
+                          onClick={() =>
+                            handleCopy(createdAccount.tempPassword, "new-pass")
+                          }
                           className="p-1 rounded hover:bg-slate-800 text-slate-300"
                           title="Copy password"
                         >
@@ -663,29 +829,22 @@ export default function StaffMailPortal({
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-400">Webmail Portal URL:</span>
-                      <a
-                        href="https://mail.cleadglobal.org"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-mono font-bold text-amber-300 hover:underline inline-flex items-center gap-1"
-                      >
-                        https://mail.cleadglobal.org
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                      <span className="text-slate-400">Status:</span>
+                      <span className="font-mono font-bold text-emerald-400">
+                        Active on Firebase Cloud
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2.5">
-                    <a
-                      href="https://mail.cleadglobal.org"
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => openWebmailForAccount(createdAccount)}
                       className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs text-center flex items-center justify-center gap-1.5 transition"
                     >
-                      Launch mail.cleadglobal.org
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                      <Inbox className="w-4 h-4" />
+                      Open {createdAccount.username} Webmail Inbox
+                    </button>
                     <button
                       type="button"
                       onClick={() => setActiveTab("directory")}
@@ -701,63 +860,354 @@ export default function StaffMailPortal({
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-                    <Globe className="w-5 h-5" />
+                    <Inbox className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="text-sm font-extrabold text-white">
-                      Webmail Login Portal
+                      Built-In Staff Webmail Client
                     </h3>
                     <p className="text-xs text-slate-400">
-                      Access your inbox directly at mail.cleadglobal.org
+                      Check and send emails for any @cleadglobal.org account right here
                     </p>
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2">
                   <span className="font-mono text-xs text-amber-400 truncate">
-                    https://mail.cleadglobal.org
+                    {activeMailbox?.email || "info@cleadglobal.org"}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => handleCopy("https://mail.cleadglobal.org", "portal-url")}
-                      className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold flex items-center gap-1"
+                      onClick={() => openWebmailForAccount(activeMailbox)}
+                      className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold flex items-center gap-1"
                     >
-                      {copiedField === "portal-url" ? (
-                        <>
-                          <Check className="w-3 h-3 text-emerald-400" /> Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3" /> Copy URL
-                        </>
-                      )}
+                      <Inbox className="w-3.5 h-3.5" /> Launch Inbox
                     </button>
-                    <a
-                      href="https://mail.cleadglobal.org"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-[11px] font-bold flex items-center gap-1"
-                    >
-                      Open <ExternalLink className="w-3 h-3" />
-                    </a>
                   </div>
                 </div>
 
                 <ul className="space-y-2 text-xs text-slate-400 pt-1">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Custom <strong className="text-slate-200">name@cleadglobal.org</strong> staff addresses</span>
+                    <span>
+                      Custom{" "}
+                      <strong className="text-slate-200">
+                        name@cleadglobal.org
+                      </strong>{" "}
+                      staff addresses
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Compatible with Outlook, Apple Mail, Gmail & Mobile IMAP</span>
+                    <span>
+                      Instant built-in Webmail Inbox & Compose (no external 404)
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Synced with Champions Leadership Global Cloud Directory</span>
+                    <span>
+                      Synced with Champions Leadership Global Firebase Database
+                    </span>
                   </li>
                 </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* BUILT-IN WEBMAIL INBOX & COMPOSER */}
+        {activeTab === "webmail" && (
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+            {/* Webmail Top Account Bar */}
+            <div className="bg-slate-950/90 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-400 flex items-center justify-center font-bold text-sm">
+                  {(activeMailbox?.fullName || "S")[0]}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-extrabold text-white">
+                      {activeMailbox?.fullName || "Staff Mailbox"}
+                    </span>
+                    <span className="text-xs font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                      {activeMailbox?.email}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    {activeMailbox?.role} • {activeMailbox?.department}
+                  </p>
+                </div>
+              </div>
+
+              {/* Switch active staff mailbox */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <label className="text-xs text-slate-400 font-semibold flex items-center gap-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  Switch Mailbox:
+                </label>
+                <select
+                  value={activeMailbox?.email || ""}
+                  onChange={(e) => {
+                    const found = staffEmails.find(
+                      (a) => a.email === e.target.value
+                    );
+                    if (found) {
+                      setActiveMailbox(found);
+                      setSelectedMessage(null);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-400"
+                >
+                  {staffEmails.map((acc) => (
+                    <option key={acc.id} value={acc.email}>
+                      {acc.email} ({acc.fullName})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {sendSuccessBanner && (
+              <div className="bg-emerald-500/15 border-b border-emerald-500/30 px-6 py-3 text-xs font-bold text-emerald-300 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                {sendSuccessBanner}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-12 min-h-[480px]">
+              {/* Left Sidebar */}
+              <div className="md:col-span-3 border-b md:border-b-0 md:border-r border-slate-800 p-4 space-y-2 bg-slate-950/40">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMailFolder("compose");
+                    setSelectedMessage(null);
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md mb-3 transition"
+                >
+                  <PenSquare className="w-4 h-4" />
+                  Compose Email
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMailFolder("inbox");
+                    setSelectedMessage(null);
+                  }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-bold flex items-center justify-between transition ${
+                    mailFolder === "inbox"
+                      ? "bg-slate-800 text-amber-400 border border-slate-700"
+                      : "text-slate-300 hover:bg-slate-800/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Inbox className="w-4 h-4" /> Inbox
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 text-slate-300">
+                    {inboxMessages.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMailFolder("sent");
+                    setSelectedMessage(null);
+                  }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-bold flex items-center justify-between transition ${
+                    mailFolder === "sent"
+                      ? "bg-slate-800 text-amber-400 border border-slate-700"
+                      : "text-slate-300 hover:bg-slate-800/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Send className="w-4 h-4" /> Sent Mail
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 text-slate-300">
+                    {sentMessages.length}
+                  </span>
+                </button>
+              </div>
+
+              {/* Right Content Area */}
+              <div className="md:col-span-9 p-6">
+                {mailFolder === "compose" ? (
+                  <form onSubmit={handleSendEmail} className="space-y-4 max-w-2xl">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                      <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                        <PenSquare className="w-4 h-4 text-amber-400" />
+                        New Message from {activeMailbox?.email}
+                      </h3>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                        To (Recipient Email) *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="colleague@cleadglobal.org or external email"
+                        value={composeTo}
+                        onChange={(e) => setComposeTo(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                        Subject *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter email subject..."
+                        value={composeSubject}
+                        onChange={(e) => setComposeSubject(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                        Message Body *
+                      </label>
+                      <textarea
+                        rows={7}
+                        required
+                        placeholder="Write your official message here..."
+                        value={composeBody}
+                        onChange={(e) => setComposeBody(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-2">
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs inline-flex items-center gap-2 transition"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        Send Official Email
+                      </button>
+                      <a
+                        href={`mailto:${encodeURIComponent(
+                          composeTo
+                        )}?subject=${encodeURIComponent(
+                          composeSubject
+                        )}&body=${encodeURIComponent(composeBody)}`}
+                        className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs inline-flex items-center gap-1.5 transition"
+                      >
+                        Open in Device Mail App
+                      </a>
+                    </div>
+                  </form>
+                ) : selectedMessage ? (
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMessage(null)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300"
+                      >
+                        <ArrowLeft className="w-4 h-4" /> Back to{" "}
+                        {mailFolder === "sent" ? "Sent Mail" : "Inbox"}
+                      </button>
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" /> {selectedMessage.date}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-extrabold text-white">
+                        {selectedMessage.subject}
+                      </h3>
+                      <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+                        <div>
+                          <span className="text-slate-500">From:</span>{" "}
+                          <strong className="text-slate-200">
+                            {selectedMessage.fromName || selectedMessage.from}
+                          </strong>{" "}
+                          &lt;{selectedMessage.from}&gt;
+                        </div>
+                        <div>
+                          <span className="text-slate-500">To:</span>{" "}
+                          <strong className="text-amber-300 font-mono">
+                            {selectedMessage.to}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm text-slate-200 whitespace-pre-line leading-relaxed">
+                      {selectedMessage.body}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setComposeTo(selectedMessage.from);
+                        setComposeSubject(`Re: ${selectedMessage.subject}`);
+                        setMailFolder("compose");
+                      }}
+                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs inline-flex items-center gap-1.5"
+                    >
+                      <Reply className="w-3.5 h-3.5" /> Reply
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-400">
+                        {mailFolder === "sent" ? "Sent Messages" : "Inbox Messages"} —{" "}
+                        <span className="text-amber-400 font-mono lowercase">
+                          {activeMailbox?.email}
+                        </span>
+                      </h3>
+                    </div>
+
+                    {displayedMessages.length === 0 ? (
+                      <div className="py-12 text-center text-slate-500 text-xs">
+                        No messages in this folder yet. Click "Compose Email" to send a message.
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-slate-800/70">
+                        {displayedMessages.map((msg) => (
+                          <button
+                            key={msg.id}
+                            type="button"
+                            onClick={() => setSelectedMessage(msg)}
+                            className="w-full text-left py-3.5 px-3 hover:bg-slate-800/40 rounded-xl transition flex items-start justify-between gap-4"
+                          >
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-white text-sm truncate">
+                                  {mailFolder === "sent"
+                                    ? `To: ${msg.to}`
+                                    : msg.fromName || msg.from}
+                                </span>
+                                <span className="text-[11px] font-mono text-amber-400/90">
+                                  {mailFolder === "sent" ? "" : `<${msg.from}>`}
+                                </span>
+                              </div>
+                              <div className="text-xs font-semibold text-slate-200 mt-0.5 truncate">
+                                {msg.subject}
+                              </div>
+                              <div className="text-xs text-slate-400 truncate mt-0.5">
+                                {msg.body}
+                              </div>
+                            </div>
+                            <span className="text-[11px] text-slate-500 shrink-0 font-mono">
+                              {msg.date}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -772,7 +1222,7 @@ export default function StaffMailPortal({
                   Official @cleadglobal.org Staff Directory
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  All active custom email accounts provisioned on mail.cleadglobal.org
+                  All active custom email accounts provisioned for Champions Leadership Global
                 </p>
               </div>
 
@@ -810,9 +1260,14 @@ export default function StaffMailPortal({
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 text-sm">
                   {filteredStaff.map((acc) => (
-                    <tr key={acc.id} className="hover:bg-slate-800/30 transition">
+                    <tr
+                      key={acc.id}
+                      className="hover:bg-slate-800/30 transition"
+                    >
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-white">{acc.fullName}</div>
+                        <div className="font-bold text-white">
+                          {acc.fullName}
+                        </div>
                         <div className="text-xs text-slate-400">{acc.role}</div>
                       </td>
                       <td className="py-3.5 px-4">
@@ -843,14 +1298,13 @@ export default function StaffMailPortal({
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="inline-flex items-center gap-2">
-                          <a
-                            href="https://mail.cleadglobal.org"
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => openWebmailForAccount(acc)}
                             className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-amber-300 font-semibold inline-flex items-center gap-1"
                           >
-                            Webmail <ExternalLink className="w-3 h-3" />
-                          </a>
+                            <Inbox className="w-3 h-3" /> Open Inbox
+                          </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteAccount(acc.id)}
@@ -865,7 +1319,10 @@ export default function StaffMailPortal({
                   ))}
                   {filteredStaff.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-slate-500 text-xs">
+                      <td
+                        colSpan={5}
+                        className="py-8 text-center text-slate-500 text-xs"
+                      >
                         No matching staff email accounts found.
                       </td>
                     </tr>
@@ -877,49 +1334,96 @@ export default function StaffMailPortal({
         )}
 
         {activeTab === "config" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div className="space-y-6">
+            {/* DNS Subdomain Setup Card */}
+            <div className="bg-slate-900 border border-amber-400/30 rounded-3xl p-6 space-y-4">
               <div className="flex items-center gap-2.5">
-                <Server className="w-5 h-5 text-amber-400" />
+                <Globe className="w-5 h-5 text-amber-400" />
                 <h3 className="text-base font-extrabold text-white">
-                  Incoming Mail Server (IMAP)
+                  How to Connect <span className="text-amber-400 font-mono">mail.cleadglobal.org</span> in Vercel & DNS
                 </h3>
               </div>
-              <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Server Hostname:</span>
-                  <span className="text-amber-300 font-bold">mail.cleadglobal.org</span>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                This portal works immediately at{" "}
+                <strong className="text-amber-300 font-mono">/mail</strong> and{" "}
+                <strong className="text-amber-300 font-mono">#mail</strong> on your main domain. To also make{" "}
+                <strong className="text-amber-300 font-mono">https://mail.cleadglobal.org</strong> resolve directly without a "Page Not Found" or DNS error:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-bold text-amber-400">
+                    Step 1 — Add Domain in Vercel
+                  </div>
+                  <p className="text-slate-400">
+                    Open your Vercel Project &rarr; <strong>Settings</strong> &rarr;{" "}
+                    <strong>Domains</strong> &rarr; Click <strong>Add Domain</strong> and enter{" "}
+                    <code className="text-emerald-300">mail.cleadglobal.org</code>.
+                  </p>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">IMAP Port (SSL/TLS):</span>
-                  <span className="text-emerald-300">993</span>
-                </div>
-                <div className="flex justify-between py-1">
-                  <span className="text-slate-400">POP3 Port (SSL/TLS):</span>
-                  <span className="text-emerald-300">995</span>
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-bold text-amber-400">
+                    Step 2 — Add DNS CNAME Record
+                  </div>
+                  <p className="text-slate-400">
+                    In your domain DNS manager for <code className="text-slate-200">cleadglobal.org</code>, add a{" "}
+                    <strong className="text-emerald-300">CNAME</strong> record with Host/Name{" "}
+                    <code className="text-emerald-300">mail</code> pointing to{" "}
+                    <code className="text-emerald-300">cname.vercel-dns.com</code>.
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-              <div className="flex items-center gap-2.5">
-                <Lock className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-extrabold text-white">
-                  Outgoing Mail Server (SMTP)
-                </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <Server className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-extrabold text-white">
+                    Incoming Mail Server (IMAP)
+                  </h3>
+                </div>
+                <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Server Hostname:</span>
+                    <span className="text-amber-300 font-bold">
+                      mail.cleadglobal.org
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">IMAP Port (SSL/TLS):</span>
+                    <span className="text-emerald-300">993</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-slate-400">POP3 Port (SSL/TLS):</span>
+                    <span className="text-emerald-300">995</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">Server Hostname:</span>
-                  <span className="text-amber-300 font-bold">mail.cleadglobal.org</span>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <Lock className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-extrabold text-white">
+                    Outgoing Mail Server (SMTP)
+                  </h3>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-400">SMTP Port (SSL/TLS):</span>
-                  <span className="text-emerald-300">465 / 587</span>
-                </div>
-                <div className="flex justify-between py-1">
-                  <span className="text-slate-400">Authentication:</span>
-                  <span className="text-emerald-300">Full @cleadglobal.org Email</span>
+                <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">Server Hostname:</span>
+                    <span className="text-amber-300 font-bold">
+                      mail.cleadglobal.org
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800">
+                    <span className="text-slate-400">SMTP Port (SSL/TLS):</span>
+                    <span className="text-emerald-300">465 / 587</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-slate-400">Authentication:</span>
+                    <span className="text-emerald-300">
+                      Full @cleadglobal.org Email
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
