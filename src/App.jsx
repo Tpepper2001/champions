@@ -1038,8 +1038,10 @@ export default function App() {
 
   // ── DEBUG APP MOUNT ──────────────────────────
   const AppMountedIndicator = () => (
-    <div style={{position:"fixed", top:0, left:0, zIndex:99999, background:"red", color:"white", padding:"5px", fontSize:"10px"}}>
-      APP MOUNTED
+    <div style={{position:"fixed", top:0, left:0, zIndex:99999, background:"red", color:"white", padding:"5px", fontSize:"10px", pointerEvents: "none"}}>
+      <div>APP MOUNTED</div>
+      <div>View: {view}</div>
+      <div>Auth: {isAuthenticated ? "TRUE" : "FALSE"}</div>
     </div>
   );
 
@@ -1063,7 +1065,9 @@ export default function App() {
 
   // If in Website Manager mode, check authentication
   if (view === "manager") {
+    console.log("MANAGER VIEW: Checking auth. isAuthenticated:", isAuthenticated);
     if (!isAuthenticated) {
+      console.log("MANAGER VIEW: Not auth, rendering login");
       return (
         <><AppMountedIndicator />
         <AdminLogin
@@ -1074,6 +1078,7 @@ export default function App() {
       );
     }
 
+    console.log("MANAGER VIEW: Auth ok, rendering WebsiteManager");
     return (
       <><AppMountedIndicator />
       <WebsiteManager
@@ -1090,6 +1095,7 @@ export default function App() {
 
   // If in Staff Email Portal mode (mail.cleadglobal.org / /mail)
   if (view === "mail") {
+    console.log("MAIL VIEW: Rendering StaffMailPortal");
     return (
       <><AppMountedIndicator />
       <StaffMailPortal
