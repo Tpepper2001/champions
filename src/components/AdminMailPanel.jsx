@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mail,
   UserPlus,
@@ -11,42 +11,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Footer from "./Footer";
-
-const DEFAULT_STAFF_EMAILS = [
-  {
-    id: "staff-1",
-    fullName: "Jerry Oyedele",
-    role: "Chief Executive Officer",
-    department: "Executive Leadership",
-    username: "jerry.oyedele",
-    email: "jerry.oyedele@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "staff-2",
-    fullName: "Admin & Operations",
-    role: "Operations Desk",
-    department: "Administration",
-    username: "info",
-    email: "info@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "staff-3",
-    fullName: "Partnerships & Events",
-    role: "Events Coordinator",
-    department: "Events & Outreach",
-    username: "events",
-    email: "events@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-02-10",
-  },
-];
+import { collection, onSnapshot } from "firebase/firestore";
+import { db, OperationType, handleFirestoreError } from "../firebase";
 
 export default function AdminMailPanel({
   siteData,
@@ -54,10 +20,21 @@ export default function AdminMailPanel({
   onSaveToCloud,
   onBackToSite,
 }) {
-  const staffEmails =
-    siteData?.staffMail?.accounts && Array.isArray(siteData.staffMail.accounts)
-      ? siteData.staffMail.accounts
-      : DEFAULT_STAFF_EMAILS;
+  const [mailboxes, setMailboxes] = useState([]);
+
+  useEffect(() => {
+    const unsubMailboxes = onSnapshot(
+        collection(db, "mailboxes"),
+        (snapshot) => {
+            setMailboxes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        },
+        (error) => handleFirestoreError(error, OperationType.LIST, "mailboxes")
+    );
+
+    return () => unsubMailboxes();
+  }, []);
+
+  const staffEmails = mailboxes;
 
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");

@@ -1,30 +1,27 @@
 import React, { useState } from "react";
 import { Lock, User, ArrowLeft, ShieldAlert, Eye, EyeOff } from "lucide-react";
+import { auth, signInWithEmailAndPassword } from "../firebase";
 
 export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      // Required credentials: Username = Admin (or admin), Password = Pass (or pass)
-      const u = username.trim().toLowerCase();
-      const p = password.trim();
-      if (u === "admin" && (p === "Pass" || p === "pass")) {
-        setIsLoading(false);
-        onLoginSuccess();
-      } else {
-        setIsLoading(false);
-        setError("Invalid username or password. Please use Admin / Pass.");
-      }
-    }, 300);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      onLoginSuccess();
+    } catch (err) {
+      console.error(err);
+      setError("Invalid email or password.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -83,21 +80,21 @@ export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                Username
+                Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <User className="w-4 h-4" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   required
                   autoFocus
-                  autoComplete="username"
-                  placeholder="Username"
-                  value={username}
+                  autoComplete="email"
+                  placeholder="admin@example.com"
+                  value={email}
                   onChange={(e) => {
-                    setUsername(e.target.value);
+                    setEmail(e.target.value);
                     if (error) setError("");
                   }}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
@@ -148,20 +145,13 @@ export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying...</span>
+                  <span>Signing in...</span>
                 </>
               ) : (
                 <span>Sign In to Manager</span>
               )}
             </button>
           </form>
-
-          {/* Credential Hint */}
-          <div className="pt-4 border-t border-slate-800/80 text-center">
-            <p className="text-[11px] text-slate-400 leading-relaxed">
-              Default access: <span className="text-amber-400 font-mono font-bold">Admin</span> / <span className="text-amber-400 font-mono font-bold">Pass</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>

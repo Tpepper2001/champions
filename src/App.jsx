@@ -10,6 +10,9 @@ import {
   loadSiteData,
   subscribeSiteData,
   testConnection,
+  auth,
+  onAuthStateChanged,
+  signOut,
 } from "./firebase";
 
 const styles = `
@@ -880,28 +883,24 @@ export default function App() {
       }
     };
   }, []);
-
   // ── AUTHENTICATION ───────────────
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    try {
-      return localStorage.getItem("clg_admin_authenticated") === "true";
-    } catch (e) {
-      return false;
-    }
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setAuthChecked(true);
+    });
+    return unsubscribe;
+  }, []);
 
   const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-    try {
-      localStorage.setItem("clg_admin_authenticated", "true");
-    } catch (e) {}
+    // Auth state is handled by onAuthStateChanged
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    try {
-      localStorage.removeItem("clg_admin_authenticated");
-    } catch (e) {}
+  const handleLogout = async () => {
+    await signOut(auth);
     navigate("home");
   };
 

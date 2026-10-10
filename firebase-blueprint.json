@@ -49,10 +49,6 @@
           "type": "object",
           "description": "Booking and contact inquiry configuration."
         },
-        "staffMail": {
-          "type": "object",
-          "description": "Staff custom @cleadglobal.org email accounts provisioned via mail.cleadglobal.org."
-        },
         "updatedAt": {
           "type": "string",
           "format": "date-time",
@@ -61,32 +57,45 @@
         }
       }
     },
+    "Mailbox": {
+      "title": "Mailbox",
+      "description": "A staff email account/mailbox.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "name", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message within a mailbox.",
+      "type": "object",
+      "properties": {
+        "mailboxId": { "type": "string" },
+        "from": { "type": "string" },
+        "subject": { "type": "string" },
+        "body": { "type": "string" },
+        "receivedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["mailboxId", "from", "subject", "receivedAt"]
+    },
     "Email": {
       "title": "Email",
       "description": "Inbound emails received via Resend webhooks.",
       "type": "object",
       "properties": {
-        "from": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "html": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "receivedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
+        "mailboxId": { "type": "string" },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "subject": { "type": "string" },
+        "html": { "type": "string" },
+        "text": { "type": "string" },
+        "receivedAt": { "type": "string", "format": "date-time" }
       },
       "required": [
+        "mailboxId",
         "from",
         "to",
         "subject",
@@ -99,9 +108,17 @@
       "schema": "SiteSetting",
       "description": "Stores the live website content document (settingId = 'main') synced across all clients."
     },
+    "/mailboxes/{mailboxId}": {
+      "schema": "Mailbox",
+      "description": "Staff mailboxes."
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages for a mailbox."
+    },
     "/emails/{emailId}": {
       "schema": "Email",
-      "description": "Stores inbound emails."
+      "description": "Inbound emails."
     }
   }
 }

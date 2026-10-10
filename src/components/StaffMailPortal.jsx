@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mail,
   UserPlus,
@@ -26,56 +26,8 @@ import {
   Reply,
 } from "lucide-react";
 import Footer from "./Footer";
-
-const DEFAULT_STAFF_EMAILS = [
-  {
-    id: "staff-1",
-    fullName: "Jerry Oyedele",
-    role: "Chief Executive Officer",
-    department: "Executive Leadership",
-    username: "jerry.oyedele",
-    email: "jerry.oyedele@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "staff-2",
-    fullName: "Admin & Operations",
-    role: "Operations Desk",
-    department: "Administration",
-    username: "info",
-    email: "info@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "staff-3",
-    fullName: "Partnerships & Events",
-    role: "Events Coordinator",
-    department: "Events & Outreach",
-    username: "events",
-    email: "events@cleadglobal.org",
-    forwardingEmail: "championsleadershipglobal@gmail.com",
-    status: "Active",
-    createdAt: "2026-02-10",
-  },
-];
-
-const DEFAULT_MESSAGES = [
-  {
-    id: "msg-welcome-1",
-    to: "all@cleadglobal.org",
-    from: "system@cleadglobal.org",
-    fromName: "CLG Mail System (mail.cleadglobal.org)",
-    subject: "Welcome to Official Champions Leadership Global Staff Webmail",
-    body: "Welcome to your official @cleadglobal.org staff mailbox!\n\nYour custom corporate email address is now active on mail.cleadglobal.org. You can use this portal to:\n• Send and receive official messages with colleagues and external contacts\n• Provision new @cleadglobal.org email addresses for staff and regional directors\n• Connect your mailbox to mobile or desktop email clients via IMAP/SMTP.\n\n— Champions Leadership Global IT & Operations",
-    date: "2026-02-15 09:00",
-    folder: "inbox",
-    read: false,
-  },
-];
+import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
+import { db, OperationType, handleFirestoreError } from "../firebase";
 
 export default function StaffMailPortal({
   siteData,
@@ -84,15 +36,33 @@ export default function StaffMailPortal({
   onBackToSite,
   onOpenManager,
 }) {
-  const staffEmails =
-    siteData?.staffMail?.accounts && Array.isArray(siteData.staffMail.accounts)
-      ? siteData.staffMail.accounts
-      : DEFAULT_STAFF_EMAILS;
+  const [mailboxes, setMailboxes] = useState([]);
+  const [messages, setMessages] = useState([]);
 
-  const messages =
-    siteData?.staffMail?.messages && Array.isArray(siteData.staffMail.messages)
-      ? siteData.staffMail.messages
-      : DEFAULT_MESSAGES;
+  useEffect(() => {
+    const unsubMailboxes = onSnapshot(
+        collection(db, "mailboxes"),
+        (snapshot) => {
+            setMailboxes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        },
+        (error) => handleFirestoreError(error, OperationType.LIST, "mailboxes")
+    );
+
+    const unsubMessages = onSnapshot(
+        collection(db, "messages"),
+        (snapshot) => {
+            setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        },
+        (error) => handleFirestoreError(error, OperationType.LIST, "messages")
+    );
+
+    return () => {
+        unsubMailboxes();
+        unsubMessages();
+    };
+  }, []);
+
+  const staffEmails = mailboxes;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInStaffAccount, setLoggedInStaffAccount] = useState(null);
@@ -240,68 +210,49 @@ export default function StaffMailPortal({
 
     setIsCreating(true);
 
-    const newAccount = {
-      id: `staff-${Date.now()}`,
-      fullName: fullName.trim(),
-      role: role.trim() || "Staff Member",
-      department,
-      username: cleanUser,
-      email: fullEmail,
-      forwardingEmail:
-        forwardingEmail.trim() || siteData?.branding?.email || "",
-      tempPassword: finalPassword,
-      status: "Active",
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-
-    const welcomeMsg = {
-      id: `msg-${Date.now()}`,
-      to: fullEmail,
-      from: "admin@cleadglobal.org",
-      fromName: "Champions Leadership Global Admin",
-      subject: `Your new ${fullEmail} staff mailbox is ready`,
-      body: `Hello ${newAccount.fullName},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\nRole: ${newAccount.role}\nDepartment: ${newAccount.department}\nForwarding Address: ${newAccount.forwardingEmail || "None set"}\n\nYou can read and send emails directly from this Webmail Portal at any time.\n\nWarm regards,\nChampions Leadership Global`,
-      date: new Date().toISOString().slice(0, 16).replace("T", " "),
-      folder: "inbox",
-      read: false,
-    };
-
-    const updatedAccounts = [newAccount, ...staffEmails];
-    const updatedMessages = [welcomeMsg, ...messages];
-
-    const nextSiteData = {
-      ...siteData,
-      staffMail: {
-        ...(siteData?.staffMail || {}),
-        portalUrl: "mail.cleadglobal.org",
-        domain: "cleadglobal.org",
-        accounts: updatedAccounts,
-        messages: updatedMessages,
-      },
-    };
-
-    if (onUpdateSiteData) {
-      onUpdateSiteData(nextSiteData);
-    }
-
     try {
-      if (onSaveToCloud) {
-        await onSaveToCloud(nextSiteData);
-      }
-    } catch (err) {
-      console.warn("Saved locally, cloud sync notice:", err);
-    }
+      const mailboxRef = await addDoc(collection(db, "mailboxes"), {
+        email: fullEmail,
+        name: fullName.trim(),
+        createdAt: new Date().toISOString()
+      });
 
-    setTimeout(() => {
+      await addDoc(collection(db, "messages"), {
+        mailboxId: mailboxRef.id,
+        from: "admin@cleadglobal.org",
+        subject: `Your new ${fullEmail} staff mailbox is ready`,
+        body: `Hello ${fullName.trim()},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\n`,
+        receivedAt: new Date().toISOString()
+      });
+
+      const newAccount = {
+        id: mailboxRef.id,
+        fullName: fullName.trim(),
+        role: role.trim() || "Staff Member",
+        department,
+        username: cleanUser,
+        email: fullEmail,
+        forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
+        tempPassword: finalPassword,
+        status: "Active",
+        createdAt: new Date().toISOString().slice(0, 10),
+      };
+
+      setTimeout(() => {
+        setIsCreating(false);
+        setCreatedAccount(newAccount);
+        setActiveMailbox(newAccount);
+        setFullName("");
+        setRole("");
+        setUsername("");
+        setPassword("");
+        setAutoSuggested(true);
+      }, 300);
+    } catch (err) {
+      setErrorMsg("Failed to provision mailbox. Please try again.");
       setIsCreating(false);
-      setCreatedAccount(newAccount);
-      setActiveMailbox(newAccount);
-      setFullName("");
-      setRole("");
-      setUsername("");
-      setPassword("");
-      setAutoSuggested(true);
-    }, 300);
+      handleFirestoreError(err, OperationType.WRITE, "mailboxes/messages");
+    }
   };
 
   const handleSendEmail = async (e) => {
