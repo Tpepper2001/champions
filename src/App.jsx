@@ -882,7 +882,7 @@ export default function App() {
   // ── AUTHENTICATION ───────────────
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      return sessionStorage.getItem("clg_admin_authenticated") === "true";
+      return localStorage.getItem("clg_admin_authenticated") === "true";
     } catch (e) {
       return false;
     }
@@ -891,14 +891,14 @@ export default function App() {
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     try {
-      sessionStorage.setItem("clg_admin_authenticated", "true");
+      localStorage.setItem("clg_admin_authenticated", "true");
     } catch (e) {}
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     try {
-      sessionStorage.removeItem("clg_admin_authenticated");
+      localStorage.removeItem("clg_admin_authenticated");
     } catch (e) {}
     navigate("home");
   };
