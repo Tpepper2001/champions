@@ -3,6 +3,7 @@ import { defaultSiteData } from "./defaultSiteData";
 import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
 import StaffMailPortal from "./components/StaffMailPortal";
+import ErrorBoundary from "./components/ErrorBoundary";
 import {
   saveSiteData,
   loadSiteData,
@@ -1082,15 +1083,17 @@ export default function App() {
     try {
       return (
         <><AppMountedIndicator />
-        <WebsiteManager
-          data={siteData}
-          onChange={handleSiteDataChange}
-          onSave={handleSaveSiteData}
-          onReset={handleResetSiteData}
-          onClose={() => navigate("home")}
-          onLogout={handleLogout}
-          onOpenMailPortal={() => navigate("mail")}
-        /></>
+        <ErrorBoundary>
+          <WebsiteManager
+            data={siteData}
+            onChange={handleSiteDataChange}
+            onSave={handleSaveSiteData}
+            onReset={handleResetSiteData}
+            onClose={() => navigate("home")}
+            onLogout={handleLogout}
+            onOpenMailPortal={() => navigate("mail")}
+          />
+        </ErrorBoundary></>
       );
     } catch (e) {
       console.error("WEBSITE MANAGER RENDER ERROR:", e);
@@ -1104,15 +1107,17 @@ export default function App() {
     try {
       return (
         <><AppMountedIndicator />
-        <StaffMailPortal
-          siteData={siteData}
-          onUpdateSiteData={handleSiteDataChange}
-          onSaveToCloud={async (updatedData) => {
-            await saveSiteData(updatedData || siteData);
-          }}
-          onBackToSite={() => navigate("home")}
-          onOpenManager={() => navigate("manager")}
-        /></>
+        <ErrorBoundary>
+          <StaffMailPortal
+            siteData={siteData}
+            onUpdateSiteData={handleSiteDataChange}
+            onSaveToCloud={async (updatedData) => {
+              await saveSiteData(updatedData || siteData);
+            }}
+            onBackToSite={() => navigate("home")}
+            onOpenManager={() => navigate("manager")}
+          />
+        </ErrorBoundary></>
       );
     } catch (e) {
       console.error("STAFF MAIL PORTAL RENDER ERROR:", e);
