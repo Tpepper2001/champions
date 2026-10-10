@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "SiteSetting": {
+      "title": "SiteSetting",
+      "description": "Global website configuration, sections, and staff mail directory for Champions Leadership Global.",
+      "type": "object",
+      "properties": {
+        "branding": {
+          "type": "object",
+          "description": "Organization branding, contact details, and social media links."
+        },
+        "hero": {
+          "type": "object",
+          "description": "Homepage hero banner content and call-to-action settings."
+        },
+        "statsSection": {
+          "type": "object",
+          "description": "Impact metrics and statistics displayed on the website."
+        },
+        "aboutSection": {
+          "type": "object",
+          "description": "About Us, mission, vision, and organization story."
+        },
+        "coreValues": {
+          "type": "object",
+          "description": "Core values and guiding principles."
+        },
+        "ceoSection": {
+          "type": "object",
+          "description": "Founder & CEO profile, biography, and speaking information."
+        },
+        "eventsSection": {
+          "type": "object",
+          "description": "Upcoming and past leadership events and summits."
+        },
+        "teamSection": {
+          "type": "object",
+          "description": "Executive team members and global volunteers."
+        },
+        "blogSection": {
+          "type": "object",
+          "description": "Published leadership articles and blog posts."
+        },
+        "reviewsSection": {
+          "type": "object",
+          "description": "Testimonials and participant reviews."
+        },
+        "bookingSection": {
+          "type": "object",
+          "description": "Booking and contact inquiry configuration."
+        },
+        "staffMail": {
+          "type": "object",
+          "description": "Staff custom @cleadglobal.org email accounts provisioned via mail.cleadglobal.org."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of the last content update.",
+          "maxLength": 64
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/site_settings/{settingId}": {
+      "schema": "SiteSetting",
+      "description": "Stores the live website content document (settingId = 'main') synced across all clients."
+    }
+  }
+}

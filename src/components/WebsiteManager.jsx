@@ -20,6 +20,7 @@ import {
   Compass,
   FileText,
   LogOut,
+  Mail,
 } from "lucide-react";
 
 export default function WebsiteManager({
@@ -29,6 +30,7 @@ export default function WebsiteManager({
   onReset,
   onClose,
   onLogout,
+  onOpenMailPortal,
   initialTab = "branding",
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -127,17 +129,29 @@ export default function WebsiteManager({
               </h1>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Supabase Database
+                Firebase Database
               </span>
             </div>
             <p className="text-xs text-slate-400 hidden sm:block">
-              Live Cloud CMS • Changes sync across all devices via Supabase
+              Live Cloud CMS • Changes sync across all devices via Firebase
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 flex-wrap">
+          {onOpenMailPortal && (
+            <button
+              type="button"
+              onClick={onOpenMailPortal}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 transition active:scale-95 shadow-sm"
+              title="Open mail.cleadglobal.org Staff Email Portal"
+            >
+              <Mail className="w-4 h-4 text-amber-400" />
+              mail.cleadglobal.org
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onClose}
@@ -194,7 +208,7 @@ export default function WebsiteManager({
       {saveToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-emerald-500 text-slate-950 px-5 py-3 rounded-2xl shadow-2xl font-bold flex items-center gap-2 text-sm animate-bounce">
           <CheckCircle2 className="w-5 h-5" />
-          Changes published & saved to Supabase Database!
+          Changes published & saved to Firebase Database!
         </div>
       )}
 

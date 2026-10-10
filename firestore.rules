@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidSiteSetting(data) {
+      return data is map
+        && data.keys().size() <= 30
+        && (!('branding' in data) || data.branding is map)
+        && (!('hero' in data) || data.hero is map)
+        && (!('statsSection' in data) || data.statsSection is map)
+        && (!('aboutSection' in data) || data.aboutSection is map)
+        && (!('coreValues' in data) || data.coreValues is map)
+        && (!('ceoSection' in data) || data.ceoSection is map)
+        && (!('eventsSection' in data) || data.eventsSection is map)
+        && (!('teamSection' in data) || data.teamSection is map)
+        && (!('blogSection' in data) || data.blogSection is map)
+        && (!('reviewsSection' in data) || data.reviewsSection is map)
+        && (!('bookingSection' in data) || data.bookingSection is map)
+        && (!('staffMail' in data) || data.staffMail is map)
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+    }
+
+    match /test/{docId} {
+      allow get: if isValidId(docId);
+    }
+
+    match /site_settings/{settingId} {
+      allow get: if isValidId(settingId) && settingId == 'main';
+      allow create: if isValidId(settingId) && settingId == 'main' && isValidSiteSetting(incoming());
+      allow update: if isValidId(settingId) && settingId == 'main' && isValidSiteSetting(incoming());
+    }
+  }
+}

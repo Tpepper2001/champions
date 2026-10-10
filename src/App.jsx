@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { defaultSiteData } from "./defaultSiteData";
 import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
+import StaffMailPortal from "./components/StaffMailPortal";
 import {
   saveSiteData,
   loadSiteData,
   subscribeSiteData,
   testConnection,
-} from "./supabase";
+} from "./firebase";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;700&display=swap');
@@ -715,8 +716,36 @@ const isManagerRoute = (val) => {
   );
 };
 
+const isMailRoute = (val) => {
+  if (!val) return false;
+  const decoded = decodeURIComponent(val).toLowerCase().trim();
+  const clean = decoded
+    .replace(/^#+/, "")
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "")
+    .split("?")[0]
+    .split("#")[0];
+
+  return (
+    clean === "mail" ||
+    clean === "webmail" ||
+    clean === "staffmail" ||
+    clean === "staff-mail" ||
+    clean === "mail.cleadglobal.org"
+  );
+};
+
 const getViewFromLocation = () => {
   if (typeof window === "undefined") return "home";
+
+  // 0. Check if accessed via mail.cleadglobal.org subdomain or /mail routes
+  if (
+    window.location.hostname.toLowerCase().startsWith("mail.") ||
+    isMailRoute(window.location.pathname) ||
+    isMailRoute(window.location.hash)
+  ) {
+    return "mail";
+  }
 
   // 1. Check pathname (e.g., /websitemanager or /websitemanager/)
   if (isManagerRoute(window.location.pathname)) {
@@ -731,17 +760,23 @@ const getViewFromLocation = () => {
   // 3. Check search parameters (e.g. ?page=websitemanager or ?admin or ?manager)
   try {
     const params = new URLSearchParams(window.location.search);
+    if (params.has("mail") || params.has("webmail") || params.has("staffmail")) {
+      return "mail";
+    }
     if (params.has("admin") || params.has("manager") || params.has("websitemanager")) {
       return "manager";
     }
     const qp = params.get("page") || params.get("view") || params.get("route");
+    if (qp && isMailRoute(qp)) {
+      return "mail";
+    }
     if (qp && isManagerRoute(qp)) {
       return "manager";
     }
   } catch (e) {}
 
   const rawHash = window.location.hash.replace(/^#\/?/, "").split("/")[0];
-  const valid = ["home", "ceo", "events", "team", "blog", "booking"];
+  const valid = ["home", "ceo", "events", "team", "blog", "booking", "mail"];
   return valid.includes(rawHash) ? rawHash : "home";
 };
 
@@ -792,19 +827,19 @@ export default function App() {
     }
   };
 
-  // Save to Supabase
+  // Save to Firebase
   const handleSaveSiteData = async () => {
     try {
       localStorage.setItem("clg_site_content_v1", JSON.stringify(siteData));
     } catch (e) {}
     const result = await saveSiteData(siteData);
     if (!result.success) {
-      console.error("Supabase save failed:", result.error);
+      console.error("Firebase save failed:", result.error);
       throw result.error;
     }
   };
 
-  // Reset to original defaults in Supabase
+  // Reset to original defaults in Firebase
   const handleResetSiteData = async () => {
     setSiteData(defaultSiteData);
     try {
@@ -813,11 +848,11 @@ export default function App() {
     await saveSiteData(defaultSiteData);
   };
 
-  // Connect and synchronize with Supabase
+  // Connect and synchronize with Firebase
   useEffect(() => {
     testConnection();
 
-    // Initial load from Supabase
+    // Initial load from Firebase
     loadSiteData().then((cloudData) => {
       if (cloudData && typeof cloudData === "object") {
         setSiteData(cloudData);
@@ -938,6 +973,12 @@ export default function App() {
       } catch (e) {
         window.location.hash = "websitemanager";
       }
+    } else if (v === "mail") {
+      try {
+        window.history.pushState(null, "", "/mail");
+      } catch (e) {
+        window.location.hash = "mail";
+      }
     } else if (post) {
       const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       try {
@@ -999,6 +1040,22 @@ export default function App() {
         onReset={handleResetSiteData}
         onClose={() => navigate("home")}
         onLogout={handleLogout}
+        onOpenMailPortal={() => navigate("mail")}
+      />
+    );
+  }
+
+  // If in Staff Email Portal mode (mail.cleadglobal.org / /mail)
+  if (view === "mail") {
+    return (
+      <StaffMailPortal
+        siteData={siteData}
+        onUpdateSiteData={handleSiteDataChange}
+        onSaveToCloud={async (updatedData) => {
+          await saveSiteData(updatedData || siteData);
+        }}
+        onBackToSite={() => navigate("home")}
+        onOpenManager={() => navigate("manager")}
       />
     );
   }
@@ -2917,26 +2974,49 @@ export default function App() {
         </div>
         <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
           <p style={{ opacity: 0.4, fontSize: "0.85rem" }}>{branding.copyrightText}</p>
-          <a
-            href="/websitemanager"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("manager");
-            }}
-            style={{
-              opacity: 0.3,
-              fontSize: "0.78rem",
-              color: "rgba(255,255,255,0.7)",
-              textDecoration: "none",
-              cursor: "pointer",
-              transition: "opacity 0.2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.3")}
-            title="Website Manager Login (or press Ctrl+Shift+M)"
-          >
-            🔒 Staff Login
-          </a>
+          <div style={{ display: "flex", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
+            <a
+              href="https://mail.cleadglobal.org"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("mail");
+              }}
+              style={{
+                opacity: 0.55,
+                fontSize: "0.78rem",
+                color: "#F4D03F",
+                textDecoration: "none",
+                cursor: "pointer",
+                transition: "opacity 0.2s ease",
+                fontWeight: 600,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.55")}
+              title="Create & access custom @cleadglobal.org staff emails (mail.cleadglobal.org)"
+            >
+              ✉ Staff Email (mail.cleadglobal.org)
+            </a>
+            <a
+              href="/websitemanager"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("manager");
+              }}
+              style={{
+                opacity: 0.3,
+                fontSize: "0.78rem",
+                color: "rgba(255,255,255,0.7)",
+                textDecoration: "none",
+                cursor: "pointer",
+                transition: "opacity 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.3")}
+              title="Website Manager Login (or press Ctrl+Shift+M)"
+            >
+              🔒 Staff Login
+            </a>
+          </div>
         </div>
       </footer>
     </div>
