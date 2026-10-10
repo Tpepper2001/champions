@@ -441,6 +441,10 @@ export default function StaffMailPortal({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+      {/* DEBUG INFO */}
+      <div className="bg-red-900 p-2 text-[10px] font-mono">
+        DEBUG: isLoggedIn={String(isLoggedIn)} activeTab={activeTab} mailboxEmail={activeMailbox?.email || 'none'}
+      </div>
       {/* TOP BAR */}
       <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">

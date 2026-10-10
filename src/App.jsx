@@ -1036,10 +1036,17 @@ export default function App() {
     };
   }, []);
 
-  // ... existing code ...
+  // ── DEBUG APP MOUNT ──────────────────────────
+  const AppMountedIndicator = () => (
+    <div style={{position:"fixed", top:0, left:0, zIndex:99999, background:"red", color:"white", padding:"5px", fontSize:"10px"}}>
+      APP MOUNTED
+    </div>
+  );
+
   if (errorUI) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-red-900 text-white">
+        <AppMountedIndicator />
         <div className="bg-red-950 p-6 rounded-xl border border-red-800">
           <h2 className="text-xl font-bold mb-2">App Error</h2>
           <p className="font-mono">{errorUI}</p>
@@ -1058,15 +1065,17 @@ export default function App() {
   if (view === "manager") {
     if (!isAuthenticated) {
       return (
+        <><AppMountedIndicator />
         <AdminLogin
           onLoginSuccess={handleLoginSuccess}
           onCancel={() => navigate("home")}
           logoUrl={siteData.branding.logoUrl}
-        />
+        /></>
       );
     }
 
     return (
+      <><AppMountedIndicator />
       <WebsiteManager
         data={siteData}
         onChange={handleSiteDataChange}
@@ -1075,13 +1084,14 @@ export default function App() {
         onClose={() => navigate("home")}
         onLogout={handleLogout}
         onOpenMailPortal={() => navigate("mail")}
-      />
+      /></>
     );
   }
 
   // If in Staff Email Portal mode (mail.cleadglobal.org / /mail)
   if (view === "mail") {
     return (
+      <><AppMountedIndicator />
       <StaffMailPortal
         siteData={siteData}
         onUpdateSiteData={handleSiteDataChange}
@@ -1090,7 +1100,7 @@ export default function App() {
         }}
         onBackToSite={() => navigate("home")}
         onOpenManager={() => navigate("manager")}
-      />
+      /></>
     );
   }
 
@@ -1110,7 +1120,9 @@ export default function App() {
 
   return (
     <div>
-      {/* NAVBAR */}
+      <AppMountedIndicator />
+
+
       <nav className={"navbar" + (scrolled ? " scrolled" : "")}>
         <div className="nav-container">
           <div className="logo" onClick={() => navigate("home")}>
