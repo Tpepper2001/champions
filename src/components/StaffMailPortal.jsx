@@ -25,6 +25,7 @@ import {
   Clock,
   Reply,
 } from "lucide-react";
+import Footer from "./Footer";
 
 const DEFAULT_STAFF_EMAILS = [
   {
