@@ -31,11 +31,15 @@ import {
   auth, 
   db, 
   signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
   signOut, 
   onAuthStateChanged, 
   OperationType, 
   handleFirestoreError 
 } from "../firebase";
+// NOTE: I cannot use the simple import { ... } = "../firebase" directly in this multi_edit because I need to add createUserWithEmailAndPassword. 
+// I will fix the import statement in a separate edit_file call or use a more precise replacement.
+// Wait, multi_edit_file replaces the EXACT content. I'll just replace the import statement.
 
 export default function StaffMailPortal({
   siteData,
@@ -81,6 +85,7 @@ export default function StaffMailPortal({
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [isSignupMode, setIsSignupMode] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -135,8 +140,16 @@ export default function StaffMailPortal({
     }
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    try {
+      await createUserWithEmailAndPassword(auth, loginUsername, loginPassword);
+      setLoginUsername("");
+      setLoginPassword("");
+    } catch (err) {
+      setLoginError("Failed to create account: " + err.message);
+    }
   };
 
   const handleFullNameChange = (e) => {
@@ -362,8 +375,10 @@ export default function StaffMailPortal({
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-8">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
-          <h2 className="text-xl font-black text-white text-center">Staff Login</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <h2 className="text-xl font-black text-white text-center">
+            {isSignupMode ? "Create Staff Account" : "Staff Login"}
+          </h2>
+          <form onSubmit={isSignupMode ? handleSignup : handleLogin} className="space-y-4">
             <input
               type="text"
               placeholder="Username or Email"
@@ -383,7 +398,14 @@ export default function StaffMailPortal({
               type="submit"
               className="w-full py-3 bg-amber-400 text-slate-950 font-bold rounded-xl"
             >
-              Login
+              {isSignupMode ? "Sign Up" : "Login"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSignupMode(!isSignupMode)}
+              className="w-full text-xs text-slate-400 hover:text-white mt-2"
+            >
+              {isSignupMode ? "Already have an account? Login" : "Need an account? Sign up"}
             </button>
           </form>
         </div>

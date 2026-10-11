@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   doc,
@@ -13,7 +13,7 @@ import firebaseConfig from "./firebase-applet-config.json";
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
-export { signInWithEmailAndPassword, signOut, onAuthStateChanged };
+export { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
 
 const SITE_SETTINGS_COLLECTION = "site_settings";
 const SITE_SETTINGS_DOC_ID = "main";
