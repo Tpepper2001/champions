@@ -75,6 +75,7 @@ export default function StaffMailPortal({
   const staffEmails = mailboxes;
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isLoggedIn = isAuthenticated;
   const [currentUser, setCurrentUser] = useState(null);
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
