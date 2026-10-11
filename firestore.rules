@@ -54,12 +54,12 @@ service cloud.firestore {
     }
     
     match /messages/{messageId} {
-      allow get: if isSignedIn() && (get(/databases/$(database)/documents/messages/$(messageId)).data.mailboxId == request.auth.uid || isAdmin());
+      allow read: if isSignedIn() && (resource.data.mailboxId == request.auth.uid || isAdmin());
       allow write: if isAdmin();
     }
 
     match /emails/{emailId} {
-      allow get: if isSignedIn() && (get(/databases/$(database)/documents/emails/$(emailId)).data.mailboxId == request.auth.uid || isAdmin());
+      allow read: if isSignedIn() && (resource.data.mailboxId == request.auth.uid || isAdmin());
       allow write: if false;
     }
   }
