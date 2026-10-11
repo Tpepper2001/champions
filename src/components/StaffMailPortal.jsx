@@ -48,6 +48,8 @@ export default function StaffMailPortal({
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const unsubMailboxes = onSnapshot(
         collection(db, "mailboxes"),
         (snapshot) => {
@@ -68,7 +70,7 @@ export default function StaffMailPortal({
         unsubMailboxes();
         unsubMessages();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const staffEmails = mailboxes;
 
