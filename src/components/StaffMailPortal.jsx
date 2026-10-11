@@ -46,6 +46,9 @@ export default function StaffMailPortal({
 }) {
   const [mailboxes, setMailboxes] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isLoggedIn = isAuthenticated;
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -74,9 +77,7 @@ export default function StaffMailPortal({
 
   const staffEmails = mailboxes;
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const isLoggedIn = isAuthenticated;
-  const [currentUser, setCurrentUser] = useState(null);
+
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
