@@ -50,6 +50,7 @@ service cloud.firestore {
 
     match /mailboxes/{mailboxId} {
       allow get: if isSignedIn() && (request.auth.uid == mailboxId || isAdmin());
+      allow list: if isSignedIn();
       allow write: if isAdmin();
     }
     
