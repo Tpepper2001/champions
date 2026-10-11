@@ -26,7 +26,7 @@ import {
   Reply,
 } from "lucide-react";
 import Footer from "./Footer";
-import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, query, where, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { 
   auth, 
   db, 
@@ -55,6 +55,26 @@ export default function StaffMailPortal({
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    const runCleanup = async () => {
+      if (localStorage.getItem("cleanup_run")) return;
+      try {
+        const collections = ["mailboxes", "messages"];
+        for (const colName of collections) {
+          const querySnapshot = await getDocs(collection(db, colName));
+          for (const docSnapshot of querySnapshot.docs) {
+            await deleteDoc(doc(db, colName, docSnapshot.id));
+          }
+        }
+        localStorage.setItem("cleanup_run", "true");
+        console.log("Cleanup complete!");
+      } catch (e) {
+        console.error("Cleanup failed:", e);
+      }
+    };
+    runCleanup();
+  }, []);
+
+  useEffect(() => {
     if (!isAuthenticated) return;
 
     const unsubMailboxes = onSnapshot(
@@ -78,8 +98,6 @@ export default function StaffMailPortal({
         unsubMessages();
     };
   }, [isAuthenticated]);
-
-  const staffEmails = mailboxes;
 
 
   const [loginUsername, setLoginUsername] = useState("");
@@ -144,9 +162,25 @@ export default function StaffMailPortal({
     e.preventDefault();
     setLoginError("");
     try {
-      await createUserWithEmailAndPassword(auth, loginUsername, loginPassword);
-      setLoginUsername("");
-      setLoginPassword("");
+      const userCredential = await createUserWithEmailAndPassword(auth, loginUsername, loginPassword);
+      const user = userCredential.user;
+      
+      // Create mailbox document automatically
+      const mailboxRef = await addDoc(collection(db, "mailboxes"), {
+        email: user.email,
+        name: user.email.split('@')[0], // Use part of email as name initially
+        createdAt: new Date().toISOString()
+      });
+
+      // Create welcome message
+      await addDoc(collection(db, "messages"), {
+        mailboxId: mailboxRef.id,
+        from: "admin@cleadglobal.org",
+        subject: "Welcome to Champions Leadership Global",
+        body: `Hello,\n\nYour official Champions Leadership Global mailbox is ready.\n\n`,
+        receivedAt: new Date().toISOString()
+      });
+      
     } catch (err) {
       setLoginError("Failed to create account: " + err.message);
     }
@@ -539,18 +573,6 @@ export default function StaffMailPortal({
         <div className="max-w-6xl mx-auto mt-6 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setActiveTab("create")}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "create"
-                ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20"
-                : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/70"
-            }`}
-          >
-            <UserPlus className="w-4 h-4" />
-            Create Custom Staff Email
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveTab("webmail")}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
               activeTab === "webmail"
@@ -588,398 +610,8 @@ export default function StaffMailPortal({
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
-        {activeTab === "create" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* LEFT: CREATE FORM */}
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div>
-                  <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
-                    <UserPlus className="w-5 h-5 text-amber-400" />
-                    Provision New Staff Email Address
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Fill in your staff details below to create your custom @cleadglobal.org mailbox.
-                  </p>
-                </div>
-                <span className="text-[11px] font-mono bg-slate-800 text-amber-300 px-2.5 py-1 rounded-lg border border-slate-700">
-                  @cleadglobal.org
-                </span>
-              </div>
-
-              {errorMsg && (
-                <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs font-medium">
-                  {errorMsg}
-                </div>
-              )}
-
-              <form onSubmit={handleCreateEmail} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Staff Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Jane Doe"
-                      value={fullName}
-                      onChange={handleFullNameChange}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Job Title / Role *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Program Coordinator"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Department
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
-                      >
-                        <option value="Executive Leadership">
-                          Executive Leadership
-                        </option>
-                        <option value="Leadership & Programs">
-                          Leadership & Programs
-                        </option>
-                        <option value="Administration">Administration</option>
-                        <option value="Events & Outreach">
-                          Events & Outreach
-                        </option>
-                        <option value="Media & Communications">
-                          Media & Communications
-                        </option>
-                        <option value="Global Chapters & Volunteers">
-                          Global Chapters & Volunteers
-                        </option>
-                        <option value="Finance & Partnerships">
-                          Finance & Partnerships
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Recovery / Forwarding Email
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Personal email for notifications"
-                      value={forwardingEmail}
-                      onChange={(e) => setForwardingEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Custom Email Handle Input */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Choose Custom Email Address *
-                  </label>
-                  <div className="flex items-stretch rounded-xl overflow-hidden border border-slate-700 focus-within:border-amber-400 bg-slate-950">
-                    <input
-                      type="text"
-                      required
-                      placeholder="firstname.lastname"
-                      value={username}
-                      onChange={handleUsernameChange}
-                      className="flex-1 px-3.5 py-3 bg-transparent text-white text-sm font-mono focus:outline-none"
-                    />
-                    <span className="px-4 py-3 bg-slate-800/90 text-amber-400 font-mono text-sm font-bold flex items-center border-l border-slate-700 select-none">
-                      @cleadglobal.org
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-[11px] text-slate-400">
-                      Preview:{" "}
-                      <strong className="text-emerald-400 font-mono">
-                        {username
-                          ? `${username}@cleadglobal.org`
-                          : "your.name@cleadglobal.org"}
-                      </strong>
-                    </span>
-                    <div className="flex gap-1.5">
-                      {fullName.trim() && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const parts = fullName
-                                .trim()
-                                .toLowerCase()
-                                .replace(/[^a-z0-9\s]/g, "")
-                                .split(/\s+/)
-                                .filter(Boolean);
-                              if (parts.length >= 2) {
-                                setUsername(
-                                  `${parts[0]}.${parts[parts.length - 1]}`
-                                );
-                              } else if (parts[0]) {
-                                setUsername(parts[0]);
-                              }
-                            }}
-                            className="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
-                          >
-                            first.last
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const parts = fullName
-                                .trim()
-                                .toLowerCase()
-                                .replace(/[^a-z0-9\s]/g, "")
-                                .split(/\s+/)
-                                .filter(Boolean);
-                              if (parts.length >= 2) {
-                                setUsername(
-                                  `${parts[0][0]}${parts[parts.length - 1]}`
-                                );
-                              }
-                            }}
-                            className="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
-                          >
-                            flast
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mailbox Password */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      Mailbox Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={generateStrongPassword}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300"
-                    >
-                      <RefreshCw className="w-3 h-3" /> Generate Secure Password
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter password or leave blank to auto-generate"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm font-mono focus:outline-none focus:border-amber-400"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="w-full py-3.5 px-6 rounded-xl font-extrabold text-sm text-slate-950 bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 transition shadow-lg shadow-amber-400/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isCreating ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                      Provisioning Mailbox...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-4 h-4" />
-                      Create Custom Email Address
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-
-            {/* RIGHT: CREDENTIALS RESULT OR WEBMAIL ACCESS */}
-            <div className="lg:col-span-5 space-y-6">
-              {createdAccount ? (
-                <div className="bg-emerald-950/30 border-2 border-emerald-500/40 rounded-3xl p-6 shadow-2xl space-y-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                        <CheckCircle2 className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
-                          Mailbox Created & Active
-                        </span>
-                        <h3 className="text-base font-extrabold text-white">
-                          {createdAccount.fullName}
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 space-y-3 text-xs">
-                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
-                      <span className="text-slate-400">Email Address:</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-amber-400">
-                          {createdAccount.email}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleCopy(createdAccount.email, "new-email")
-                          }
-                          className="p-1 rounded hover:bg-slate-800 text-slate-300"
-                          title="Copy email"
-                        >
-                          {copiedField === "new-email" ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
-                      <span className="text-slate-400">Password:</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-emerald-300">
-                          {createdAccount.tempPassword}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleCopy(createdAccount.tempPassword, "new-pass")
-                          }
-                          className="p-1 rounded hover:bg-slate-800 text-slate-300"
-                          title="Copy password"
-                        >
-                          {copiedField === "new-pass" ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-400">Status:</span>
-                      <span className="font-mono font-bold text-emerald-400">
-                        Active on Firebase Cloud
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => openWebmailForAccount(createdAccount)}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs text-center flex items-center justify-center gap-1.5 transition"
-                    >
-                      <Inbox className="w-4 h-4" />
-                      Open {createdAccount.username} Webmail Inbox
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("directory")}
-                      className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition"
-                    >
-                      View Directory
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Portal Access Box */}
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-                    <Inbox className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-extrabold text-white">
-                      Built-In Staff Webmail Client
-                    </h3>
-                    <p className="text-xs text-slate-400">
-                      Check and send emails for any @cleadglobal.org account right here
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-amber-400 truncate">
-                    {activeMailbox?.email || "info@cleadglobal.org"}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => openWebmailForAccount(activeMailbox)}
-                      className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold flex items-center gap-1"
-                    >
-                      <Inbox className="w-3.5 h-3.5" /> Launch Inbox
-                    </button>
-                  </div>
-                </div>
-
-                <ul className="space-y-2 text-xs text-slate-400 pt-1">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>
-                      Custom{" "}
-                      <strong className="text-slate-200">
-                        name@cleadglobal.org
-                      </strong>{" "}
-                      staff addresses
-                    </span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>
-                      Instant built-in Webmail Inbox & Compose (no external 404)
-                    </span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>
-                      Synced with Champions Leadership Global Firebase Database
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* MAIN CONTENT */}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
 
         {/* BUILT-IN WEBMAIL INBOX & COMPOSER */}
         {activeTab === "webmail" && (
