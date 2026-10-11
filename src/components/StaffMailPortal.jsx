@@ -99,6 +99,8 @@ export default function StaffMailPortal({
     };
   }, [isAuthenticated]);
 
+  const staffEmails = mailboxes;
+
 
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
