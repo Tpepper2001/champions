@@ -27,7 +27,15 @@ import {
 } from "lucide-react";
 import Footer from "./Footer";
 import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
-import { auth, db, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "../firebase";
+import { 
+  auth, 
+  db, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged, 
+  OperationType, 
+  handleFirestoreError 
+} from "../firebase";
 
 export default function StaffMailPortal({
   siteData,
