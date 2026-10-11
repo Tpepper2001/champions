@@ -1,12 +1,10 @@
 import admin from 'firebase-admin';
+import { verifyWebhookSignature } from 'resend';
 
 // Initialize Firebase Admin
 if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(
-    Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '', 'base64').toString('utf8')
-  );
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.applicationDefault()
   });
 }
 
@@ -18,6 +16,19 @@ export default async function handler(req, res) {
   }
 
   try {
+    const signature = req.headers['svix-signature'];
+    const payload = JSON.stringify(req.body);
+
+    const isVerified = verifyWebhookSignature(
+      payload,
+      signature,
+      process.env.RESEND_WEBHOOK_SECRET
+    );
+
+    if (!isVerified) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     // Handle the email data received from Resend
     const { from, to, subject, html, text } = req.body;
     
@@ -31,10 +42,8 @@ export default async function handler(req, res) {
       receivedAt: new Date().toISOString()
     });
 
-    console.log('Email received and saved successfully.');
     return res.status(200).json({ message: 'Email saved successfully' });
   } catch (error) {
-    console.error('Error saving email:', error);
     return res.status(500).json({ error: 'Failed to save email' });
   }
 }

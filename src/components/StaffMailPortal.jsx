@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import Footer from "./Footer";
 import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
-import { db, OperationType, handleFirestoreError } from "../firebase";
+import { auth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "../firebase";
 
 export default function StaffMailPortal({
   siteData,
@@ -64,11 +64,16 @@ export default function StaffMailPortal({
 
   const staffEmails = mailboxes;
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggedInStaffAccount, setLoggedInStaffAccount] = useState(null);
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
@@ -102,31 +107,21 @@ export default function StaffMailPortal({
       .replace(/\.+/g, ".")
       .replace(/^\.|\.$/g, "");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const account = staffEmails.find(
-      (acc) =>
-        (acc.username === loginUsername.toLowerCase() ||
-         acc.email.toLowerCase() === loginUsername.toLowerCase()) &&
-        acc.tempPassword === loginPassword
-    );
+    setLoginError("");
 
-    if (account) {
-      setIsLoggedIn(true);
-      setLoggedInStaffAccount(account);
-      setActiveMailbox(account);
+    try {
+      await signInWithEmailAndPassword(auth, loginUsername, loginPassword);
       setLoginUsername("");
       setLoginPassword("");
-      setLoginError("");
-    } else {
-      setLoginError("Invalid username/email or password.");
+    } catch (err) {
+      setLoginError("Invalid username or password.");
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setLoggedInStaffAccount(null);
-    setActiveMailbox(null);
+  const handleLogout = async () => {
+    await signOut(auth);
   };
 
   const handleFullNameChange = (e) => {
@@ -348,7 +343,7 @@ export default function StaffMailPortal({
   const displayedMessages =
     mailFolder === "sent" ? sentMessages : inboxMessages;
 
-  if (!isLoggedIn && activeTab !== "create") {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-8">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
@@ -376,16 +371,6 @@ export default function StaffMailPortal({
               Login
             </button>
           </form>
-          <p className="text-center text-xs text-slate-400 mt-4">
-            Don't have an email?{' '}
-            <button
-              type="button"
-              onClick={() => setActiveTab("create")}
-              className="text-amber-400 hover:text-amber-300 font-bold"
-            >
-              Click here to create an email
-            </button>
-          </p>
         </div>
       </div>
     );
@@ -393,10 +378,6 @@ export default function StaffMailPortal({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
-      {/* DEBUG INFO */}
-      <div className="bg-red-900 p-2 text-[10px] font-mono">
-        DEBUG: isLoggedIn={String(isLoggedIn)} activeTab={activeTab} mailboxEmail={activeMailbox?.email || 'none'}
-      </div>
       {/* TOP BAR */}
       <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
