@@ -152,6 +152,10 @@ export default function StaffMailPortal({
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
   const handleFullNameChange = (e) => {
     const val = e.target.value;
     setFullName(val);
@@ -376,19 +380,22 @@ export default function StaffMailPortal({
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-8">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
           <h2 className="text-xl font-black text-white text-center">
-            {isSignupMode ? "Create Staff Account" : "Staff Login"}
+            {isSignupMode ? "Staff Mail Enrollment" : "Staff Login"}
           </h2>
+          <p className="text-sm text-slate-400 text-center -mt-2">
+            {isSignupMode ? "Register for your official staff email mailbox." : "Sign in to access your webmail portal."}
+          </p>
           <form onSubmit={isSignupMode ? handleSignup : handleLogin} className="space-y-4">
             <input
               type="text"
-              placeholder="Username or Email"
+              placeholder="Corporate Email Address"
               value={loginUsername}
               onChange={(e) => setLoginUsername(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white"
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder={isSignupMode ? "Set Mailbox Password" : "Password"}
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white"
@@ -398,14 +405,14 @@ export default function StaffMailPortal({
               type="submit"
               className="w-full py-3 bg-amber-400 text-slate-950 font-bold rounded-xl"
             >
-              {isSignupMode ? "Sign Up" : "Login"}
+              {isSignupMode ? "Enroll Now" : "Sign In"}
             </button>
             <button
               type="button"
               onClick={() => setIsSignupMode(!isSignupMode)}
               className="w-full text-xs text-slate-400 hover:text-white mt-2"
             >
-              {isSignupMode ? "Already have an account? Login" : "Need an account? Sign up"}
+              {isSignupMode ? "Already enrolled? Sign in" : "New staff member? Enroll here"}
             </button>
           </form>
         </div>
