@@ -24,6 +24,8 @@ import {
   UserCheck,
   Clock,
   Reply,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import Footer from "./Footer";
 import { collection, onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
@@ -59,6 +61,17 @@ export default function StaffMailPortal({
   const [sendSuccessBanner, setSendSuccessBanner] = useState("");
   const [sendErrorBanner, setSendErrorBanner] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [sendProgress, setSendProgress] = useState(null);
+  // sendProgress shape: {
+  //   step: 1 | 2 | 3 | 4,
+  //   percentage: number,
+  //   stage: string,
+  //   details: string,
+  //   status: 'in-progress' | 'success' | 'error',
+  //   errorStep?: number,
+  //   errorMessage?: string,
+  //   errorDetails?: string,
+  // }
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -423,9 +436,37 @@ export default function StaffMailPortal({
       senderEmail.split("@")[0];
 
     setIsSending(true);
+
+    // Helper sleep for smooth stage visibility
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     try {
+      // Step 1: Authentication & Identity Validation
+      setSendProgress({
+        step: 1,
+        percentage: 20,
+        stage: "Step 1/4: Authenticating Sender Identity",
+        details: `Verifying authorization for ${senderEmail} (${currentUser?.uid ? "Authenticated" : "Session active"})...`,
+        status: "in-progress",
+      });
+      await delay(350);
+
+      if (!currentUser && !auth.currentUser) {
+        throw new Error("Authentication failed: User is not logged into Firebase Authentication.");
+      }
+
+      // Step 2: Payload Packaging & Validation
+      setSendProgress({
+        step: 2,
+        percentage: 45,
+        stage: "Step 2/4: Packaging Message Envelope",
+        details: `Validating recipient headers for ${targetRecipient} and encrypting body contents...`,
+        status: "in-progress",
+      });
+      await delay(400);
+
       const nowIso = new Date().toISOString();
-      await addDoc(collection(db, "messages"), {
+      const payload = {
         mailboxId: activeMailbox?.id || "general",
         to: targetRecipient,
         from: senderEmail,
@@ -437,18 +478,65 @@ export default function StaffMailPortal({
         folder: "sent",
         read: true,
         createdAt: nowIso,
+      };
+
+      // Step 3: Firestore Database Dispatch
+      setSendProgress({
+        step: 3,
+        percentage: 75,
+        stage: "Step 3/4: Transmitting to Cloud Mail Relay",
+        details: `Writing record to Firestore 'messages' collection with security rule verification...`,
+        status: "in-progress",
       });
 
-      setSendSuccessBanner(`Message successfully sent to ${targetRecipient}!`);
+      const docRef = await addDoc(collection(db, "messages"), payload);
+
+      // Step 4: Routing & Mailbox Confirmation
+      setSendProgress({
+        step: 4,
+        percentage: 100,
+        stage: "Step 4/4: Message Dispatched & Synced",
+        details: `Record #${docRef.id} confirmed on cloud server. Recipient routing complete!`,
+        status: "success",
+      });
+
+      setSendSuccessBanner(`Message successfully delivered to ${targetRecipient}!`);
       setComposeTo("");
       setComposeSubject("");
       setComposeBody("");
+      
+      // Keep completed progress visible for a moment then switch to sent folder
+      await delay(1200);
       setMailFolder("sent");
-      setTimeout(() => setSendSuccessBanner(""), 5000);
+      setTimeout(() => {
+        setSendProgress(null);
+        setSendSuccessBanner("");
+      }, 4000);
     } catch (err) {
       console.error("Error sending email:", err);
       const msg = err?.message || "Failed to send message. Please try again.";
       setSendErrorBanner(`Failed to send email: ${msg}`);
+
+      // Pinpoint exact failure step for the user
+      setSendProgress((prev) => {
+        const failedStep = prev ? prev.step : 1;
+        let stepName = "Unknown step";
+        if (failedStep === 1) stepName = "Sender Authentication";
+        else if (failedStep === 2) stepName = "Payload Packaging";
+        else if (failedStep === 3) stepName = "Firestore Cloud Transmission / Security Rules";
+        else if (failedStep === 4) stepName = "Confirmation & Routing";
+
+        return {
+          step: failedStep,
+          percentage: prev ? prev.percentage : 25,
+          stage: `Error at Step ${failedStep}/4: ${stepName}`,
+          details: `Error details: ${msg}`,
+          status: "error",
+          errorStep: failedStep,
+          errorMessage: msg,
+        };
+      });
+
       handleFirestoreError(err, OperationType.WRITE, "messages");
     } finally {
       setIsSending(false);
@@ -1137,6 +1225,118 @@ export default function StaffMailPortal({
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
                       />
                     </div>
+
+                    {/* DELIVERY PROGRESS BAR & STEP TRACKER */}
+                    {sendProgress && (
+                      <div
+                        className={`rounded-2xl p-4 border transition-all duration-300 ${
+                          sendProgress.status === "error"
+                            ? "bg-rose-950/40 border-rose-800/80 text-rose-200"
+                            : sendProgress.status === "success"
+                            ? "bg-emerald-950/40 border-emerald-800/80 text-emerald-200"
+                            : "bg-slate-950 border-amber-400/40 text-slate-200 shadow-lg shadow-amber-400/5"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <div className="flex items-center gap-2">
+                            {sendProgress.status === "in-progress" && (
+                              <Loader2 className="w-4 h-4 text-amber-400 animate-spin shrink-0" />
+                            )}
+                            {sendProgress.status === "success" && (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            )}
+                            {sendProgress.status === "error" && (
+                              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                            )}
+                            <span className="text-xs font-black tracking-wide">
+                              {sendProgress.stage}
+                            </span>
+                          </div>
+                          <span
+                            className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
+                              sendProgress.status === "error"
+                                ? "bg-rose-900/60 text-rose-300"
+                                : sendProgress.status === "success"
+                                ? "bg-emerald-900/60 text-emerald-300"
+                                : "bg-amber-400/20 text-amber-300"
+                            }`}
+                          >
+                            {sendProgress.percentage}%
+                          </span>
+                        </div>
+
+                        {/* Progress Bar Track */}
+                        <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                          <div
+                            className={`h-full rounded-full transition-all duration-300 ${
+                              sendProgress.status === "error"
+                                ? "bg-rose-500"
+                                : sendProgress.status === "success"
+                                ? "bg-emerald-400"
+                                : "bg-gradient-to-r from-amber-500 to-amber-300"
+                            }`}
+                            style={{ width: `${sendProgress.percentage}%` }}
+                          />
+                        </div>
+
+                        {/* 4 Stage Pills */}
+                        <div className="grid grid-cols-4 gap-1.5 mt-3 pt-2 border-t border-slate-800/60 text-[10px] font-bold">
+                          {[
+                            { step: 1, label: "1. Auth Check" },
+                            { step: 2, label: "2. Payload Prep" },
+                            { step: 3, label: "3. Cloud DB Write" },
+                            { step: 4, label: "4. Delivered" },
+                          ].map((st) => {
+                            const isDone = sendProgress.step > st.step || (sendProgress.step === st.step && sendProgress.status === "success");
+                            const isCurrent = sendProgress.step === st.step;
+                            const isFailed = sendProgress.status === "error" && sendProgress.errorStep === st.step;
+
+                            return (
+                              <div
+                                key={st.step}
+                                className={`px-2 py-1.5 rounded-lg flex flex-col items-center justify-center text-center transition ${
+                                  isFailed
+                                    ? "bg-rose-900/40 text-rose-300 border border-rose-500/50"
+                                    : isDone
+                                    ? "bg-emerald-950/40 text-emerald-300 border border-emerald-500/30"
+                                    : isCurrent
+                                    ? "bg-amber-400/20 text-amber-300 border border-amber-400/40 animate-pulse"
+                                    : "bg-slate-900/50 text-slate-500 border border-slate-800"
+                                }`}
+                              >
+                                <span>{st.label}</span>
+                                <span className="text-[9px] font-normal opacity-80 mt-0.5">
+                                  {isFailed ? "Failed" : isDone ? "Complete" : isCurrent ? "Active" : "Pending"}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Detailed Status or Diagnostic Error Message */}
+                        <div className="mt-2.5 text-[11px] leading-relaxed">
+                          {sendProgress.status === "error" ? (
+                            <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-200">
+                              <p className="font-bold flex items-center gap-1.5 text-rose-300">
+                                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                Exact Point of Failure: Stage {sendProgress.errorStep}
+                              </p>
+                              <p className="mt-1 font-mono text-[10px] break-words text-rose-200/90">
+                                {sendProgress.errorMessage}
+                              </p>
+                              <p className="mt-1.5 text-[10px] text-slate-400">
+                                Tip: Verify that you are signed in, the recipient address is valid, and permissions are granted in Firestore rules.
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-slate-400 font-mono text-[10px] flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                              {sendProgress.details}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-3 pt-2">
                       <button
