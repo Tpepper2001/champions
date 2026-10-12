@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Mail,
   UserPlus,
@@ -27,6 +27,11 @@ import {
   AlertCircle,
   Loader2,
   ExternalLink,
+  Terminal,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Activity,
 } from "lucide-react";
 import Footer from "./Footer";
 import { collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
@@ -74,6 +79,99 @@ export default function StaffMailPortal({
   //   errorMessage?: string,
   //   errorDetails?: string,
   // }
+
+  // DELIVERY & ERROR LOGGING STATES
+  const [deliveryLogs, setDeliveryLogs] = useState(() => {
+    try {
+      const saved = localStorage.getItem("clg_mail_delivery_logs");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showLogConsole, setShowLogConsole] = useState(false);
+  const [logFilter, setLogFilter] = useState("all"); // "all" | "error" | "warn" | "info" | "success"
+  const [resendStatus, setResendStatus] = useState(null);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [testConnectionStatus, setTestConnectionStatus] = useState(null);
+  const [copiedLogId, setCopiedLogId] = useState(null);
+  const [expandedLogId, setExpandedLogId] = useState(null);
+
+  const appendLog = (level, stage, message, details = null) => {
+    const newEntry = {
+      id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: new Date().toLocaleTimeString(),
+      isoTime: new Date().toISOString(),
+      level, // 'info' | 'warn' | 'error' | 'success'
+      stage,
+      message,
+      details: details ? JSON.parse(JSON.stringify(details)) : null,
+    };
+    setDeliveryLogs((prev) => {
+      const updated = [newEntry, ...prev].slice(0, 100);
+      try {
+        localStorage.setItem("clg_mail_delivery_logs", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    return newEntry;
+  };
+
+  const clearDeliveryLogs = () => {
+    setDeliveryLogs([]);
+    try {
+      localStorage.removeItem("clg_mail_delivery_logs");
+    } catch {}
+  };
+
+  const checkResendServerStatus = useCallback(async () => {
+    setIsCheckingStatus(true);
+    try {
+      const res = await fetch("/api/resend-status");
+      if (res.ok) {
+        const data = await res.json();
+        setResendStatus(data);
+        appendLog(
+          data.configured ? "info" : "warn",
+          "Server Health",
+          `Resend API Status: ${data.configured ? "Configured (" + data.apiKeyMasked + ")" : "Not configured in .env"}`,
+          data
+        );
+      } else {
+        appendLog("error", "Server Health", `Status check returned HTTP ${res.status}`);
+      }
+    } catch (err) {
+      appendLog("error", "Server Health", "Cannot contact /api/resend-status: " + err.message, { error: err.message });
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  }, []);
+
+  const handleTestConnection = async () => {
+    setTestConnectionStatus({ loading: true });
+    appendLog("info", "Diagnostics", "Running diagnostic probe to test Resend API connection...");
+    try {
+      const res = await fetch("/api/test-connection", { method: "POST" });
+      const data = await res.json();
+      setTestConnectionStatus({ loading: false, data, ok: res.ok && data.ok });
+      if (res.ok && data.ok) {
+        appendLog("success", "Diagnostics", "Resend API connection probe PASSED: " + (data.message || "Connected"), data);
+      } else {
+        appendLog("error", "Diagnostics", `Diagnostic probe FAILED (${data.code || "HTTP " + res.status}): ${data.error}`, data);
+      }
+    } catch (err) {
+      const errData = { error: err.message };
+      setTestConnectionStatus({ loading: false, data: errData, ok: false });
+      appendLog("error", "Diagnostics", "Diagnostic probe network failure: " + err.message, errData);
+    }
+  };
+
+  // Run status check once on mount when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkResendServerStatus();
+    }
+  }, [isAuthenticated, checkResendServerStatus]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -466,6 +564,7 @@ export default function StaffMailPortal({
       targetRecipient === (activeMailbox?.forwardingEmail || "").toLowerCase().trim();
 
     setIsSending(true);
+    appendLog("info", "Validation", `Initiating email dispatch: to="${targetRecipient}", subject="${composeSubject.trim()}"`);
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -478,7 +577,8 @@ export default function StaffMailPortal({
         details: `Verifying authorization for ${senderEmail} (${currentUser?.uid ? "Authenticated" : "Session active"})...`,
         status: "in-progress",
       });
-      await delay(250);
+      appendLog("info", "Step 1: Auth", `Authenticated as ${currentUser?.email} (${senderEmail})`);
+      await delay(200);
 
       if (!currentUser && !auth.currentUser) {
         throw new Error("Authentication failed: User is not logged into Firebase Authentication.");
@@ -492,7 +592,8 @@ export default function StaffMailPortal({
         details: `Resolving recipient routing for ${targetRecipient} and preparing dual delivery records...`,
         status: "in-progress",
       });
-      await delay(250);
+      appendLog("info", "Step 2: Envelope", `To: ${targetRecipient} (${isExternal ? "External internet address" : "Internal @cleadglobal.org"}). Subject: "${composeSubject.trim()}"`);
+      await delay(200);
 
       const nowIso = new Date().toISOString();
       const subjectText = composeSubject.trim();
@@ -525,8 +626,10 @@ export default function StaffMailPortal({
             createdAt: nowIso.slice(0, 10),
           });
           targetMb = { id: newDocRef.id, email: targetRecipient, fullName: defaultMbName };
+          appendLog("info", "Provisioning", `Auto-provisioned internal mailbox for ${targetRecipient} (Doc ID: ${newDocRef.id})`);
         } catch (provisionErr) {
           console.warn("Could not auto-provision recipient mailbox:", provisionErr);
+          appendLog("warn", "Provisioning", `Failed to auto-provision mailbox: ${provisionErr.message}`);
         }
       }
 
@@ -575,9 +678,11 @@ export default function StaffMailPortal({
         status: "delivered",
       };
       const inboxDocRef = await addDoc(collection(db, "messages"), inboxPayload);
+      appendLog("info", "Step 3: Cloud DB", `Dual records created in Firestore: Sent #${sentDocRef.id}, Inbox #${inboxDocRef.id}`);
 
       // Step 4: Dispatch via Resend Cloud API for internet delivery
       let resendOutcome = null;
+      let resendHttpStatus = 0;
       try {
         setSendProgress({
           step: 4,
@@ -586,6 +691,7 @@ export default function StaffMailPortal({
           details: `Calling Resend API proxy relay for internet delivery to ${targetRecipient}...`,
           status: "in-progress",
         });
+        appendLog("info", "Step 4: Resend Dispatch", `Calling /api/send-email: From "${senderEmail}", To "${targetRecipient}", Subject "${subjectText}"`);
 
         const resendRes = await fetch("/api/send-email", {
           method: "POST",
@@ -598,62 +704,121 @@ export default function StaffMailPortal({
             text: bodyText,
           }),
         });
+        resendHttpStatus = resendRes.status;
 
-        if (resendRes.ok) {
-          resendOutcome = await resendRes.json();
+        const resendJson = await resendRes.json().catch(() => ({
+          ok: false,
+          error: `Non-JSON response from server (HTTP ${resendRes.status})`,
+        }));
+
+        resendOutcome = {
+          ...resendJson,
+          httpStatus: resendHttpStatus,
+          ok: resendRes.ok && Boolean(resendJson.ok),
+        };
+
+        if (resendOutcome.ok) {
+          appendLog("success", "Step 4: Resend Dispatch", `Resend API accepted dispatch! Dispatch ID: ${resendOutcome.id}`, resendOutcome);
         } else {
-          resendOutcome = await resendRes
-            .json()
-            .catch(() => ({ error: `Server HTTP ${resendRes.status}` }));
+          appendLog("error", "Step 4: Resend Dispatch", `Resend API rejected message (${resendOutcome.code || "HTTP " + resendHttpStatus}): ${resendOutcome.error || "Delivery failed"}`, {
+            httpStatus: resendHttpStatus,
+            code: resendOutcome.code,
+            error: resendOutcome.error,
+            details: resendOutcome.details,
+            troubleshooting: resendOutcome.troubleshooting,
+          });
         }
       } catch (proxyErr) {
         console.warn("Resend API proxy warning:", proxyErr);
-        resendOutcome = { error: proxyErr.message || "Proxy connection issue" };
+        resendOutcome = {
+          ok: false,
+          error: proxyErr.message || "Proxy connection issue",
+          code: "ERR_NETWORK_PROXY",
+        };
+        appendLog("error", "Step 4: Resend Dispatch", `Network/proxy exception: ${proxyErr.message}`, { error: proxyErr.message });
       }
 
-      const deliveredViaResend = !!(resendOutcome && resendOutcome.ok);
+      const deliveredViaResend = Boolean(resendOutcome && resendOutcome.ok);
 
-      // Routing & Confirmation
-      setSendProgress({
-        step: 4,
-        percentage: 100,
-        stage: deliveredViaResend
-          ? "Step 4/4: Delivered via Resend Cloud API"
-          : "Step 4/4: Message Dispatched & Synced",
-        details: deliveredViaResend
-          ? `Resend Dispatch ID #${resendOutcome.id} confirmed! Synced to Intranet Inbox (#${inboxDocRef.id}).`
-          : `Records #${sentDocRef.id} (Sent) and #${inboxDocRef.id} (Inbox) delivered. ${
-              resendOutcome?.error ? `Resend Notice: ${resendOutcome.error}` : ""
-            }`,
-        status: "success",
-      });
+      // Handle delivery status and error reporting
+      if (isExternal && !deliveredViaResend) {
+        const errorReason = resendOutcome?.error || "Resend API rejected external delivery";
+        setSendProgress({
+          step: 4,
+          percentage: 85,
+          stage: "Step 4/4: Internet Dispatch Issue (Resend API)",
+          details: `Archived to intranet cloud (#${sentDocRef.id}), but external delivery to ${targetRecipient} failed: ${errorReason}`,
+          status: "error",
+          errorStep: 4,
+          errorMessage: errorReason,
+          errorDetails: resendOutcome?.troubleshooting ? resendOutcome.troubleshooting.join(" • ") : undefined,
+        });
 
-      setLastSentResult({
-        recipient: targetRecipient,
-        recipientIsExternal: isExternal,
-        recipientMailbox: targetMb,
-        subject: subjectText,
-        body: bodyText,
-        sentDocId: sentDocRef.id,
-        inboxDocId: inboxDocRef.id,
-        isSentToSelf: isSelf,
-        resendDispatched: deliveredViaResend,
-        resendId: resendOutcome?.id || null,
-        resendError: resendOutcome && !resendOutcome.ok ? resendOutcome.error : null,
-      });
+        setSendErrorBanner(
+          `External email could not be delivered to ${targetRecipient}: ${errorReason}. Inspect the Diagnostic Error Logs below.`
+        );
+        setSendSuccessBanner("");
+        setShowLogConsole(true);
 
-      setSendSuccessBanner(
-        deliveredViaResend
-          ? `Message delivered via Resend API and synced to ${targetRecipient}!`
-          : `Message successfully delivered to ${targetRecipient}!`
-      );
-      setComposeTo("");
-      setComposeSubject("");
-      setComposeBody("");
+        setLastSentResult({
+          recipient: targetRecipient,
+          recipientIsExternal: isExternal,
+          recipientMailbox: targetMb,
+          subject: subjectText,
+          body: bodyText,
+          sentDocId: sentDocRef.id,
+          inboxDocId: inboxDocRef.id,
+          isSentToSelf: isSelf,
+          resendDispatched: false,
+          resendId: null,
+          resendError: errorReason,
+          resendCode: resendOutcome?.code || `HTTP_${resendHttpStatus}`,
+          resendDetails: resendOutcome?.details || null,
+          resendTroubleshooting: resendOutcome?.troubleshooting || null,
+        });
+      } else {
+        // Successful delivery (either Resend succeeded or internal intranet message delivered)
+        setSendProgress({
+          step: 4,
+          percentage: 100,
+          stage: deliveredViaResend
+            ? "Step 4/4: Delivered via Resend Cloud API"
+            : "Step 4/4: Message Dispatched & Synced",
+          details: deliveredViaResend
+            ? `Resend Dispatch ID #${resendOutcome.id} confirmed! Synced to Intranet Inbox (#${inboxDocRef.id}).`
+            : `Delivered to internal mailbox #${inboxDocRef.id}.`,
+          status: "success",
+        });
+
+        setLastSentResult({
+          recipient: targetRecipient,
+          recipientIsExternal: isExternal,
+          recipientMailbox: targetMb,
+          subject: subjectText,
+          body: bodyText,
+          sentDocId: sentDocRef.id,
+          inboxDocId: inboxDocRef.id,
+          isSentToSelf: isSelf,
+          resendDispatched: deliveredViaResend,
+          resendId: resendOutcome?.id || null,
+          resendError: null,
+        });
+
+        setSendSuccessBanner(
+          deliveredViaResend
+            ? `Message delivered via Resend API and synced to ${targetRecipient}!`
+            : `Message successfully delivered to ${targetRecipient}!`
+        );
+        setComposeTo("");
+        setComposeSubject("");
+        setComposeBody("");
+      }
     } catch (err) {
       console.error("Error sending email:", err);
       const msg = err?.message || "Failed to send message. Please try again.";
       setSendErrorBanner(`Failed to send email: ${msg}`);
+      appendLog("error", "Fatal Send Error", `Send process aborted: ${msg}`, { error: err.stack || err.message });
+      setShowLogConsole(true);
 
       setSendProgress((prev) => {
         const failedStep = prev ? prev.step : 1;
@@ -1306,11 +1471,324 @@ export default function StaffMailPortal({
                     {sentMessages.length}
                   </span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMailFolder("logs");
+                    setSelectedMessage(null);
+                  }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-bold flex items-center justify-between transition ${
+                    mailFolder === "logs"
+                      ? "bg-slate-800 text-sky-400 border border-slate-700"
+                      : "text-slate-300 hover:bg-slate-800/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-sky-400" /> Delivery & Error Logs
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {deliveryLogs.filter((l) => l.level === "error").length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black animate-pulse">
+                        {deliveryLogs.filter((l) => l.level === "error").length} err
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 text-slate-400">
+                      {deliveryLogs.length}
+                    </span>
+                  </div>
+                </button>
               </div>
 
               {/* Right Content Area */}
               <div className="md:col-span-9 p-6">
-                {mailFolder === "compose" ? (
+                {mailFolder === "logs" ? (
+                  /* FULL DELIVERY & DIAGNOSTICS LOG CENTER */
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                      <div>
+                        <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                          <Terminal className="w-5 h-5 text-sky-400" />
+                          Mail Delivery Diagnostics & Server Logs
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Real-time trace of message dispatches, Resend API status, cloud synchronization, and network errors.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleTestConnection}
+                          disabled={testConnectionStatus?.loading}
+                          className="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
+                        >
+                          <Activity className="w-3.5 h-3.5 text-sky-400" />
+                          {testConnectionStatus?.loading ? "Testing..." : "Run Test Probe"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={checkResendServerStatus}
+                          disabled={isCheckingStatus}
+                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isCheckingStatus ? "animate-spin" : ""}`} />
+                          Refresh Status
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const report = `CHAMPIONS LEADERSHIP GLOBAL - MAIL DIAGNOSTICS REPORT\nGenerated: ${new Date().toISOString()}\nResend Configured: ${resendStatus?.configured ? "YES" : "NO"} (${resendStatus?.apiKeyMasked || "No Key"})\nSender Domain: ${resendStatus?.senderDomain || "cleadglobal.org"}\nActive Mailbox: ${activeMailbox?.email || "None"}\nUser Email: ${currentUser?.email || "None"}\n\n--- DELIVERY LOG ENTRIES (${deliveryLogs.length}) ---\n${deliveryLogs.map((l) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.stage}] ${l.message} ${l.details ? "\nDetails: " + JSON.stringify(l.details, null, 2) : ""}`).join("\n\n")}`;
+                            navigator.clipboard.writeText(report);
+                            setCopiedLogId("report");
+                            setTimeout(() => setCopiedLogId(null), 2000);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
+                        >
+                          {copiedLogId === "report" ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" /> Copied Report!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Full Report
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={clearDeliveryLogs}
+                          className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-950/60 border border-slate-800 text-slate-400 hover:text-rose-400 text-xs font-bold transition cursor-pointer"
+                        >
+                          Clear Logs
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Status Overview Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-bold">Resend API Proxy</span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : "bg-rose-500 animate-pulse"}`} />
+                        </div>
+                        <div className="text-sm font-extrabold text-white">
+                          {resendStatus?.configured ? "Configured & Active" : "Missing RESEND_API_KEY"}
+                        </div>
+                        <p className="text-[11px] font-mono text-slate-400">
+                          {resendStatus?.apiKeyMasked ? `Key: ${resendStatus.apiKeyMasked}` : "Set RESEND_API_KEY in .env"}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-bold">Sender Domain</span>
+                          <Globe className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <div className="text-sm font-extrabold text-white font-mono">
+                          cleadglobal.org
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          Fallback: <span className="font-mono text-slate-300">onboarding@resend.dev</span>
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-bold">Events Logged</span>
+                          <span className="text-xs font-mono font-bold text-amber-400">{deliveryLogs.length}</span>
+                        </div>
+                        <div className="text-sm font-extrabold text-white flex items-center gap-2">
+                          <span className="text-rose-400">{deliveryLogs.filter(l => l.level === "error").length} Errors</span>
+                          <span className="text-slate-500">•</span>
+                          <span className="text-emerald-400">{deliveryLogs.filter(l => l.level === "success").length} Success</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          {deliveryLogs.filter(l => l.level === "warn").length} warnings recorded
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Diagnostic Probe Card if present */}
+                    {testConnectionStatus && (
+                      <div
+                        className={`p-4 rounded-2xl border space-y-2 ${
+                          testConnectionStatus.ok
+                            ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
+                            : "bg-rose-950/40 border-rose-500/40 text-rose-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between font-bold text-xs">
+                          <span className="flex items-center gap-2">
+                            {testConnectionStatus.ok ? (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-rose-400" />
+                            )}
+                            Diagnostic Connection Probe: {testConnectionStatus.ok ? "PASSED" : "FAILED"}
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-400">
+                            {testConnectionStatus.data?.code || ""}
+                          </span>
+                        </div>
+                        <p className="text-xs leading-relaxed font-mono">
+                          {testConnectionStatus.data?.error || testConnectionStatus.data?.message}
+                        </p>
+                        {testConnectionStatus.data?.troubleshooting && (
+                          <div className="pt-1">
+                            <span className="text-xs font-bold text-white">Suggested Fixes:</span>
+                            <ul className="list-disc pl-5 text-xs text-slate-300 space-y-1 mt-1 font-sans">
+                              {testConnectionStatus.data.troubleshooting.map((tip, idx) => (
+                                <li key={idx}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Filter Pills */}
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {["all", "error", "warn", "info", "success"].map((f) => {
+                          const count = f === "all" ? deliveryLogs.length : deliveryLogs.filter((l) => l.level === f).length;
+                          return (
+                            <button
+                              key={f}
+                              type="button"
+                              onClick={() => setLogFilter(f)}
+                              className={`px-3 py-1 rounded-xl text-xs font-bold uppercase transition cursor-pointer ${
+                                logFilter === f
+                                  ? "bg-amber-400 text-slate-950"
+                                  : "bg-slate-950 border border-slate-800 text-slate-400 hover:text-white"
+                              }`}
+                            >
+                              {f} ({count})
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <span className="text-xs text-slate-500">
+                        Showing {deliveryLogs.filter((l) => (logFilter === "all" ? true : l.level === logFilter)).length} of {deliveryLogs.length} events
+                      </span>
+                    </div>
+
+                    {/* Detailed Log Table */}
+                    <div className="rounded-2xl border border-slate-800 overflow-hidden bg-slate-950">
+                      {deliveryLogs.filter((l) => (logFilter === "all" ? true : l.level === logFilter)).length === 0 ? (
+                        <div className="p-8 text-center text-slate-500 text-xs">
+                          No logs found matching filter "{logFilter}". Click "Run Test Probe" or send an email to generate logs.
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-800/80 max-h-[500px] overflow-y-auto font-mono text-xs">
+                          {deliveryLogs
+                            .filter((l) => (logFilter === "all" ? true : l.level === logFilter))
+                            .map((entry) => {
+                              const isExp = expandedLogId === entry.id;
+                              return (
+                                <div key={entry.id} className="p-3.5 hover:bg-slate-900/60 transition space-y-1.5">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-start gap-2 flex-wrap">
+                                      <span className="text-slate-500 text-[11px]">
+                                        [{entry.timestamp}]
+                                      </span>
+                                      <span
+                                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                                          entry.level === "error"
+                                            ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                                            : entry.level === "warn"
+                                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                            : entry.level === "success"
+                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                            : "bg-sky-500/20 text-sky-300 border border-sky-500/30"
+                                        }`}
+                                      >
+                                        {entry.level}
+                                      </span>
+                                      <span className="text-amber-400 font-bold text-[11px]">
+                                        [{entry.stage}]
+                                      </span>
+                                      <span className="text-slate-200 font-sans text-xs break-all">
+                                        {entry.message}
+                                      </span>
+                                    </div>
+
+                                    {entry.details && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setExpandedLogId(isExp ? null : entry.id)}
+                                        className="text-xs text-sky-400 hover:text-sky-300 font-sans font-bold inline-flex items-center gap-1 shrink-0 cursor-pointer"
+                                      >
+                                        {isExp ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                        {isExp ? "Collapse" : "Inspect Payload"}
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {isExp && entry.details && (
+                                    <div className="mt-2 p-3 rounded-xl bg-black/90 border border-slate-800 text-[11px] text-slate-300 overflow-x-auto">
+                                      <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/80 text-[10px] text-slate-400 font-sans">
+                                        <span>Diagnostic Object Payload</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(JSON.stringify(entry.details, null, 2));
+                                            setCopiedLogId(entry.id);
+                                            setTimeout(() => setCopiedLogId(null), 1500);
+                                          }}
+                                          className="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1 cursor-pointer"
+                                        >
+                                          {copiedLogId === entry.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                          {copiedLogId === entry.id ? "Copied" : "Copy JSON"}
+                                        </button>
+                                      </div>
+                                      <pre className="whitespace-pre-wrap">{JSON.stringify(entry.details, null, 2)}</pre>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* How Resend & Email Routing Works Guide */}
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs text-slate-300">
+                      <h4 className="font-bold text-white flex items-center gap-2 text-sm">
+                        <Info className="w-4 h-4 text-amber-400" />
+                        Understanding Email Delivery & Resend API Architecture
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-400 leading-relaxed font-sans text-xs">
+                        <div className="space-y-1.5">
+                          <strong className="text-white block font-sans">1. Internal Staff Emails (@cleadglobal.org):</strong>
+                          <p>
+                            Internal communications to any colleague or yourself are automatically recorded in Firestore and delivered instantly to the recipient's Webmail Inbox with 100% reliability, requiring no external mail server.
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <strong className="text-white block font-sans">2. External Internet Emails (Gmail, Yahoo, etc.):</strong>
+                          <p>
+                            To deliver directly to a recipient's personal inbox outside the system, the server relays through the Resend API. This requires <code className="text-amber-300 font-mono">RESEND_API_KEY</code> set in <code className="text-amber-300 font-mono">.env</code>.
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <strong className="text-white block font-sans">3. Resend Free Sandbox Notice:</strong>
+                          <p>
+                            If you are using Resend on the free tier with <code className="text-amber-300 font-mono">onboarding@resend.dev</code>, Resend only permits sending test emails to the email address registered on your Resend account. To send to any external address, verify <code className="text-amber-300 font-mono">cleadglobal.org</code> at <a href="https://resend.com/domains" target="_blank" rel="noreferrer" className="text-sky-400 underline">resend.com/domains</a>.
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <strong className="text-white block font-sans">4. Direct Gmail 1-Click Dispatch:</strong>
+                          <p>
+                            You can bypass all API requirements anytime by clicking the <strong>"Open & Send in Gmail (Web)"</strong> button when composing a message, which opens a pre-composed message in your personal Gmail.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : mailFolder === "compose" ? (
                   <form onSubmit={handleSendEmail} className="space-y-4 max-w-2xl">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2">
@@ -1645,7 +2123,7 @@ export default function StaffMailPortal({
                       </div>
                     )}
 
-                    <div className="flex items-center gap-3 pt-2">
+                    <div className="flex items-center gap-3 pt-2 flex-wrap">
                       <button
                         type="submit"
                         disabled={isSending}
@@ -1664,7 +2142,231 @@ export default function StaffMailPortal({
                       >
                         Open in Device Mail App
                       </a>
+                      <button
+                        type="button"
+                        onClick={() => setShowLogConsole((prev) => !prev)}
+                        className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition ml-auto ${
+                          showLogConsole
+                            ? "bg-sky-950/60 border-sky-500/50 text-sky-300"
+                            : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        <Terminal className="w-3.5 h-3.5 text-sky-400" />
+                        {showLogConsole ? "Hide Error Logs" : "View Error Logs"}
+                        {deliveryLogs.filter((l) => l.level === "error").length > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black animate-pulse">
+                            {deliveryLogs.filter((l) => l.level === "error").length}
+                          </span>
+                        )}
+                      </button>
                     </div>
+
+                    {/* LIVE ERROR & DELIVERY LOG CONSOLE */}
+                    {(showLogConsole || sendProgress?.status === "error") && (
+                      <div className="rounded-2xl p-4 bg-slate-950 border border-slate-800 space-y-3 mt-4 shadow-2xl">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                          <div className="flex items-center gap-2">
+                            <Terminal className="w-4 h-4 text-sky-400" />
+                            <span className="text-xs font-black text-white uppercase tracking-wider">
+                              Delivery & Error Logs Console
+                            </span>
+                            <span className={`w-2 h-2 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : "bg-rose-500"}`} />
+                            <span className="text-[10px] font-mono text-slate-400">
+                              Resend: {resendStatus?.configured ? "Key Active" : "Key Missing in .env"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {/* Filter pills */}
+                            {["all", "error", "warn", "info"].map((f) => {
+                              const count = f === "all" ? deliveryLogs.length : deliveryLogs.filter((l) => l.level === f).length;
+                              return (
+                                <button
+                                  key={f}
+                                  type="button"
+                                  onClick={() => setLogFilter(f)}
+                                  className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase transition ${
+                                    logFilter === f
+                                      ? "bg-amber-400 text-slate-950"
+                                      : "bg-slate-900 text-slate-400 hover:text-white"
+                                  }`}
+                                >
+                                  {f} ({count})
+                                </button>
+                              );
+                            })}
+
+                            <button
+                              type="button"
+                              onClick={handleTestConnection}
+                              disabled={testConnectionStatus?.loading}
+                              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                            >
+                              <Activity className="w-3 h-3 text-sky-400" />
+                              {testConnectionStatus?.loading ? "Testing..." : "Test Probe"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const logText = deliveryLogs
+                                  .map((l) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.stage}] ${l.message} ${l.details ? JSON.stringify(l.details) : ""}`)
+                                  .join("\n");
+                                navigator.clipboard.writeText(logText);
+                                setCopiedLogId("all");
+                                setTimeout(() => setCopiedLogId(null), 2000);
+                              }}
+                              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                            >
+                              {copiedLogId === "all" ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-400" /> Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 text-slate-400" /> Copy Logs
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={clearDeliveryLogs}
+                              className="px-2 py-1 rounded bg-slate-900 hover:bg-rose-950/60 text-slate-500 hover:text-rose-400 text-[10px] transition cursor-pointer"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Test Probe Result Card if available */}
+                        {testConnectionStatus && (
+                          <div
+                            className={`p-3 rounded-xl border text-xs font-mono space-y-1 ${
+                              testConnectionStatus.ok
+                                ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
+                                : "bg-rose-950/60 border-rose-500/40 text-rose-300"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between font-bold text-[11px]">
+                              <span className="flex items-center gap-1.5">
+                                {testConnectionStatus.ok ? (
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                ) : (
+                                  <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+                                )}
+                                Diagnostic Probe Result: {testConnectionStatus.ok ? "SUCCESS" : "FAILED"}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                {testConnectionStatus.data?.code || ""}
+                              </span>
+                            </div>
+                            <p className="text-[11px] leading-relaxed">
+                              {testConnectionStatus.data?.error || testConnectionStatus.data?.message}
+                            </p>
+                            {testConnectionStatus.data?.troubleshooting && (
+                              <ul className="list-disc pl-4 text-[10px] text-slate-300 space-y-0.5 mt-1 font-sans">
+                                {testConnectionStatus.data.troubleshooting.map((tip, idx) => (
+                                  <li key={idx}>{tip}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Log Stream Terminal */}
+                        <div className="bg-black/90 p-3 rounded-xl border border-slate-900 max-h-64 overflow-y-auto space-y-1.5 font-mono text-[11px]">
+                          {deliveryLogs
+                            .filter((l) => (logFilter === "all" ? true : l.level === logFilter))
+                            .length === 0 ? (
+                            <div className="text-slate-500 text-center py-4">
+                              No log entries recorded for filter "{logFilter}". Click "Test Probe" or send an email.
+                            </div>
+                          ) : (
+                            deliveryLogs
+                              .filter((l) => (logFilter === "all" ? true : l.level === logFilter))
+                              .map((entry) => {
+                                const isExp = expandedLogId === entry.id;
+                                return (
+                                  <div
+                                    key={entry.id}
+                                    className={`p-2 rounded-lg border transition ${
+                                      entry.level === "error"
+                                        ? "bg-rose-950/40 border-rose-900/60 text-rose-200"
+                                        : entry.level === "warn"
+                                        ? "bg-amber-950/30 border-amber-900/50 text-amber-200"
+                                        : entry.level === "success"
+                                        ? "bg-emerald-950/30 border-emerald-900/50 text-emerald-200"
+                                        : "bg-slate-900/40 border-slate-800 text-slate-300"
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex items-start gap-1.5 flex-wrap">
+                                        <span className="text-[10px] text-slate-500 select-none">
+                                          [{entry.timestamp}]
+                                        </span>
+                                        <span
+                                          className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded select-none ${
+                                            entry.level === "error"
+                                              ? "bg-rose-600 text-white"
+                                              : entry.level === "warn"
+                                              ? "bg-amber-500 text-slate-950"
+                                              : entry.level === "success"
+                                              ? "bg-emerald-600 text-white"
+                                              : "bg-sky-600 text-white"
+                                          }`}
+                                        >
+                                          {entry.level}
+                                        </span>
+                                        <span className="text-amber-300/80 text-[10px]">
+                                          [{entry.stage}]
+                                        </span>
+                                        <span className="break-all">{entry.message}</span>
+                                      </div>
+
+                                      {entry.details && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setExpandedLogId(isExp ? null : entry.id)}
+                                          className="text-[10px] text-sky-400 hover:text-sky-300 shrink-0 font-sans font-bold flex items-center gap-0.5"
+                                        >
+                                          {isExp ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                          {isExp ? "Hide" : "Details"}
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {isExp && entry.details && (
+                                      <pre className="mt-2 p-2 rounded bg-black border border-slate-800 text-[10px] text-slate-300 overflow-x-auto whitespace-pre-wrap">
+                                        {JSON.stringify(entry.details, null, 2)}
+                                      </pre>
+                                    )}
+                                  </div>
+                                );
+                              })
+                          )}
+                        </div>
+
+                        {/* Troubleshooting & Direct Alternative Callout */}
+                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2">
+                          <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px]">
+                            <Info className="w-3.5 h-3.5" />
+                            How to Resolve External Email Delivery:
+                          </div>
+                          <ul className="list-disc pl-4 space-y-1 text-[11px] text-slate-400 leading-relaxed font-sans">
+                            <li>
+                              <strong className="text-slate-200">1. Server Environment (.env):</strong> Ensure you have <code className="text-amber-300 font-mono">RESEND_API_KEY=re_...</code> in your <code className="text-amber-300 font-mono">.env</code> file.
+                            </li>
+                            <li>
+                              <strong className="text-slate-200">2. Free Resend Sandbox Limitation:</strong> On Resend's free tier without a custom domain, emails sent through the test domain can only be sent to your registered account email. To send to any Gmail address, verify <code className="text-amber-300 font-mono">cleadglobal.org</code> at <a href="https://resend.com/domains" target="_blank" rel="noreferrer" className="text-sky-400 underline">resend.com/domains</a>.
+                            </li>
+                            <li>
+                              <strong className="text-slate-200">3. Instant 1-Click Alternative:</strong> You can send directly using your personal/staff Gmail client by clicking the <strong>"Open & Send in Gmail (Web)"</strong> button above.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
                   </form>
                 ) : selectedMessage ? (
                   <div className="space-y-5">
