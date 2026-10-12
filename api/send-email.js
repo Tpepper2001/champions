@@ -1,6 +1,4 @@
-import { Resend } from 'resend';
-
-const DOMAIN = 'cleadglobal.org';
+const { Resend } = require('resend');
 
 const escapeHtml = (t) =>
   String(t || '')
@@ -8,8 +6,8 @@ const escapeHtml = (t) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-export default async function handler(req, res) {
-  // CORS & Method Check
+module.exports = async function handler(req, res) {
+  // Method check
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
@@ -75,7 +73,7 @@ export default async function handler(req, res) {
       sendResult = { error: errFirst };
     }
 
-    // Attempt 2: If domain is unverified on Resend, fallback to onboarding@resend.dev
+    // Attempt 2: If domain is unverified on Resend, fall back to onboarding@resend.dev
     if (
       sendResult?.error &&
       (String(sendResult.error.message || '').toLowerCase().includes('domain') ||
@@ -143,4 +141,4 @@ export default async function handler(req, res) {
       error: err.message || 'Internal server error while transmitting email',
     });
   }
-}
+};
