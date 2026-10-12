@@ -1,6 +1,6 @@
-import { Resend } from 'resend';
+const { Resend } = require('resend');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const rawKey = (
     process.env.RESEND_API_KEY ||
     process.env.REACT_APP_RESEND_API_KEY ||
@@ -23,4 +23,4 @@ export default async function handler(req, res) {
       ? 'Resend API key is detected in the server environment.'
       : 'RESEND_API_KEY is not defined in server environment variables. Please add RESEND_API_KEY in your Vercel Project Settings.',
   });
-}
+};
