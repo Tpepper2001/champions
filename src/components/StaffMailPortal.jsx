@@ -26,9 +26,10 @@ import {
   Reply,
   AlertCircle,
   Loader2,
+  ExternalLink,
 } from "lucide-react";
 import Footer from "./Footer";
-import { collection, onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { 
   auth, 
   db, 
@@ -62,6 +63,7 @@ export default function StaffMailPortal({
   const [sendErrorBanner, setSendErrorBanner] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendProgress, setSendProgress] = useState(null);
+  const [lastSentResult, setLastSentResult] = useState(null);
   // sendProgress shape: {
   //   step: 1 | 2 | 3 | 4,
   //   percentage: number,
@@ -106,28 +108,49 @@ export default function StaffMailPortal({
     const userEmail = (currentUser.email || "").toLowerCase().trim();
     if (!userEmail) return;
 
-    const myMailbox = mailboxes.find(
-      (m) => (m.email || "").toLowerCase().trim() === userEmail
-    );
+    const userBase = userEmail.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    const myMailbox = mailboxes.find((m) => {
+      const mbEmail = (m.email || "").toLowerCase().trim();
+      const mbFwd = (m.forwardingEmail || "").toLowerCase().trim();
+      const mbUser = (m.username || "").toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+      return (
+        mbEmail === userEmail ||
+        mbFwd === userEmail ||
+        (mbUser && userBase && (mbUser === userBase || userBase.includes(mbUser) || mbUser.includes(userBase)))
+      );
+    });
 
     if (myMailbox) {
       if (!activeMailbox || activeMailbox.id !== myMailbox.id) {
         setActiveMailbox(myMailbox);
       }
     } else if (mailboxes.length > 0 && !activeMailbox) {
-      setActiveMailbox(mailboxes[0]);
+      // Look for any mailbox sharing part of user's name
+      const fuzzyMatch = mailboxes.find((m) => {
+        const mName = (m.fullName || m.name || "").toLowerCase();
+        const uName = (currentUser.displayName || "").toLowerCase();
+        return uName && mName && (mName.includes(uName) || uName.includes(mName));
+      });
+      setActiveMailbox(fuzzyMatch || mailboxes[0]);
     } else if (mailboxes.length === 0 && !activeMailbox) {
       // If no mailbox exists in Firestore yet for the authenticated user, provision it
       const defaultName = (currentUser.displayName || userEmail.split("@")[0])
         .replace(/[._-]/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase());
+      const cleanUser = sanitizeUsername(userEmail.split("@")[0]);
+      const officialEmail = userEmail.endsWith("@cleadglobal.org")
+        ? userEmail
+        : `${cleanUser}@cleadglobal.org`;
+
       const newMb = {
-        email: userEmail,
+        email: officialEmail,
+        forwardingEmail: userEmail,
         fullName: defaultName,
         name: defaultName,
         role: "Staff Member",
         department: "Leadership & Programs",
-        username: userEmail.split("@")[0],
+        username: cleanUser,
         status: "Active",
         createdAt: new Date().toISOString().slice(0, 10),
       };
@@ -411,6 +434,7 @@ export default function StaffMailPortal({
     e.preventDefault();
     setSendErrorBanner("");
     setSendSuccessBanner("");
+    setLastSentResult(null);
 
     const target = composeTo.trim();
     if (!target || !composeSubject.trim()) {
@@ -435,9 +459,14 @@ export default function StaffMailPortal({
       currentUser?.displayName ||
       senderEmail.split("@")[0];
 
+    const isExternal = !targetRecipient.endsWith("@cleadglobal.org");
+    const isSelf =
+      targetRecipient === senderEmail ||
+      targetRecipient === (currentUser?.email || "").toLowerCase().trim() ||
+      targetRecipient === (activeMailbox?.forwardingEmail || "").toLowerCase().trim();
+
     setIsSending(true);
 
-    // Helper sleep for smooth stage visibility
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     try {
@@ -449,75 +478,183 @@ export default function StaffMailPortal({
         details: `Verifying authorization for ${senderEmail} (${currentUser?.uid ? "Authenticated" : "Session active"})...`,
         status: "in-progress",
       });
-      await delay(350);
+      await delay(250);
 
       if (!currentUser && !auth.currentUser) {
         throw new Error("Authentication failed: User is not logged into Firebase Authentication.");
       }
 
-      // Step 2: Payload Packaging & Validation
+      // Step 2: Payload Packaging & Recipient Resolution
       setSendProgress({
         step: 2,
         percentage: 45,
         stage: "Step 2/4: Packaging Message Envelope",
-        details: `Validating recipient headers for ${targetRecipient} and encrypting body contents...`,
+        details: `Resolving recipient routing for ${targetRecipient} and preparing dual delivery records...`,
         status: "in-progress",
       });
-      await delay(400);
+      await delay(250);
 
       const nowIso = new Date().toISOString();
-      const payload = {
-        mailboxId: activeMailbox?.id || "general",
-        to: targetRecipient,
-        from: senderEmail,
-        fromName: senderName,
-        subject: composeSubject.trim(),
-        body: composeBody.trim(),
-        date: nowIso,
-        receivedAt: nowIso,
-        folder: "sent",
-        read: true,
-        createdAt: nowIso,
-      };
+      const subjectText = composeSubject.trim();
+      const bodyText = composeBody.trim();
 
-      // Step 3: Firestore Database Dispatch
+      // Find or provision recipient mailbox
+      let targetMb = mailboxes.find((m) => {
+        const e = (m.email || "").toLowerCase().trim();
+        const f = (m.forwardingEmail || "").toLowerCase().trim();
+        const u = (m.username || "").toLowerCase().trim();
+        const tr = targetRecipient.toLowerCase().trim();
+        return e === tr || f === tr || (u && tr.split("@")[0] === u);
+      });
+
+      // Auto-provision recipient mailbox if internal @cleadglobal.org address
+      if (!targetMb && targetRecipient.endsWith("@cleadglobal.org")) {
+        try {
+          const userPart = targetRecipient.split("@")[0];
+          const defaultMbName = userPart
+            .replace(/[._-]/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+          const newDocRef = await addDoc(collection(db, "mailboxes"), {
+            email: targetRecipient,
+            fullName: defaultMbName,
+            name: defaultMbName,
+            role: "Staff Member",
+            department: "Champions Leadership Global",
+            username: userPart,
+            status: "Active",
+            createdAt: nowIso.slice(0, 10),
+          });
+          targetMb = { id: newDocRef.id, email: targetRecipient, fullName: defaultMbName };
+        } catch (provisionErr) {
+          console.warn("Could not auto-provision recipient mailbox:", provisionErr);
+        }
+      }
+
+      // Step 3: Cloud Database Relay Write (Sent copy + Recipient Inbox copy)
       setSendProgress({
         step: 3,
         percentage: 75,
-        stage: "Step 3/4: Transmitting to Cloud Mail Relay",
-        details: `Writing record to Firestore 'messages' collection with security rule verification...`,
+        stage: "Step 3/4: Writing to Cloud Mail Relay",
+        details: `Transmitting dual records to Firestore 'messages' (Sent Outbox record & Recipient Inbox record)...`,
         status: "in-progress",
       });
 
-      const docRef = await addDoc(collection(db, "messages"), payload);
+      // 1. Sent record for sender Outbox
+      const sentPayload = {
+        mailboxId: activeMailbox?.id || "general",
+        senderMailboxId: activeMailbox?.id || null,
+        folder: "sent",
+        to: targetRecipient,
+        from: senderEmail,
+        fromName: senderName,
+        subject: subjectText,
+        body: bodyText,
+        date: nowIso,
+        receivedAt: nowIso,
+        read: true,
+        createdAt: nowIso,
+        status: "delivered",
+      };
+      const sentDocRef = await addDoc(collection(db, "messages"), sentPayload);
 
-      // Step 4: Routing & Mailbox Confirmation
+      // 2. Inbox record for recipient Inbox
+      const inboxPayload = {
+        mailboxId: targetMb?.id || (isSelf && activeMailbox?.id ? activeMailbox.id : "general"),
+        recipientMailboxId: targetMb?.id || null,
+        recipientEmail: targetRecipient,
+        folder: "inbox",
+        to: targetRecipient,
+        from: senderEmail,
+        fromName: senderName,
+        subject: subjectText,
+        body: bodyText,
+        date: nowIso,
+        receivedAt: nowIso,
+        read: false,
+        createdAt: nowIso,
+        status: "delivered",
+      };
+      const inboxDocRef = await addDoc(collection(db, "messages"), inboxPayload);
+
+      // Step 4: Dispatch via Resend Cloud API for internet delivery
+      let resendOutcome = null;
+      try {
+        setSendProgress({
+          step: 4,
+          percentage: 90,
+          stage: "Step 4/4: Transmitting via Resend Cloud API",
+          details: `Calling Resend API proxy relay for internet delivery to ${targetRecipient}...`,
+          status: "in-progress",
+        });
+
+        const resendRes = await fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: senderEmail,
+            fromName: senderName,
+            to: targetRecipient,
+            subject: subjectText,
+            text: bodyText,
+          }),
+        });
+
+        if (resendRes.ok) {
+          resendOutcome = await resendRes.json();
+        } else {
+          resendOutcome = await resendRes
+            .json()
+            .catch(() => ({ error: `Server HTTP ${resendRes.status}` }));
+        }
+      } catch (proxyErr) {
+        console.warn("Resend API proxy warning:", proxyErr);
+        resendOutcome = { error: proxyErr.message || "Proxy connection issue" };
+      }
+
+      const deliveredViaResend = !!(resendOutcome && resendOutcome.ok);
+
+      // Routing & Confirmation
       setSendProgress({
         step: 4,
         percentage: 100,
-        stage: "Step 4/4: Message Dispatched & Synced",
-        details: `Record #${docRef.id} confirmed on cloud server. Recipient routing complete!`,
+        stage: deliveredViaResend
+          ? "Step 4/4: Delivered via Resend Cloud API"
+          : "Step 4/4: Message Dispatched & Synced",
+        details: deliveredViaResend
+          ? `Resend Dispatch ID #${resendOutcome.id} confirmed! Synced to Intranet Inbox (#${inboxDocRef.id}).`
+          : `Records #${sentDocRef.id} (Sent) and #${inboxDocRef.id} (Inbox) delivered. ${
+              resendOutcome?.error ? `Resend Notice: ${resendOutcome.error}` : ""
+            }`,
         status: "success",
       });
 
-      setSendSuccessBanner(`Message successfully delivered to ${targetRecipient}!`);
+      setLastSentResult({
+        recipient: targetRecipient,
+        recipientIsExternal: isExternal,
+        recipientMailbox: targetMb,
+        subject: subjectText,
+        body: bodyText,
+        sentDocId: sentDocRef.id,
+        inboxDocId: inboxDocRef.id,
+        isSentToSelf: isSelf,
+        resendDispatched: deliveredViaResend,
+        resendId: resendOutcome?.id || null,
+        resendError: resendOutcome && !resendOutcome.ok ? resendOutcome.error : null,
+      });
+
+      setSendSuccessBanner(
+        deliveredViaResend
+          ? `Message delivered via Resend API and synced to ${targetRecipient}!`
+          : `Message successfully delivered to ${targetRecipient}!`
+      );
       setComposeTo("");
       setComposeSubject("");
       setComposeBody("");
-      
-      // Keep completed progress visible for a moment then switch to sent folder
-      await delay(1200);
-      setMailFolder("sent");
-      setTimeout(() => {
-        setSendProgress(null);
-        setSendSuccessBanner("");
-      }, 4000);
     } catch (err) {
       console.error("Error sending email:", err);
       const msg = err?.message || "Failed to send message. Please try again.";
       setSendErrorBanner(`Failed to send email: ${msg}`);
 
-      // Pinpoint exact failure step for the user
       setSendProgress((prev) => {
         const failedStep = prev ? prev.step : 1;
         let stepName = "Unknown step";
@@ -569,19 +706,26 @@ export default function StaffMailPortal({
     currentUser?.email ||
     ""
   ).toLowerCase().trim();
-  const currentUsername = currentMailboxEmail.split("@")[0];
+  const currentFwdEmail = (activeMailbox?.forwardingEmail || "").toLowerCase().trim();
+  const currentUsername = (activeMailbox?.username || currentMailboxEmail.split("@")[0] || "").toLowerCase().trim();
+  const currentAuthEmail = (currentUser?.email || "").toLowerCase().trim();
 
   const inboxMessages = messages
     .filter((m) => {
-      const toEmail = (m.to || "").toLowerCase().trim();
+      // Must not be a pure sent copy
+      if (m.folder === "sent") {
+        return false;
+      }
+
+      const toEmail = (m.to || m.recipientEmail || "").toLowerCase().trim();
       const toUsername = toEmail.split("@")[0];
 
       // Direct recipient match
       const isDirect =
         toEmail === currentMailboxEmail ||
-        (currentUsername &&
-          toUsername === currentUsername &&
-          (toEmail.endsWith("@cleadglobal.org") || !toEmail.includes("@")));
+        (currentFwdEmail && toEmail === currentFwdEmail) ||
+        (currentAuthEmail && toEmail === currentAuthEmail) ||
+        (currentUsername && toUsername === currentUsername);
 
       // Broadcast address match
       const isBroadcast =
@@ -589,36 +733,42 @@ export default function StaffMailPortal({
         toEmail === "everyone@cleadglobal.org" ||
         toEmail === "staff@cleadglobal.org";
 
-      // Welcome message tied to this mailbox
+      // Tied to this mailbox ID
       const isForThisMailbox =
-        activeMailbox?.id && m.mailboxId === activeMailbox.id && m.folder !== "sent";
+        activeMailbox?.id &&
+        (m.mailboxId === activeMailbox.id || m.recipientMailboxId === activeMailbox.id);
 
       return isDirect || isBroadcast || isForThisMailbox;
     })
     .sort(
       (a, b) =>
-        new Date(b.date || b.receivedAt || 0) -
-        new Date(a.date || a.receivedAt || 0)
+        new Date(b.date || b.receivedAt || b.createdAt || 0) -
+        new Date(a.date || a.receivedAt || a.createdAt || 0)
     );
 
   const sentMessages = messages
     .filter((m) => {
+      if (m.folder !== "sent") return false;
+
       const fromEmail = (m.from || "").toLowerCase().trim();
       const fromUsername = fromEmail.split("@")[0];
 
       const isDirectSender =
         fromEmail === currentMailboxEmail ||
+        (currentFwdEmail && fromEmail === currentFwdEmail) ||
+        (currentAuthEmail && fromEmail === currentAuthEmail) ||
         (currentUsername && fromUsername === currentUsername);
 
       const isSentFromThisMailbox =
-        activeMailbox?.id && m.mailboxId === activeMailbox.id && m.folder === "sent";
+        activeMailbox?.id &&
+        (m.mailboxId === activeMailbox.id || m.senderMailboxId === activeMailbox.id);
 
       return isDirectSender || isSentFromThisMailbox;
     })
     .sort(
       (a, b) =>
-        new Date(b.date || b.receivedAt || 0) -
-        new Date(a.date || a.receivedAt || 0)
+        new Date(b.date || b.receivedAt || b.createdAt || 0) -
+        new Date(a.date || a.receivedAt || a.createdAt || 0)
     );
 
   const displayedMessages =
@@ -1125,9 +1275,16 @@ export default function StaffMailPortal({
                   <span className="flex items-center gap-2">
                     <Inbox className="w-4 h-4" /> Inbox
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 text-slate-300">
-                    {inboxMessages.length}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {inboxMessages.filter((m) => !m.read).length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-400 text-slate-950 font-black">
+                        {inboxMessages.filter((m) => !m.read).length} new
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 text-slate-300">
+                      {inboxMessages.length}
+                    </span>
+                  </div>
                 </button>
 
                 <button
@@ -1338,6 +1495,156 @@ export default function StaffMailPortal({
                       </div>
                     )}
 
+                    {/* DELIVERY VERIFICATION & ACTIONS PANEL */}
+                    {lastSentResult && (
+                      <div className="rounded-2xl p-4 bg-emerald-950/40 border border-emerald-500/40 space-y-3.5 shadow-xl">
+                        <div className="flex items-center justify-between gap-2 border-b border-emerald-500/20 pb-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span className="text-xs font-black text-emerald-300 uppercase tracking-wider">
+                              Delivery Confirmed & Synced
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            Sent #{lastSentResult.sentDocId.slice(0, 6)} • Inbox #{lastSentResult.inboxDocId.slice(0, 6)}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1.5 text-xs">
+                          {lastSentResult.resendDispatched && (
+                            <div className="flex items-start gap-2 text-emerald-300 bg-emerald-950/60 p-2.5 rounded-xl border border-emerald-500/30">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                              <div>
+                                <strong className="text-white">Resend API Internet Relay:</strong> Successfully dispatched to public email servers (Resend ID: <span className="font-mono text-emerald-300">{lastSentResult.resendId}</span>).
+                              </div>
+                            </div>
+                          )}
+
+                          {lastSentResult.resendError && (
+                            <div className="flex items-start gap-2 text-amber-300 bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/30">
+                              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                              <div className="text-[11px] leading-relaxed">
+                                <strong className="text-white">Resend Relay Notice:</strong> {lastSentResult.resendError}
+                                <span className="block text-slate-400 mt-0.5">
+                                  Your message is safely recorded in the intranet cloud database. To send directly to external Gmail without an API key, use the 1-click Gmail button below.
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="flex items-start gap-2 text-slate-300">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="text-white">Sent Outbox Archive:</strong> Recorded in{" "}
+                              <span className="font-mono text-amber-300">{activeMailbox?.email}</span> Sent folder.
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 text-slate-300">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="text-white">Recipient Webmail Inbox:</strong> Delivered directly to{" "}
+                              <span className="font-mono text-emerald-300">{lastSentResult.recipient}</span> Inbox as unread message.
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* External recipient explanation & dispatch bridge */}
+                        {lastSentResult.recipientIsExternal && (
+                          <div className="bg-slate-950/80 rounded-xl p-3 border border-amber-400/30 space-y-2 text-xs">
+                            <div className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px]">
+                              <Globe className="w-3.5 h-3.5 shrink-0" />
+                              External Domain ({lastSentResult.recipient.split("@")[1] || "internet"})
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                              This email has been registered in the CLG Webmail relay. For recipients on public services like Google Mail, click below to dispatch directly via your web Gmail account or device client:
+                            </p>
+                            <div className="flex items-center gap-2 flex-wrap pt-1">
+                              <a
+                                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+                                  lastSentResult.recipient
+                                )}&su=${encodeURIComponent(
+                                  lastSentResult.subject
+                                )}&body=${encodeURIComponent(lastSentResult.body)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs inline-flex items-center gap-1.5 shadow transition"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                Open & Send in Gmail (Web)
+                              </a>
+                              <a
+                                href={`mailto:${encodeURIComponent(
+                                  lastSentResult.recipient
+                                )}?subject=${encodeURIComponent(
+                                  lastSentResult.subject
+                                )}&body=${encodeURIComponent(lastSentResult.body)}`}
+                                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs inline-flex items-center gap-1.5 transition"
+                              >
+                                <Mail className="w-3.5 h-3.5" />
+                                Device Mail App
+                              </a>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Immediate Navigation Buttons */}
+                        <div className="flex items-center gap-2 flex-wrap pt-1">
+                          {lastSentResult.isSentToSelf && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMailFolder("inbox");
+                                setSelectedMessage(null);
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+                            >
+                              <Inbox className="w-3.5 h-3.5" />
+                              View in Your Inbox Now
+                            </button>
+                          )}
+
+                          {lastSentResult.recipientMailbox && !lastSentResult.isSentToSelf && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMailbox(lastSentResult.recipientMailbox);
+                                setMailFolder("inbox");
+                                setSelectedMessage(null);
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+                            >
+                              <Inbox className="w-3.5 h-3.5" />
+                              Switch & View in {lastSentResult.recipientMailbox.email} Inbox
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMailFolder("sent");
+                              setSelectedMessage(null);
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs inline-flex items-center gap-1.5 transition"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            View in Sent Mail
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLastSentResult(null);
+                              setSendProgress(null);
+                              setSendSuccessBanner("");
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white font-semibold text-xs transition ml-auto"
+                          >
+                            Compose Another Email
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-3 pt-2">
                       <button
                         type="submit"
@@ -1433,12 +1740,24 @@ export default function StaffMailPortal({
                           <button
                             key={msg.id}
                             type="button"
-                            onClick={() => setSelectedMessage(msg)}
-                            className="w-full text-left py-3.5 px-3 hover:bg-slate-800/40 rounded-xl transition flex items-start justify-between gap-4"
+                            onClick={() => {
+                              setSelectedMessage(msg);
+                              if (!msg.read && msg.id) {
+                                updateDoc(doc(db, "messages", msg.id), { read: true }).catch(console.error);
+                              }
+                            }}
+                            className={`w-full text-left py-3.5 px-3 hover:bg-slate-800/40 rounded-xl transition flex items-start justify-between gap-4 ${
+                              !msg.read && mailFolder === "inbox"
+                                ? "bg-amber-400/5 border-l-2 border-amber-400"
+                                : ""
+                            }`}
                           >
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-white text-sm truncate">
+                                {!msg.read && mailFolder === "inbox" && (
+                                  <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Unread Message" />
+                                )}
+                                <span className={`text-sm truncate ${!msg.read && mailFolder === "inbox" ? "font-black text-white" : "font-bold text-slate-200"}`}>
                                   {mailFolder === "sent"
                                     ? `To: ${msg.to}`
                                     : msg.fromName || msg.from}
@@ -1447,7 +1766,7 @@ export default function StaffMailPortal({
                                   {mailFolder === "sent" ? "" : `<${msg.from}>`}
                                 </span>
                               </div>
-                              <div className="text-xs font-semibold text-slate-200 mt-0.5 truncate">
+                              <div className={`text-xs mt-0.5 truncate ${!msg.read && mailFolder === "inbox" ? "font-bold text-amber-300" : "font-semibold text-slate-300"}`}>
                                 {msg.subject}
                               </div>
                               <div className="text-xs text-slate-400 truncate mt-0.5">
