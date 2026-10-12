@@ -47,15 +47,99 @@ export default function StaffMailPortal({
 }) {
   const [mailboxes, setMailboxes] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [activeMailbox, setActiveMailbox] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isLoggedIn = isAuthenticated;
   const [currentUser, setCurrentUser] = useState(null);
+  const [activeMailbox, setActiveMailbox] = useState(null);
+  const [mailFolder, setMailFolder] = useState("inbox"); // "inbox" | "sent" | "compose"
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [sendSuccessBanner, setSendSuccessBanner] = useState("");
+  const [sendErrorBanner, setSendErrorBanner] = useState("");
+  const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const unsubMailboxes = onSnapshot(
+      collection(db, "mailboxes"),
+      (snapshot) => {
+        setMailboxes(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      },
+      (error) => handleFirestoreError(error, OperationType.LIST, "mailboxes")
+    );
+
+    const unsubMessages = onSnapshot(
+      collection(db, "messages"),
+      (snapshot) => {
+        setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      },
+      (error) => handleFirestoreError(error, OperationType.LIST, "messages")
+    );
+
+    return () => {
+      unsubMailboxes();
+      unsubMessages();
+    };
+  }, [isAuthenticated]);
+
+  const staffEmails = mailboxes;
+
+  // Automatically select or create mailbox for the authenticated user
+  useEffect(() => {
+    if (!currentUser || !isAuthenticated) return;
+    const userEmail = (currentUser.email || "").toLowerCase().trim();
+    if (!userEmail) return;
+
+    const myMailbox = mailboxes.find(
+      (m) => (m.email || "").toLowerCase().trim() === userEmail
+    );
+
+    if (myMailbox) {
+      if (!activeMailbox || activeMailbox.id !== myMailbox.id) {
+        setActiveMailbox(myMailbox);
+      }
+    } else if (mailboxes.length > 0 && !activeMailbox) {
+      setActiveMailbox(mailboxes[0]);
+    } else if (mailboxes.length === 0 && !activeMailbox) {
+      // If no mailbox exists in Firestore yet for the authenticated user, provision it
+      const defaultName = (currentUser.displayName || userEmail.split("@")[0])
+        .replace(/[._-]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const newMb = {
+        email: userEmail,
+        fullName: defaultName,
+        name: defaultName,
+        role: "Staff Member",
+        department: "Leadership & Programs",
+        username: userEmail.split("@")[0],
+        status: "Active",
+        createdAt: new Date().toISOString().slice(0, 10),
+      };
+      addDoc(collection(db, "mailboxes"), newMb)
+        .then((docRef) => {
+          const created = { id: docRef.id, ...newMb };
+          setActiveMailbox(created);
+        })
+        .catch((err) => console.error("Could not auto-provision mailbox:", err));
+    }
+  }, [mailboxes, currentUser, isAuthenticated, activeMailbox]);
+
 
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isSignupMode, setIsSignupMode] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
@@ -73,105 +157,27 @@ export default function StaffMailPortal({
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("webmail"); // "create" | "webmail" | "directory" | "config"
 
-  // Built-in Webmail state
-  const [mailFolder, setMailFolder] = useState("inbox"); // "inbox" | "sent" | "compose"
-  const [selectedMessage, setSelectedMessage] = useState(null);
-  const [composeTo, setComposeTo] = useState("");
-  const [composeSubject, setComposeSubject] = useState("");
-  const [composeBody, setComposeBody] = useState("");
-  const [sendSuccessBanner, setSendSuccessBanner] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [sendError, setSendError] = useState("");
+  // Built-in Webmail helpers
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
-      setCurrentUser(user);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const unsubMailboxes = onSnapshot(
-      collection(db, "mailboxes"),
-      (snapshot) => {
-        setMailboxes(
-          snapshot.docs.map((d) => {
-            const data = d.data();
-            return {
-              id: d.id,
-              ...data,
-              fullName: data.fullName || data.name || (data.email ? data.email.split("@")[0] : "Staff"),
-              role: data.role || "Staff Member",
-              department: data.department || "Leadership & Programs",
-              status: data.status || "Active",
-            };
-          })
-        );
-      },
-      (error) => {
-        try {
-          handleFirestoreError(error, OperationType.LIST, "mailboxes");
-        } catch (e) {
-          console.warn("Mailboxes listener warning:", e);
-        }
+  const formatMsgDate = (val) => {
+    if (!val) return "Just now";
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return val;
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      if (isToday) {
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       }
-    );
-
-    const unsubMessages = onSnapshot(
-      collection(db, "messages"),
-      (snapshot) => {
-        setMessages(
-          snapshot.docs.map((d) => {
-            const data = d.data();
-            return {
-              id: d.id,
-              ...data,
-              date:
-                data.date ||
-                (data.receivedAt
-                  ? String(data.receivedAt).slice(0, 16).replace("T", " ")
-                  : ""),
-            };
-          })
-        );
-      },
-      (error) => {
-        try {
-          handleFirestoreError(error, OperationType.LIST, "messages");
-        } catch (e) {
-          console.warn("Messages listener warning:", e);
-        }
-      }
-    );
-
-    return () => {
-      unsubMailboxes();
-      unsubMessages();
-    };
-  }, [isAuthenticated]);
-
-  const staffEmails = mailboxes;
-
-  // Auto-select the signed-in user's own mailbox (or first available mailbox)
-  useEffect(() => {
-    if (activeMailbox || mailboxes.length === 0) return;
-    if (currentUser?.email) {
-      const mine = mailboxes.find(
-        (m) => m.email?.toLowerCase() === currentUser.email.toLowerCase()
-      );
-      if (mine) {
-        setActiveMailbox({ ...mine, fullName: mine.fullName || mine.name });
-        return;
-      }
+      return d.toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+        year: d.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+      });
+    } catch {
+      return val;
     }
-    setActiveMailbox({
-      ...mailboxes[0],
-      fullName: mailboxes[0].fullName || mailboxes[0].name,
-    });
-  }, [mailboxes, currentUser, activeMailbox]);
+  };
 
   const sanitizeUsername = (val) =>
     val
@@ -180,52 +186,74 @@ export default function StaffMailPortal({
       .replace(/\.+/g, ".")
       .replace(/^\.|\.$/g, "");
 
+  const normalizeEmailInput = (input) => {
+    const trimmed = input.trim().toLowerCase();
+    if (!trimmed) return "";
+    return trimmed.includes("@") ? trimmed : `${sanitizeUsername(trimmed)}@cleadglobal.org`;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
+    const emailToUse = normalizeEmailInput(loginUsername);
+    if (!emailToUse) {
+      setLoginError("Please enter your email or username.");
+      return;
+    }
 
     try {
-      await signInWithEmailAndPassword(auth, loginUsername, loginPassword);
+      await signInWithEmailAndPassword(auth, emailToUse, loginPassword);
       setLoginUsername("");
       setLoginPassword("");
     } catch (err) {
-      setLoginError("Invalid username or password.");
+      setLoginError("Invalid email/username or password.");
     }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoginError("");
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, loginUsername, loginPassword);
-      const user = userCredential.user;
-      const nowIso = new Date().toISOString();
-      const displayName = user.email ? user.email.split("@")[0] : "Staff Member";
+    const emailToUse = normalizeEmailInput(loginUsername);
+    if (!emailToUse) {
+      setLoginError("Please enter a desired username or email address.");
+      return;
+    }
+    if (!loginPassword || loginPassword.length < 6) {
+      setLoginError("Password must be at least 6 characters.");
+      return;
+    }
 
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, emailToUse, loginPassword);
+      const user = userCredential.user;
+      const defaultName = fullName.trim() || user.email.split("@")[0];
+      
       // Create mailbox document automatically
       const mailboxRef = await addDoc(collection(db, "mailboxes"), {
         email: user.email,
-        name: displayName,
-        fullName: displayName,
-        role: "Staff Member",
-        department: "Leadership & Programs",
-        username: displayName,
+        name: defaultName,
+        fullName: defaultName,
+        role: role.trim() || "Staff Member",
+        department: department || "Leadership & Programs",
+        username: user.email.split("@")[0],
         status: "Active",
-        createdAt: nowIso,
+        createdAt: new Date().toISOString().slice(0, 10),
       });
 
       // Create welcome message
       await addDoc(collection(db, "messages"), {
         mailboxId: mailboxRef.id,
-        folder: "inbox",
-        from: "admin@cleadglobal.org",
-        fromName: "Champions Leadership Global",
         to: user.email,
+        from: "admin@cleadglobal.org",
+        fromName: "CLG Mail System",
         subject: "Welcome to Champions Leadership Global",
-        body: `Hello ${displayName},\n\nYour official Champions Leadership Global mailbox (${user.email}) is ready.\n\n`,
-        receivedAt: nowIso,
-        date: nowIso.slice(0, 16).replace("T", " "),
+        body: `Hello ${defaultName},\n\nYour official Champions Leadership Global mailbox (${user.email}) is ready.\n\nYou can now send and receive messages using the Webmail Portal.`,
+        date: new Date().toISOString().slice(0, 10),
+        receivedAt: new Date().toISOString(),
+        folder: "inbox",
+        read: false,
       });
+      
     } catch (err) {
       setLoginError("Failed to create account: " + err.message);
     }
@@ -317,34 +345,10 @@ export default function StaffMailPortal({
     setIsCreating(true);
 
     try {
-      const nowIso = new Date().toISOString();
-      const mailboxRef = await addDoc(collection(db, "mailboxes"), {
-        email: fullEmail,
-        name: fullName.trim() || cleanUser,
-        fullName: fullName.trim() || cleanUser,
-        role: role.trim() || "Staff Member",
-        department,
-        username: cleanUser,
-        forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
-        status: "Active",
-        createdAt: nowIso,
-      });
-
-      await addDoc(collection(db, "messages"), {
-        mailboxId: mailboxRef.id,
-        folder: "inbox",
-        from: "admin@cleadglobal.org",
-        fromName: "Champions Leadership Global",
-        to: fullEmail,
-        subject: `Your new ${fullEmail} staff mailbox is ready`,
-        body: `Hello ${fullName.trim() || cleanUser},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\n`,
-        receivedAt: nowIso,
-        date: nowIso.slice(0, 16).replace("T", " "),
-      });
-
-      const newAccount = {
-        id: mailboxRef.id,
-        fullName: fullName.trim() || cleanUser,
+      const displayName = fullName.trim() || cleanUser;
+      const mailboxData = {
+        fullName: displayName,
+        name: displayName,
         role: role.trim() || "Staff Member",
         department,
         username: cleanUser,
@@ -352,118 +356,100 @@ export default function StaffMailPortal({
         forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
         tempPassword: finalPassword,
         status: "Active",
-        createdAt: nowIso.slice(0, 10),
+        createdAt: new Date().toISOString().slice(0, 10),
       };
 
-      setTimeout(() => {
-        setIsCreating(false);
-        setCreatedAccount(newAccount);
-        setActiveMailbox(newAccount);
-        setFullName("");
-        setRole("");
-        setUsername("");
-        setPassword("");
-        setAutoSuggested(true);
-      }, 300);
-    } catch (err) {
-      setErrorMsg("Failed to provision mailbox. Please try again.");
+      const mailboxRef = await addDoc(collection(db, "mailboxes"), mailboxData);
+
+      await addDoc(collection(db, "messages"), {
+        mailboxId: mailboxRef.id,
+        to: fullEmail,
+        from: "admin@cleadglobal.org",
+        fromName: "CLG Mail System",
+        subject: `Your new ${fullEmail} staff mailbox is ready`,
+        body: `Hello ${displayName},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\nTemporary Password: ${finalPassword}`,
+        date: new Date().toISOString().slice(0, 10),
+        receivedAt: new Date().toISOString(),
+        folder: "inbox",
+        read: false,
+      });
+
+      const newAccount = {
+        id: mailboxRef.id,
+        ...mailboxData,
+      };
+
       setIsCreating(false);
-      try {
-        handleFirestoreError(err, OperationType.WRITE, "mailboxes/messages");
-      } catch (e) {
-        console.warn(e);
-      }
+      setCreatedAccount(newAccount);
+      setActiveMailbox(newAccount);
+      setFullName("");
+      setRole("");
+      setUsername("");
+      setPassword("");
+      setAutoSuggested(true);
+    } catch (err) {
+      setErrorMsg("Failed to provision mailbox: " + (err.message || "Please try again."));
+      setIsCreating(false);
+      handleFirestoreError(err, OperationType.WRITE, "mailboxes/messages");
     }
   };
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
-    if (!composeTo.trim() || !composeSubject.trim() || isSending) return;
-    if (!activeMailbox?.email) {
-      setSendError("No mailbox selected. Choose a mailbox first.");
+    setSendErrorBanner("");
+    setSendSuccessBanner("");
+
+    const target = composeTo.trim();
+    if (!target || !composeSubject.trim()) {
+      setSendErrorBanner("Please provide both a recipient and a subject.");
       return;
     }
 
-    setSendError("");
+    // Auto-append domain if only username entered
+    const targetRecipient = target.includes("@")
+      ? target.toLowerCase()
+      : `${sanitizeUsername(target)}@cleadglobal.org`;
+
+    const senderEmail = (
+      activeMailbox?.email ||
+      currentUser?.email ||
+      "info@cleadglobal.org"
+    ).toLowerCase().trim();
+
+    const senderName =
+      activeMailbox?.fullName ||
+      activeMailbox?.name ||
+      currentUser?.displayName ||
+      senderEmail.split("@")[0];
+
     setIsSending(true);
     try {
-      const recipients = composeTo
-        .split(/[,;\s]+/)
-        .map((x) => x.trim())
-        .filter(Boolean);
+      const nowIso = new Date().toISOString();
+      await addDoc(collection(db, "messages"), {
+        mailboxId: activeMailbox?.id || "general",
+        to: targetRecipient,
+        from: senderEmail,
+        fromName: senderName,
+        subject: composeSubject.trim(),
+        body: composeBody.trim(),
+        date: nowIso,
+        receivedAt: nowIso,
+        folder: "sent",
+        read: true,
+        createdAt: nowIso,
+      });
 
-      let apiHandled = false;
-      try {
-        const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : "";
-        const resp = await fetch("/api/send-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-          },
-          body: JSON.stringify({
-            from: activeMailbox.email,
-            fromName: activeMailbox.fullName || activeMailbox.name || "",
-            to: recipients,
-            subject: composeSubject.trim(),
-            text: composeBody,
-          }),
-        });
-        const contentType = resp.headers.get("content-type") || "";
-        if (resp.ok && contentType.includes("application/json")) {
-          apiHandled = true;
-        }
-      } catch (networkErr) {
-        // Fallback to direct Firestore message recording below
-      }
-
-      if (!apiHandled) {
-        const nowIso = new Date().toISOString();
-        const dateStr = nowIso.slice(0, 16).replace("T", " ");
-        await addDoc(collection(db, "messages"), {
-          mailboxId: activeMailbox.id || "sent",
-          folder: "sent",
-          from: activeMailbox.email,
-          fromName: activeMailbox.fullName || activeMailbox.name || "",
-          to: recipients.join(", "),
-          subject: composeSubject.trim(),
-          body: composeBody,
-          receivedAt: nowIso,
-          date: dateStr,
-        });
-
-        // Also deliver to any internal @cleadglobal.org recipient mailboxes
-        for (const rcpt of recipients) {
-          const targetMb = staffEmails.find(
-            (m) => m.email?.toLowerCase() === rcpt.toLowerCase()
-          );
-          if (targetMb && targetMb.id !== activeMailbox.id) {
-            await addDoc(collection(db, "messages"), {
-              mailboxId: targetMb.id,
-              folder: "inbox",
-              from: activeMailbox.email,
-              fromName: activeMailbox.fullName || activeMailbox.name || "",
-              to: targetMb.email,
-              subject: composeSubject.trim(),
-              body: composeBody,
-              receivedAt: nowIso,
-              date: dateStr,
-            });
-          }
-        }
-      }
-
-      setSendSuccessBanner(
-        `Message sent from ${activeMailbox.email} to ${recipients.join(", ")}`
-      );
+      setSendSuccessBanner(`Message successfully sent to ${targetRecipient}!`);
       setComposeTo("");
       setComposeSubject("");
       setComposeBody("");
       setMailFolder("sent");
-      setSelectedMessage(null);
-      setTimeout(() => setSendSuccessBanner(""), 4000);
+      setTimeout(() => setSendSuccessBanner(""), 5000);
     } catch (err) {
-      setSendError(err.message || "Failed to send message.");
+      console.error("Error sending email:", err);
+      const msg = err?.message || "Failed to send message. Please try again.";
+      setSendErrorBanner(`Failed to send email: ${msg}`);
+      handleFirestoreError(err, OperationType.WRITE, "messages");
     } finally {
       setIsSending(false);
     }
@@ -472,32 +458,13 @@ export default function StaffMailPortal({
   const handleDeleteAccount = async (id) => {
     try {
       await deleteDoc(doc(db, "mailboxes", id));
-    } catch (err) {
-      try {
-        handleFirestoreError(err, OperationType.DELETE, `mailboxes/${id}`);
-      } catch (e) {
-        console.warn("Failed to delete mailbox in Firestore:", e);
+      if (activeMailbox?.id === id) {
+        const remaining = staffEmails.filter((acc) => acc.id !== id);
+        setActiveMailbox(remaining[0] || null);
       }
+    } catch (e) {
+      handleFirestoreError(e, OperationType.DELETE, "mailboxes");
     }
-    const updatedAccounts = staffEmails.filter((acc) => acc.id !== id);
-    const nextSiteData = {
-      ...siteData,
-      staffMail: {
-        ...(siteData?.staffMail || {}),
-        portalUrl: "mail.cleadglobal.org",
-        domain: "cleadglobal.org",
-        accounts: updatedAccounts,
-        messages,
-      },
-    };
-    if (onUpdateSiteData) {
-      onUpdateSiteData(nextSiteData);
-    }
-    try {
-      if (onSaveToCloud) {
-        await onSaveToCloud(nextSiteData);
-      }
-    } catch (e) {}
   };
 
   const filteredStaff = staffEmails.filter(
@@ -508,22 +475,63 @@ export default function StaffMailPortal({
       item.role?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Filter messages for activeMailbox
-  const currentMailboxEmail = (activeMailbox?.email || "").toLowerCase();
-  const inboxMessages = messages.filter(
-    (m) =>
-      m.folder !== "sent" &&
-      ((m.to && m.to.toLowerCase() === currentMailboxEmail) ||
-        (m.to && m.to.toLowerCase() === "all@cleadglobal.org") ||
-        (activeMailbox?.id && m.mailboxId === activeMailbox.id))
-  );
-  const sentMessages = messages.filter(
-    (m) =>
-      m.folder === "sent"
-        ? m.from?.toLowerCase() === currentMailboxEmail ||
-          (activeMailbox?.id && m.mailboxId === activeMailbox.id)
-        : m.from?.toLowerCase() === currentMailboxEmail
-  );
+  // Filter and sort messages for activeMailbox
+  const currentMailboxEmail = (
+    activeMailbox?.email ||
+    currentUser?.email ||
+    ""
+  ).toLowerCase().trim();
+  const currentUsername = currentMailboxEmail.split("@")[0];
+
+  const inboxMessages = messages
+    .filter((m) => {
+      const toEmail = (m.to || "").toLowerCase().trim();
+      const toUsername = toEmail.split("@")[0];
+
+      // Direct recipient match
+      const isDirect =
+        toEmail === currentMailboxEmail ||
+        (currentUsername &&
+          toUsername === currentUsername &&
+          (toEmail.endsWith("@cleadglobal.org") || !toEmail.includes("@")));
+
+      // Broadcast address match
+      const isBroadcast =
+        toEmail === "all@cleadglobal.org" ||
+        toEmail === "everyone@cleadglobal.org" ||
+        toEmail === "staff@cleadglobal.org";
+
+      // Welcome message tied to this mailbox
+      const isForThisMailbox =
+        activeMailbox?.id && m.mailboxId === activeMailbox.id && m.folder !== "sent";
+
+      return isDirect || isBroadcast || isForThisMailbox;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.date || b.receivedAt || 0) -
+        new Date(a.date || a.receivedAt || 0)
+    );
+
+  const sentMessages = messages
+    .filter((m) => {
+      const fromEmail = (m.from || "").toLowerCase().trim();
+      const fromUsername = fromEmail.split("@")[0];
+
+      const isDirectSender =
+        fromEmail === currentMailboxEmail ||
+        (currentUsername && fromUsername === currentUsername);
+
+      const isSentFromThisMailbox =
+        activeMailbox?.id && m.mailboxId === activeMailbox.id && m.folder === "sent";
+
+      return isDirectSender || isSentFromThisMailbox;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.date || b.receivedAt || 0) -
+        new Date(a.date || a.receivedAt || 0)
+    );
 
   const displayedMessages =
     mailFolder === "sent" ? sentMessages : inboxMessages;
@@ -567,15 +575,6 @@ export default function StaffMailPortal({
             >
               {isSignupMode ? "Already enrolled? Sign in" : "New staff member? Enroll here"}
             </button>
-            {onBackToSite && (
-              <button
-                type="button"
-                onClick={onBackToSite}
-                className="w-full text-xs text-amber-400 hover:text-amber-300 font-semibold pt-2 flex items-center justify-center gap-1.5 border-t border-slate-800"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" /> Return to Main Website
-              </button>
-            )}
           </form>
         </div>
       </div>
@@ -713,6 +712,18 @@ export default function StaffMailPortal({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("create")}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+              activeTab === "create"
+                ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20"
+                : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/70"
+            }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            Create New Staff Email
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("directory")}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
               activeTab === "directory"
@@ -722,18 +733,6 @@ export default function StaffMailPortal({
           >
             <Mail className="w-4 h-4" />
             Staff Email Directory ({staffEmails.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("create")}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "create"
-                ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20"
-                : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/70"
-            }`}
-          >
-            <UserPlus className="w-4 h-4" />
-            Provision Staff Email
           </button>
           <button
             type="button"
@@ -753,36 +752,32 @@ export default function StaffMailPortal({
         {/* MAIN CONTENT */}
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
 
-        {/* PROVISION NEW STAFF EMAIL */}
+        {/* CREATE NEW STAFF EMAIL TAB */}
         {activeTab === "create" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-              <div className="border-b border-slate-800 pb-4">
-                <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
-                  <UserPlus className="w-5 h-5 text-amber-400" />
-                  Provision Official @cleadglobal.org Mailbox
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  Create a new corporate staff email account and instant webmail inbox.
-                </p>
-              </div>
-
-              {errorMsg && (
-                <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs font-semibold">
-                  {errorMsg}
+            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+              <div className="flex items-center gap-2.5 border-b border-slate-800 pb-4 mb-6">
+                <UserPlus className="w-5 h-5 text-amber-400" />
+                <div>
+                  <h2 className="text-lg font-extrabold text-white">
+                    Create Official @cleadglobal.org Email
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Provision a new custom staff email address and instant webmail inbox
+                  </p>
                 </div>
-              )}
+              </div>
 
               <form onSubmit={handleCreateEmail} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
-                      Staff Full Name *
+                      Full Name *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Jerry Oyedele"
+                      placeholder="e.g. Jane Doe"
                       value={fullName}
                       onChange={handleFullNameChange}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
@@ -794,7 +789,7 @@ export default function StaffMailPortal({
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Program Director"
+                      placeholder="e.g. Program Coordinator"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
@@ -812,11 +807,12 @@ export default function StaffMailPortal({
                       onChange={(e) => setDepartment(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
                     >
-                      <option value="Executive Leadership">Executive Leadership</option>
+                      <option value="Executive Office">Executive Office</option>
                       <option value="Leadership & Programs">Leadership & Programs</option>
-                      <option value="Content & Media">Content & Media</option>
-                      <option value="Community & HR">Community & HR</option>
-                      <option value="Administration">Administration</option>
+                      <option value="Operations & Admin">Operations & Admin</option>
+                      <option value="Media & Communications">Media & Communications</option>
+                      <option value="Partnerships & Outreach">Partnerships & Outreach</option>
+                      <option value="Finance & Grants">Finance & Grants</option>
                     </select>
                   </div>
                   <div>
@@ -835,7 +831,7 @@ export default function StaffMailPortal({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
-                    Corporate Email Username *
+                    Desired Email Username *
                   </label>
                   <div className="flex items-center rounded-xl bg-slate-950 border border-slate-800 focus-within:border-amber-400 overflow-hidden">
                     <input
@@ -854,13 +850,13 @@ export default function StaffMailPortal({
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-300 uppercase">
-                      Initial Mailbox Password
+                    <label className="block text-xs font-bold text-slate-300 uppercase">
+                      Mailbox Password
                     </label>
                     <button
                       type="button"
                       onClick={generateStrongPassword}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300"
+                      className="text-[11px] font-bold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1"
                     >
                       <RefreshCw className="w-3 h-3" /> Generate Strong Password
                     </button>
@@ -868,25 +864,31 @@ export default function StaffMailPortal({
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Leave blank to auto-generate"
+                      placeholder="Leave blank to auto-generate password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm font-mono focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm font-mono focus:outline-none focus:border-amber-400"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="w-full py-3 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 transition shadow-lg shadow-amber-400/20"
+                  className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-400/20 transition"
                 >
                   <UserPlus className="w-4 h-4" />
                   {isCreating ? "Provisioning Mailbox..." : "Create @cleadglobal.org Email"}
@@ -896,63 +898,42 @@ export default function StaffMailPortal({
 
             <div className="lg:col-span-5 space-y-6">
               {createdAccount ? (
-                <div className="bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 space-y-4 shadow-xl">
+                <div className="bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 shadow-xl space-y-4">
                   <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-sm">
                     <CheckCircle2 className="w-5 h-5" />
-                    Mailbox Provisioned Successfully!
+                    Mailbox Successfully Provisioned!
                   </div>
                   <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
-                    <div className="flex items-center justify-between py-1 border-b border-slate-800">
-                      <span className="text-slate-400">Email:</span>
-                      <span className="text-amber-300 font-bold">{createdAccount.email}</span>
+                    <div className="flex justify-between py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Staff Name:</span>
+                      <span className="text-white font-bold">{createdAccount.fullName}</span>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-slate-800">
-                      <span className="text-slate-400">Temp Password:</span>
+                    <div className="flex justify-between py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Email Address:</span>
+                      <span className="text-amber-400 font-bold">{createdAccount.email}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-slate-400">Password:</span>
                       <span className="text-emerald-300">{createdAccount.tempPassword}</span>
                     </div>
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-slate-400">Department:</span>
-                      <span className="text-slate-200">{createdAccount.department}</span>
-                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleCopy(
-                          `Email: ${createdAccount.email}\nPassword: ${createdAccount.tempPassword}\nPortal: https://mail.cleadglobal.org`,
-                          "created-creds"
-                        )
-                      }
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 flex items-center justify-center gap-1.5"
-                    >
-                      {copiedField === "created-creds" ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" /> Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" /> Copy Credentials
-                        </>
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => openWebmailForAccount(createdAccount)}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-xs font-extrabold text-slate-950 flex items-center justify-center gap-1.5"
-                    >
-                      <Inbox className="w-3.5 h-3.5" /> Open Inbox
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openWebmailForAccount(createdAccount)}
+                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 transition"
+                  >
+                    <Inbox className="w-4 h-4" />
+                    Open {createdAccount.email} Inbox Now
+                  </button>
                 </div>
               ) : (
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3 text-xs text-slate-400 leading-relaxed">
-                  <div className="font-bold text-white text-sm flex items-center gap-2">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3">
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-amber-400" />
-                    Instant Cloud Provisioning
-                  </div>
-                  <p>
-                    New mailboxes are immediately synced to the live Firestore directory and can send and receive emails inside the built-in Webmail client.
+                    Instant Webmail & Directory Sync
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Every email created here is immediately added to the live Cloud Directory and gets a dedicated Webmail Inbox where you can send and receive messages.
                   </p>
                 </div>
               )}
@@ -1014,8 +995,15 @@ export default function StaffMailPortal({
 
             {sendSuccessBanner && (
               <div className="bg-emerald-500/15 border-b border-emerald-500/30 px-6 py-3 text-xs font-bold text-emerald-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 {sendSuccessBanner}
+              </div>
+            )}
+
+            {sendErrorBanner && (
+              <div className="bg-rose-500/15 border-b border-rose-500/30 px-6 py-3 text-xs font-bold text-rose-300 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-rose-400 shrink-0" />
+                {sendErrorBanner}
               </div>
             )}
 
@@ -1087,14 +1075,35 @@ export default function StaffMailPortal({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
-                        To (Recipient Email) *
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-slate-400 uppercase">
+                          To (Recipient Email or Staff) *
+                        </label>
+                        {staffEmails.length > 0 && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                            <span>Quick fill:</span>
+                            <select
+                              onChange={(e) => {
+                                if (e.target.value) setComposeTo(e.target.value);
+                              }}
+                              defaultValue=""
+                              className="bg-slate-900 border border-slate-700 text-amber-300 px-2 py-0.5 rounded text-[11px] focus:outline-none"
+                            >
+                              <option value="" disabled>Select colleague...</option>
+                              <option value="all@cleadglobal.org">All Staff (all@cleadglobal.org)</option>
+                              {staffEmails.map((s) => (
+                                <option key={s.id} value={s.email}>
+                                  {s.fullName || s.name} ({s.email})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+                      </div>
                       <input
-                        type="email"
-                        multiple
+                        type="text"
                         required
-                        placeholder="colleague@cleadglobal.org or external email"
+                        placeholder="colleague@cleadglobal.org or username"
                         value={composeTo}
                         onChange={(e) => setComposeTo(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
@@ -1129,17 +1138,14 @@ export default function StaffMailPortal({
                       />
                     </div>
 
-                    {sendError && (
-                      <p className="text-xs font-semibold text-red-400">{sendError}</p>
-                    )}
                     <div className="flex items-center gap-3 pt-2">
                       <button
                         type="submit"
                         disabled={isSending}
-                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-950 font-extrabold text-xs inline-flex items-center gap-2 transition"
+                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-950 font-extrabold text-xs inline-flex items-center gap-2 transition cursor-pointer"
                       >
                         <Send className="w-3.5 h-3.5" />
-                        {isSending ? "Sending..." : "Send Official Email"}
+                        {isSending ? "Sending Email..." : "Send Official Email"}
                       </button>
                       <a
                         href={`mailto:${encodeURIComponent(
@@ -1165,7 +1171,7 @@ export default function StaffMailPortal({
                         {mailFolder === "sent" ? "Sent Mail" : "Inbox"}
                       </button>
                       <span className="text-xs text-slate-400 flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" /> {selectedMessage.date}
+                        <Clock className="w-3.5 h-3.5" /> {formatMsgDate(selectedMessage.date || selectedMessage.receivedAt)}
                       </span>
                     </div>
 
@@ -1249,7 +1255,7 @@ export default function StaffMailPortal({
                               </div>
                             </div>
                             <span className="text-[11px] text-slate-500 shrink-0 font-mono">
-                              {msg.date}
+                              {formatMsgDate(msg.date || msg.receivedAt)}
                             </span>
                           </button>
                         ))}
