@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
-  Mail,
   UserPlus,
-  ShieldCheck,
   CheckCircle2,
   Copy,
   Check,
-  Server,
   RefreshCw,
   ArrowLeft,
 } from "lucide-react";
@@ -24,11 +21,17 @@ export default function AdminMailPanel({
 
   useEffect(() => {
     const unsubMailboxes = onSnapshot(
-        collection(db, "mailboxes"),
-        (snapshot) => {
-            setMailboxes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        },
-        (error) => handleFirestoreError(error, OperationType.LIST, "mailboxes")
+      collection(db, "mailboxes"),
+      (snapshot) => {
+        setMailboxes(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      },
+      (error) => {
+        try {
+          handleFirestoreError(error, OperationType.LIST, "mailboxes");
+        } catch (e) {
+          console.warn(e);
+        }
+      }
     );
 
     return () => unsubMailboxes();
@@ -48,7 +51,6 @@ export default function AdminMailPanel({
   const [createdAccount, setCreatedAccount] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [copiedField, setCopiedField] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const sanitizeUsername = (val) =>
     val
@@ -195,15 +197,47 @@ export default function AdminMailPanel({
             <UserPlus className="w-5 h-5 text-amber-400" />
             Provision New Staff Email Address
           </h2>
-          {/* ... (Create Email Form) ... */}
+          {errorMsg && (
+            <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs">
+              {errorMsg}
+            </div>
+          )}
           <form onSubmit={handleCreateEmail} className="space-y-4">
-              {/* Simplified form fields for brevity in this mock admin panel */}
-              <input type="text" placeholder="Full Name" value={fullName} onChange={handleFullNameChange} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
-              <input type="text" placeholder="Role" value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
-              <input type="text" placeholder="Username" value={username} onChange={handleUsernameChange} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
-              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
-              <button type="submit" className="w-full py-3 bg-amber-400 text-slate-950 font-bold rounded-xl">Create Account</button>
+            <input type="text" placeholder="Full Name" value={fullName} onChange={handleFullNameChange} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
+            <input type="text" placeholder="Role" value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
+            <select value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white">
+              <option value="Leadership & Programs">Leadership & Programs</option>
+              <option value="Executive Leadership">Executive Leadership</option>
+              <option value="Content & Media">Content & Media</option>
+              <option value="Community & HR">Community & HR</option>
+            </select>
+            <input type="text" placeholder="Username" value={username} onChange={handleUsernameChange} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
+            <input type="email" placeholder="Forwarding Email (optional)" value={forwardingEmail} onChange={(e) => setForwardingEmail(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
+            <div className="flex gap-2">
+              <input type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="flex-1 px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white" />
+              <button type="button" onClick={generateStrongPassword} className="px-3 py-2 rounded-xl bg-slate-800 text-xs font-bold text-amber-400 inline-flex items-center gap-1">
+                <RefreshCw className="w-3.5 h-3.5" /> Generate
+              </button>
+            </div>
+            <button type="submit" disabled={isCreating} className="w-full py-3 bg-amber-400 text-slate-950 font-bold rounded-xl">
+              {isCreating ? "Creating..." : "Create Account"}
+            </button>
           </form>
+          {createdAccount && (
+            <div className="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                <CheckCircle2 className="w-4 h-4" /> Created {createdAccount.email}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleCopy(createdAccount.email, "email")}
+                className="text-slate-300 hover:text-white inline-flex items-center gap-1"
+              >
+                {copiedField === "email" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                Copy
+              </button>
+            </div>
+          )}
         </div>
       </main>
 

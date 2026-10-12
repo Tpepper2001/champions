@@ -62,9 +62,16 @@
       "description": "A staff email account/mailbox.",
       "type": "object",
       "properties": {
-        "email": { "type": "string" },
-        "name": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "email": { "type": "string", "maxLength": 200 },
+        "name": { "type": "string", "maxLength": 200 },
+        "fullName": { "type": "string", "maxLength": 200 },
+        "role": { "type": "string", "maxLength": 200 },
+        "department": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "maxLength": 64 },
+        "password": { "type": "string", "maxLength": 200 },
+        "quota": { "type": "string", "maxLength": 64 },
+        "used": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 }
       },
       "required": ["email", "name", "createdAt"]
     },
@@ -73,11 +80,17 @@
       "description": "A message within a mailbox.",
       "type": "object",
       "properties": {
-        "mailboxId": { "type": "string" },
-        "from": { "type": "string" },
-        "subject": { "type": "string" },
-        "body": { "type": "string" },
-        "receivedAt": { "type": "string", "format": "date-time" }
+        "mailboxId": { "type": "string", "maxLength": 200 },
+        "folder": { "type": "string", "maxLength": 64 },
+        "from": { "type": "string", "maxLength": 300 },
+        "fromEmail": { "type": "string", "maxLength": 200 },
+        "to": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 500 },
+        "body": { "type": "string", "maxLength": 20000 },
+        "date": { "type": "string", "maxLength": 64 },
+        "receivedAt": { "type": "string", "maxLength": 64 },
+        "read": { "type": "boolean" },
+        "starred": { "type": "boolean" }
       },
       "required": ["mailboxId", "from", "subject", "receivedAt"]
     },

@@ -4,7 +4,6 @@ import WebsiteManager from "./components/WebsiteManager";
 import AdminLogin from "./components/AdminLogin";
 import StaffMailPortal from "./components/StaffMailPortal";
 import ErrorBoundary from "./components/ErrorBoundary";
-import Footer from "./components/Footer";
 import {
   saveSiteData,
   loadSiteData,
@@ -791,28 +790,82 @@ const getSlugFromHash = () => {
   return parts[1] || null;
 };
 
+const mergeSiteData = (parsed) => {
+  if (!parsed || typeof parsed !== "object") return defaultSiteData;
+  const ensureArr = (val, fallback) => (Array.isArray(val) ? val : fallback);
+  return {
+    ...defaultSiteData,
+    ...parsed,
+    branding: { ...defaultSiteData.branding, ...(parsed.branding || {}) },
+    hero: {
+      ...defaultSiteData.hero,
+      ...(parsed.hero || {}),
+      marqueeItems: ensureArr(parsed.hero?.marqueeItems, defaultSiteData.hero.marqueeItems),
+    },
+    statsSection: {
+      ...defaultSiteData.statsSection,
+      ...(parsed.statsSection || {}),
+      items: ensureArr(parsed.statsSection?.items, defaultSiteData.statsSection.items),
+    },
+    aboutSection: { ...defaultSiteData.aboutSection, ...(parsed.aboutSection || {}) },
+    coreValues: {
+      ...defaultSiteData.coreValues,
+      ...(parsed.coreValues || {}),
+      items: ensureArr(parsed.coreValues?.items, defaultSiteData.coreValues.items),
+    },
+    ceoSection: {
+      ...defaultSiteData.ceoSection,
+      ...(parsed.ceoSection || {}),
+      tags: ensureArr(parsed.ceoSection?.tags, defaultSiteData.ceoSection.tags),
+      degrees: ensureArr(parsed.ceoSection?.degrees, defaultSiteData.ceoSection.degrees),
+      certifications: ensureArr(
+        parsed.ceoSection?.certifications,
+        defaultSiteData.ceoSection.certifications
+      ),
+      bioSections: ensureArr(
+        parsed.ceoSection?.bioSections,
+        defaultSiteData.ceoSection.bioSections
+      ),
+    },
+    eventsSection: {
+      ...defaultSiteData.eventsSection,
+      ...(parsed.eventsSection || {}),
+      upcoming: ensureArr(parsed.eventsSection?.upcoming, defaultSiteData.eventsSection.upcoming),
+      past: ensureArr(parsed.eventsSection?.past, defaultSiteData.eventsSection.past),
+    },
+    teamSection: {
+      ...defaultSiteData.teamSection,
+      ...(parsed.teamSection || {}),
+      members: ensureArr(parsed.teamSection?.members, defaultSiteData.teamSection.members),
+    },
+    blogSection: {
+      ...defaultSiteData.blogSection,
+      ...(parsed.blogSection || {}),
+      posts: ensureArr(parsed.blogSection?.posts, defaultSiteData.blogSection.posts),
+    },
+    reviewsSection: {
+      ...defaultSiteData.reviewsSection,
+      ...(parsed.reviewsSection || {}),
+      items: ensureArr(parsed.reviewsSection?.items, defaultSiteData.reviewsSection.items),
+    },
+    bookingSection: {
+      ...defaultSiteData.bookingSection,
+      ...(parsed.bookingSection || {}),
+      sessionTypes: ensureArr(
+        parsed.bookingSection?.sessionTypes,
+        defaultSiteData.bookingSection.sessionTypes
+      ),
+    },
+  };
+};
+
 export default function App() {
   // Load site data from localStorage with fallback to defaultSiteData
   const loadInitialData = () => {
     try {
       const saved = localStorage.getItem("clg_site_content_v1");
       if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...defaultSiteData,
-          ...parsed,
-          branding: { ...defaultSiteData.branding, ...(parsed.branding || {}) },
-          hero: { ...defaultSiteData.hero, ...(parsed.hero || {}) },
-          statsSection: { ...defaultSiteData.statsSection, ...(parsed.statsSection || {}) },
-          aboutSection: { ...defaultSiteData.aboutSection, ...(parsed.aboutSection || {}) },
-          coreValues: { ...defaultSiteData.coreValues, ...(parsed.coreValues || {}) },
-          ceoSection: { ...defaultSiteData.ceoSection, ...(parsed.ceoSection || {}) },
-          eventsSection: { ...defaultSiteData.eventsSection, ...(parsed.eventsSection || {}) },
-          teamSection: { ...defaultSiteData.teamSection, ...(parsed.teamSection || {}) },
-          blogSection: { ...defaultSiteData.blogSection, ...(parsed.blogSection || {}) },
-          reviewsSection: { ...defaultSiteData.reviewsSection, ...(parsed.reviewsSection || {}) },
-          bookingSection: { ...defaultSiteData.bookingSection, ...(parsed.bookingSection || {}) },
-        };
+        return mergeSiteData(JSON.parse(saved));
       }
     } catch (e) {
       console.warn("Could not load from localStorage, using defaults", e);
@@ -821,12 +874,59 @@ export default function App() {
   };
 
   const [siteData, setSiteData] = useState(loadInitialData);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [view, setView] = useState(getViewFromLocation);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(() => {
+    const slug = getSlugFromHash();
+    if (slug) {
+      return (
+        siteData.blogSection.posts.find(
+          (p) => p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
+        ) || null
+      );
+    }
+    return null;
+  });
+
+  const navigate = (v, post = null) => {
+    setView(v);
+    setMenuOpen(false);
+    setSelectedPost(post);
+    if (v === "manager") {
+      try {
+        window.history.pushState(null, "", "/websitemanager");
+      } catch (e) {
+        window.location.hash = "websitemanager";
+      }
+    } else if (v === "mail") {
+      try {
+        window.history.pushState(null, "", "/mail");
+      } catch (e) {
+        window.location.hash = "mail";
+      }
+    } else if (post) {
+      const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      try {
+        window.history.pushState(null, "", "/");
+      } catch (e) {}
+      window.location.hash = `${v}/${slug}`;
+    } else {
+      try {
+        window.history.pushState(null, "", "/");
+      } catch (e) {}
+      window.location.hash = v === "home" ? "" : v;
+    }
+    window.scrollTo(0, 0);
+  };
 
   // Synchronize site data updates
   const handleSiteDataChange = (newData) => {
-    setSiteData(newData);
+    const merged = mergeSiteData(newData);
+    setSiteData(merged);
     try {
-      localStorage.setItem("clg_site_content_v1", JSON.stringify(newData));
+      localStorage.setItem("clg_site_content_v1", JSON.stringify(merged));
     } catch (e) {
       console.error("Storage error:", e);
     }
@@ -860,9 +960,10 @@ export default function App() {
     // Initial load from Firebase
     loadSiteData().then((cloudData) => {
       if (cloudData && typeof cloudData === "object") {
-        setSiteData(cloudData);
+        const merged = mergeSiteData(cloudData);
+        setSiteData(merged);
         try {
-          localStorage.setItem("clg_site_content_v1", JSON.stringify(cloudData));
+          localStorage.setItem("clg_site_content_v1", JSON.stringify(merged));
         } catch (e) {}
       }
     });
@@ -870,9 +971,10 @@ export default function App() {
     // Real-time synchronization
     const unsubscribe = subscribeSiteData((cloudData) => {
       if (cloudData && typeof cloudData === "object") {
-        setSiteData(cloudData);
+        const merged = mergeSiteData(cloudData);
+        setSiteData(merged);
         try {
-          localStorage.setItem("clg_site_content_v1", JSON.stringify(cloudData));
+          localStorage.setItem("clg_site_content_v1", JSON.stringify(merged));
         } catch (e) {}
       }
     });
@@ -883,14 +985,11 @@ export default function App() {
       }
     };
   }, []);
-  // ── AUTHENTICATION ───────────────
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
 
+  // ── AUTHENTICATION ───────────────
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
-      setAuthChecked(true);
     });
     return unsubscribe;
   }, []);
@@ -903,21 +1002,6 @@ export default function App() {
     await signOut(auth);
     navigate("home");
   };
-
-  const [view, setView] = useState(getViewFromLocation);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(() => {
-    const slug = getSlugFromHash();
-    if (slug) {
-      return (
-        siteData.blogSection.posts.find(
-          (p) => p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
-        ) || null
-      );
-    }
-    return null;
-  });
 
   useEffect(() => {
     const onLocationChange = () => {
@@ -964,38 +1048,6 @@ export default function App() {
     };
   }, []);
 
-  const navigate = (v, post = null) => {
-    console.log("Navigating to:", v, "post:", post);
-    setView(v);
-    setMenuOpen(false);
-    setSelectedPost(post);
-    if (v === "manager") {
-      try {
-        window.history.pushState(null, "", "/websitemanager");
-      } catch (e) {
-        window.location.hash = "websitemanager";
-      }
-    } else if (v === "mail") {
-      try {
-        window.history.pushState(null, "", "/mail");
-      } catch (e) {
-        window.location.hash = "mail";
-      }
-    } else if (post) {
-      const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      try {
-        window.history.pushState(null, "", "/");
-      } catch (e) {}
-      window.location.hash = `${v}/${slug}`;
-    } else {
-      try {
-        window.history.pushState(null, "", "/");
-      } catch (e) {}
-      window.location.hash = v === "home" ? "" : v;
-    }
-    window.scrollTo(0, 0);
-  };
-
   const navItems = [
     { label: "Home", key: "home" },
     { label: "Meet the CEO", key: "ceo" },
@@ -1022,107 +1074,50 @@ export default function App() {
       });
   };
 
-  const [errorUI, setErrorUI] = useState(null);
-
-  // Error boundary like functionality
-  useEffect(() => {
-    const errorHandler = (event) => {
-      setErrorUI(`Error: ${event.message || event.reason}`);
-    };
-    window.addEventListener("error", errorHandler);
-    window.addEventListener("unhandledrejection", errorHandler);
-    return () => {
-      window.removeEventListener("error", errorHandler);
-      window.removeEventListener("unhandledrejection", errorHandler);
-    };
-  }, []);
-
-  // ── DEBUG APP MOUNT ──────────────────────────
-  const AppMountedIndicator = () => (
-    <div style={{position:"fixed", top:0, left:0, zIndex:99999, background:"red", color:"white", padding:"5px", fontSize:"10px", pointerEvents: "none"}}>
-      <div>APP MOUNTED</div>
-      <div>View: {view}</div>
-      <div>Auth: {isAuthenticated ? "TRUE" : "FALSE"}</div>
-    </div>
-  );
-
-  if (errorUI) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-red-900 text-white">
-        <AppMountedIndicator />
-        <div className="bg-red-950 p-6 rounded-xl border border-red-800">
-          <h2 className="text-xl font-bold mb-2">App Error</h2>
-          <p className="font-mono">{errorUI}</p>
-          <button
-            onClick={() => { setErrorUI(null); window.location.reload(); }}
-            className="mt-4 bg-white text-red-900 px-4 py-2 rounded"
-          >
-            Reload
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // If in Website Manager mode, check authentication
   if (view === "manager") {
-    console.log("MANAGER VIEW: Checking auth. isAuthenticated:", isAuthenticated);
     if (!isAuthenticated) {
-      console.log("MANAGER VIEW: Not auth, rendering login");
       return (
-        <><AppMountedIndicator />
-        <AdminLogin
-          onLoginSuccess={handleLoginSuccess}
-          onCancel={() => navigate("home")}
-          logoUrl={siteData.branding.logoUrl}
-        /></>
+        <ErrorBoundary>
+          <AdminLogin
+            onLoginSuccess={handleLoginSuccess}
+            onCancel={() => navigate("home")}
+            logoUrl={siteData.branding.logoUrl}
+          />
+        </ErrorBoundary>
       );
     }
 
-    console.log("MANAGER VIEW: Auth ok, rendering WebsiteManager");
-    try {
-      return (
-        <><AppMountedIndicator />
-        <ErrorBoundary>
-          <WebsiteManager
-            data={siteData}
-            onChange={handleSiteDataChange}
-            onSave={handleSaveSiteData}
-            onReset={handleResetSiteData}
-            onClose={() => navigate("home")}
-            onLogout={handleLogout}
-            onOpenMailPortal={() => navigate("mail")}
-          />
-        </ErrorBoundary></>
-      );
-    } catch (e) {
-      console.error("WEBSITE MANAGER RENDER ERROR:", e);
-      return <div className="text-white">Rendering error in WebsiteManager</div>;
-    }
+    return (
+      <ErrorBoundary>
+        <WebsiteManager
+          data={siteData}
+          onChange={handleSiteDataChange}
+          onSave={handleSaveSiteData}
+          onReset={handleResetSiteData}
+          onClose={() => navigate("home")}
+          onLogout={handleLogout}
+          onOpenMailPortal={() => navigate("mail")}
+        />
+      </ErrorBoundary>
+    );
   }
 
   // If in Staff Email Portal mode (mail.cleadglobal.org / /mail)
   if (view === "mail") {
-    console.log("MAIL VIEW: Rendering StaffMailPortal");
-    try {
-      return (
-        <><AppMountedIndicator />
-        <ErrorBoundary>
-          <StaffMailPortal
-            siteData={siteData}
-            onUpdateSiteData={handleSiteDataChange}
-            onSaveToCloud={async (updatedData) => {
-              await saveSiteData(updatedData || siteData);
-            }}
-            onBackToSite={() => navigate("home")}
-            onOpenManager={() => navigate("manager")}
-          />
-        </ErrorBoundary></>
-      );
-    } catch (e) {
-      console.error("STAFF MAIL PORTAL RENDER ERROR:", e);
-      return <div className="text-white">Rendering error in StaffMailPortal</div>;
-    }
+    return (
+      <ErrorBoundary>
+        <StaffMailPortal
+          siteData={siteData}
+          onUpdateSiteData={handleSiteDataChange}
+          onSaveToCloud={async (updatedData) => {
+            await saveSiteData(updatedData || siteData);
+          }}
+          onBackToSite={() => navigate("home")}
+          onOpenManager={() => navigate("manager")}
+        />
+      </ErrorBoundary>
+    );
   }
 
   const {
@@ -1140,10 +1135,8 @@ export default function App() {
   } = siteData;
 
   return (
+    <ErrorBoundary>
     <div>
-      <AppMountedIndicator />
-
-
       <nav className={"navbar" + (scrolled ? " scrolled" : "")}>
         <div className="nav-container">
           <div className="logo" onClick={() => navigate("home")}>
@@ -3087,5 +3080,6 @@ export default function App() {
         </div>
       </footer>
     </div>
+    </ErrorBoundary>
   );
 }

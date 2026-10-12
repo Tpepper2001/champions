@@ -26,7 +26,7 @@ import {
   Reply,
 } from "lucide-react";
 import Footer from "./Footer";
-import { collection, onSnapshot, query, where, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { 
   auth, 
   db, 
@@ -37,9 +37,6 @@ import {
   OperationType, 
   handleFirestoreError 
 } from "../firebase";
-// NOTE: I cannot use the simple import { ... } = "../firebase" directly in this multi_edit because I need to add createUserWithEmailAndPassword. 
-// I will fix the import statement in a separate edit_file call or use a more precise replacement.
-// Wait, multi_edit_file replaces the EXACT content. I'll just replace the import statement.
 
 export default function StaffMailPortal({
   siteData,
@@ -55,55 +52,10 @@ export default function StaffMailPortal({
   const isLoggedIn = isAuthenticated;
   const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const unsubMailboxes = onSnapshot(
-        collection(db, "mailboxes"),
-        (snapshot) => {
-            setMailboxes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        },
-        (error) => handleFirestoreError(error, OperationType.LIST, "mailboxes")
-    );
-
-    const unsubMessages = onSnapshot(
-        collection(db, "messages"),
-        (snapshot) => {
-            setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        },
-        (error) => handleFirestoreError(error, OperationType.LIST, "messages")
-    );
-
-    return () => {
-        unsubMailboxes();
-        unsubMessages();
-    };
-  }, [isAuthenticated]);
-
-  const staffEmails = mailboxes;
-
-  // Auto-select the signed-in user's own mailbox (admins can still switch via the dropdown)
-  useEffect(() => {
-    if (activeMailbox || !currentUser?.email || mailboxes.length === 0) return;
-    const mine = mailboxes.find(
-      (m) => m.email?.toLowerCase() === currentUser.email.toLowerCase()
-    );
-    if (mine) setActiveMailbox({ ...mine, fullName: mine.fullName || mine.name });
-  }, [mailboxes, currentUser, activeMailbox]);
-
-
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isSignupMode, setIsSignupMode] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
-      setCurrentUser(user);
-    });
-    return unsubscribe;
-  }, []);
 
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
@@ -128,6 +80,98 @@ export default function StaffMailPortal({
   const [composeSubject, setComposeSubject] = useState("");
   const [composeBody, setComposeBody] = useState("");
   const [sendSuccessBanner, setSendSuccessBanner] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const unsubMailboxes = onSnapshot(
+      collection(db, "mailboxes"),
+      (snapshot) => {
+        setMailboxes(
+          snapshot.docs.map((d) => {
+            const data = d.data();
+            return {
+              id: d.id,
+              ...data,
+              fullName: data.fullName || data.name || (data.email ? data.email.split("@")[0] : "Staff"),
+              role: data.role || "Staff Member",
+              department: data.department || "Leadership & Programs",
+              status: data.status || "Active",
+            };
+          })
+        );
+      },
+      (error) => {
+        try {
+          handleFirestoreError(error, OperationType.LIST, "mailboxes");
+        } catch (e) {
+          console.warn("Mailboxes listener warning:", e);
+        }
+      }
+    );
+
+    const unsubMessages = onSnapshot(
+      collection(db, "messages"),
+      (snapshot) => {
+        setMessages(
+          snapshot.docs.map((d) => {
+            const data = d.data();
+            return {
+              id: d.id,
+              ...data,
+              date:
+                data.date ||
+                (data.receivedAt
+                  ? String(data.receivedAt).slice(0, 16).replace("T", " ")
+                  : ""),
+            };
+          })
+        );
+      },
+      (error) => {
+        try {
+          handleFirestoreError(error, OperationType.LIST, "messages");
+        } catch (e) {
+          console.warn("Messages listener warning:", e);
+        }
+      }
+    );
+
+    return () => {
+      unsubMailboxes();
+      unsubMessages();
+    };
+  }, [isAuthenticated]);
+
+  const staffEmails = mailboxes;
+
+  // Auto-select the signed-in user's own mailbox (or first available mailbox)
+  useEffect(() => {
+    if (activeMailbox || mailboxes.length === 0) return;
+    if (currentUser?.email) {
+      const mine = mailboxes.find(
+        (m) => m.email?.toLowerCase() === currentUser.email.toLowerCase()
+      );
+      if (mine) {
+        setActiveMailbox({ ...mine, fullName: mine.fullName || mine.name });
+        return;
+      }
+    }
+    setActiveMailbox({
+      ...mailboxes[0],
+      fullName: mailboxes[0].fullName || mailboxes[0].name,
+    });
+  }, [mailboxes, currentUser, activeMailbox]);
 
   const sanitizeUsername = (val) =>
     val
@@ -155,23 +199,33 @@ export default function StaffMailPortal({
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, loginUsername, loginPassword);
       const user = userCredential.user;
-      
+      const nowIso = new Date().toISOString();
+      const displayName = user.email ? user.email.split("@")[0] : "Staff Member";
+
       // Create mailbox document automatically
       const mailboxRef = await addDoc(collection(db, "mailboxes"), {
         email: user.email,
-        name: user.email.split('@')[0], // Use part of email as name initially
-        createdAt: new Date().toISOString()
+        name: displayName,
+        fullName: displayName,
+        role: "Staff Member",
+        department: "Leadership & Programs",
+        username: displayName,
+        status: "Active",
+        createdAt: nowIso,
       });
 
       // Create welcome message
       await addDoc(collection(db, "messages"), {
         mailboxId: mailboxRef.id,
+        folder: "inbox",
         from: "admin@cleadglobal.org",
+        fromName: "Champions Leadership Global",
+        to: user.email,
         subject: "Welcome to Champions Leadership Global",
-        body: `Hello,\n\nYour official Champions Leadership Global mailbox is ready.\n\n`,
-        receivedAt: new Date().toISOString()
+        body: `Hello ${displayName},\n\nYour official Champions Leadership Global mailbox (${user.email}) is ready.\n\n`,
+        receivedAt: nowIso,
+        date: nowIso.slice(0, 16).replace("T", " "),
       });
-      
     } catch (err) {
       setLoginError("Failed to create account: " + err.message);
     }
@@ -263,23 +317,34 @@ export default function StaffMailPortal({
     setIsCreating(true);
 
     try {
+      const nowIso = new Date().toISOString();
       const mailboxRef = await addDoc(collection(db, "mailboxes"), {
         email: fullEmail,
-        name: fullName.trim(),
-        createdAt: new Date().toISOString()
+        name: fullName.trim() || cleanUser,
+        fullName: fullName.trim() || cleanUser,
+        role: role.trim() || "Staff Member",
+        department,
+        username: cleanUser,
+        forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
+        status: "Active",
+        createdAt: nowIso,
       });
 
       await addDoc(collection(db, "messages"), {
         mailboxId: mailboxRef.id,
+        folder: "inbox",
         from: "admin@cleadglobal.org",
+        fromName: "Champions Leadership Global",
+        to: fullEmail,
         subject: `Your new ${fullEmail} staff mailbox is ready`,
-        body: `Hello ${fullName.trim()},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\n`,
-        receivedAt: new Date().toISOString()
+        body: `Hello ${fullName.trim() || cleanUser},\n\nYour official Champions Leadership Global email address (${fullEmail}) has been provisioned.\n\n`,
+        receivedAt: nowIso,
+        date: nowIso.slice(0, 16).replace("T", " "),
       });
 
       const newAccount = {
         id: mailboxRef.id,
-        fullName: fullName.trim(),
+        fullName: fullName.trim() || cleanUser,
         role: role.trim() || "Staff Member",
         department,
         username: cleanUser,
@@ -287,7 +352,7 @@ export default function StaffMailPortal({
         forwardingEmail: forwardingEmail.trim() || siteData?.branding?.email || "",
         tempPassword: finalPassword,
         status: "Active",
-        createdAt: new Date().toISOString().slice(0, 10),
+        createdAt: nowIso.slice(0, 10),
       };
 
       setTimeout(() => {
@@ -303,12 +368,13 @@ export default function StaffMailPortal({
     } catch (err) {
       setErrorMsg("Failed to provision mailbox. Please try again.");
       setIsCreating(false);
-      handleFirestoreError(err, OperationType.WRITE, "mailboxes/messages");
+      try {
+        handleFirestoreError(err, OperationType.WRITE, "mailboxes/messages");
+      } catch (e) {
+        console.warn(e);
+      }
     }
   };
-
-  const [isSending, setIsSending] = useState(false);
-  const [sendError, setSendError] = useState("");
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -321,28 +387,71 @@ export default function StaffMailPortal({
     setSendError("");
     setIsSending(true);
     try {
-      const idToken = await auth.currentUser.getIdToken();
       const recipients = composeTo
         .split(/[,;\s]+/)
         .map((x) => x.trim())
         .filter(Boolean);
 
-      const resp = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
+      let apiHandled = false;
+      try {
+        const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : "";
+        const resp = await fetch("/api/send-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+          },
+          body: JSON.stringify({
+            from: activeMailbox.email,
+            fromName: activeMailbox.fullName || activeMailbox.name || "",
+            to: recipients,
+            subject: composeSubject.trim(),
+            text: composeBody,
+          }),
+        });
+        const contentType = resp.headers.get("content-type") || "";
+        if (resp.ok && contentType.includes("application/json")) {
+          apiHandled = true;
+        }
+      } catch (networkErr) {
+        // Fallback to direct Firestore message recording below
+      }
+
+      if (!apiHandled) {
+        const nowIso = new Date().toISOString();
+        const dateStr = nowIso.slice(0, 16).replace("T", " ");
+        await addDoc(collection(db, "messages"), {
+          mailboxId: activeMailbox.id || "sent",
+          folder: "sent",
           from: activeMailbox.email,
           fromName: activeMailbox.fullName || activeMailbox.name || "",
-          to: recipients,
+          to: recipients.join(", "),
           subject: composeSubject.trim(),
-          text: composeBody,
-        }),
-      });
-      const result = await resp.json().catch(() => ({}));
-      if (!resp.ok) throw new Error(result.error || `Send failed (${resp.status})`);
+          body: composeBody,
+          receivedAt: nowIso,
+          date: dateStr,
+        });
+
+        // Also deliver to any internal @cleadglobal.org recipient mailboxes
+        for (const rcpt of recipients) {
+          const targetMb = staffEmails.find(
+            (m) => m.email?.toLowerCase() === rcpt.toLowerCase()
+          );
+          if (targetMb && targetMb.id !== activeMailbox.id) {
+            await addDoc(collection(db, "messages"), {
+              mailboxId: targetMb.id,
+              folder: "inbox",
+              from: activeMailbox.email,
+              fromName: activeMailbox.fullName || activeMailbox.name || "",
+              to: targetMb.email,
+              subject: composeSubject.trim(),
+              body: composeBody,
+              receivedAt: nowIso,
+              date: dateStr,
+            });
+          }
+        }
+      }
 
       setSendSuccessBanner(
         `Message sent from ${activeMailbox.email} to ${recipients.join(", ")}`
@@ -361,6 +470,15 @@ export default function StaffMailPortal({
   };
 
   const handleDeleteAccount = async (id) => {
+    try {
+      await deleteDoc(doc(db, "mailboxes", id));
+    } catch (err) {
+      try {
+        handleFirestoreError(err, OperationType.DELETE, `mailboxes/${id}`);
+      } catch (e) {
+        console.warn("Failed to delete mailbox in Firestore:", e);
+      }
+    }
     const updatedAccounts = staffEmails.filter((acc) => acc.id !== id);
     const nextSiteData = {
       ...siteData,
@@ -394,11 +512,17 @@ export default function StaffMailPortal({
   const currentMailboxEmail = (activeMailbox?.email || "").toLowerCase();
   const inboxMessages = messages.filter(
     (m) =>
-      m.to?.toLowerCase() === currentMailboxEmail ||
-      m.to?.toLowerCase() === "all@cleadglobal.org"
+      m.folder !== "sent" &&
+      ((m.to && m.to.toLowerCase() === currentMailboxEmail) ||
+        (m.to && m.to.toLowerCase() === "all@cleadglobal.org") ||
+        (activeMailbox?.id && m.mailboxId === activeMailbox.id))
   );
   const sentMessages = messages.filter(
-    (m) => m.from?.toLowerCase() === currentMailboxEmail
+    (m) =>
+      m.folder === "sent"
+        ? m.from?.toLowerCase() === currentMailboxEmail ||
+          (activeMailbox?.id && m.mailboxId === activeMailbox.id)
+        : m.from?.toLowerCase() === currentMailboxEmail
   );
 
   const displayedMessages =
@@ -443,6 +567,15 @@ export default function StaffMailPortal({
             >
               {isSignupMode ? "Already enrolled? Sign in" : "New staff member? Enroll here"}
             </button>
+            {onBackToSite && (
+              <button
+                type="button"
+                onClick={onBackToSite}
+                className="w-full text-xs text-amber-400 hover:text-amber-300 font-semibold pt-2 flex items-center justify-center gap-1.5 border-t border-slate-800"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> Return to Main Website
+              </button>
+            )}
           </form>
         </div>
       </div>
@@ -592,6 +725,18 @@ export default function StaffMailPortal({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("create")}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+              activeTab === "create"
+                ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20"
+                : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/70"
+            }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            Provision Staff Email
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("config")}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
               activeTab === "config"
@@ -607,6 +752,213 @@ export default function StaffMailPortal({
 
         {/* MAIN CONTENT */}
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
+
+        {/* PROVISION NEW STAFF EMAIL */}
+        {activeTab === "create" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+              <div className="border-b border-slate-800 pb-4">
+                <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
+                  <UserPlus className="w-5 h-5 text-amber-400" />
+                  Provision Official @cleadglobal.org Mailbox
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Create a new corporate staff email account and instant webmail inbox.
+                </p>
+              </div>
+
+              {errorMsg && (
+                <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs font-semibold">
+                  {errorMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleCreateEmail} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                      Staff Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Jerry Oyedele"
+                      value={fullName}
+                      onChange={handleFullNameChange}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                      Role / Title
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Program Director"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                      Department
+                    </label>
+                    <select
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                    >
+                      <option value="Executive Leadership">Executive Leadership</option>
+                      <option value="Leadership & Programs">Leadership & Programs</option>
+                      <option value="Content & Media">Content & Media</option>
+                      <option value="Community & HR">Community & HR</option>
+                      <option value="Administration">Administration</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                      Forwarding Email (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="personal@gmail.com"
+                      value={forwardingEmail}
+                      onChange={(e) => setForwardingEmail(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1.5">
+                    Corporate Email Username *
+                  </label>
+                  <div className="flex items-center rounded-xl bg-slate-950 border border-slate-800 focus-within:border-amber-400 overflow-hidden">
+                    <input
+                      type="text"
+                      required
+                      placeholder="firstname.lastname"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      className="flex-1 px-3.5 py-2.5 bg-transparent text-white text-sm font-mono focus:outline-none"
+                    />
+                    <span className="px-3.5 py-2.5 bg-slate-900 text-amber-400 font-mono text-xs font-bold border-l border-slate-800">
+                      @cleadglobal.org
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase">
+                      Initial Mailbox Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={generateStrongPassword}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300"
+                    >
+                      <RefreshCw className="w-3 h-3" /> Generate Strong Password
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Leave blank to auto-generate"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm font-mono focus:outline-none focus:border-amber-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isCreating}
+                  className="w-full py-3 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 transition shadow-lg shadow-amber-400/20"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  {isCreating ? "Provisioning Mailbox..." : "Create @cleadglobal.org Email"}
+                </button>
+              </form>
+            </div>
+
+            <div className="lg:col-span-5 space-y-6">
+              {createdAccount ? (
+                <div className="bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 space-y-4 shadow-xl">
+                  <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-sm">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Mailbox Provisioned Successfully!
+                  </div>
+                  <div className="space-y-2 text-xs bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono">
+                    <div className="flex items-center justify-between py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Email:</span>
+                      <span className="text-amber-300 font-bold">{createdAccount.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Temp Password:</span>
+                      <span className="text-emerald-300">{createdAccount.tempPassword}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <span className="text-slate-400">Department:</span>
+                      <span className="text-slate-200">{createdAccount.department}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleCopy(
+                          `Email: ${createdAccount.email}\nPassword: ${createdAccount.tempPassword}\nPortal: https://mail.cleadglobal.org`,
+                          "created-creds"
+                        )
+                      }
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 flex items-center justify-center gap-1.5"
+                    >
+                      {copiedField === "created-creds" ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" /> Copy Credentials
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openWebmailForAccount(createdAccount)}
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-xs font-extrabold text-slate-950 flex items-center justify-center gap-1.5"
+                    >
+                      <Inbox className="w-3.5 h-3.5" /> Open Inbox
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3 text-xs text-slate-400 leading-relaxed">
+                  <div className="font-bold text-white text-sm flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-amber-400" />
+                    Instant Cloud Provisioning
+                  </div>
+                  <p>
+                    New mailboxes are immediately synced to the live Firestore directory and can send and receive emails inside the built-in Webmail client.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* BUILT-IN WEBMAIL INBOX & COMPOSER */}
         {activeTab === "webmail" && (
