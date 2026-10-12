@@ -55,26 +55,6 @@ export default function StaffMailPortal({
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const runCleanup = async () => {
-      if (localStorage.getItem("cleanup_run")) return;
-      try {
-        const collections = ["mailboxes", "messages"];
-        for (const colName of collections) {
-          const querySnapshot = await getDocs(collection(db, colName));
-          for (const docSnapshot of querySnapshot.docs) {
-            await deleteDoc(doc(db, colName, docSnapshot.id));
-          }
-        }
-        localStorage.setItem("cleanup_run", "true");
-        console.log("Cleanup complete!");
-      } catch (e) {
-        console.error("Cleanup failed:", e);
-      }
-    };
-    runCleanup();
-  }, []);
-
-  useEffect(() => {
     if (!isAuthenticated) return;
 
     const unsubMailboxes = onSnapshot(
@@ -100,6 +80,15 @@ export default function StaffMailPortal({
   }, [isAuthenticated]);
 
   const staffEmails = mailboxes;
+
+  // Auto-select the signed-in user's own mailbox (admins can still switch via the dropdown)
+  useEffect(() => {
+    if (activeMailbox || !currentUser?.email || mailboxes.length === 0) return;
+    const mine = mailboxes.find(
+      (m) => m.email?.toLowerCase() === currentUser.email.toLowerCase()
+    );
+    if (mine) setActiveMailbox({ ...mine, fullName: mine.fullName || mine.name });
+  }, [mailboxes, currentUser, activeMailbox]);
 
 
   const [loginUsername, setLoginUsername] = useState("");
@@ -318,53 +307,57 @@ export default function StaffMailPortal({
     }
   };
 
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState("");
+
   const handleSendEmail = async (e) => {
     e.preventDefault();
-    if (!composeTo.trim() || !composeSubject.trim()) return;
-
-    const currentEmail = activeMailbox?.email || "info@cleadglobal.org";
-    const currentName = activeMailbox?.fullName || "CLG Staff";
-
-    const newMsg = {
-      id: `msg-${Date.now()}`,
-      to: composeTo.trim(),
-      from: currentEmail,
-      fromName: currentName,
-      subject: composeSubject.trim(),
-      body: composeBody.trim(),
-      date: new Date().toISOString().slice(0, 16).replace("T", " "),
-      folder: "sent",
-      read: true,
-    };
-
-    const updatedMessages = [newMsg, ...messages];
-    const nextSiteData = {
-      ...siteData,
-      staffMail: {
-        ...(siteData?.staffMail || {}),
-        portalUrl: "mail.cleadglobal.org",
-        domain: "cleadglobal.org",
-        accounts: staffEmails,
-        messages: updatedMessages,
-      },
-    };
-
-    if (onUpdateSiteData) {
-      onUpdateSiteData(nextSiteData);
+    if (!composeTo.trim() || !composeSubject.trim() || isSending) return;
+    if (!activeMailbox?.email) {
+      setSendError("No mailbox selected. Choose a mailbox first.");
+      return;
     }
-    try {
-      if (onSaveToCloud) {
-        await onSaveToCloud(nextSiteData);
-      }
-    } catch (err) {}
 
-    setSendSuccessBanner(`Message sent from ${currentEmail} to ${composeTo.trim()}`);
-    setComposeTo("");
-    setComposeSubject("");
-    setComposeBody("");
-    setMailFolder("sent");
-    setSelectedMessage(newMsg);
-    setTimeout(() => setSendSuccessBanner(""), 4000);
+    setSendError("");
+    setIsSending(true);
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const recipients = composeTo
+        .split(/[,;\s]+/)
+        .map((x) => x.trim())
+        .filter(Boolean);
+
+      const resp = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          from: activeMailbox.email,
+          fromName: activeMailbox.fullName || activeMailbox.name || "",
+          to: recipients,
+          subject: composeSubject.trim(),
+          text: composeBody,
+        }),
+      });
+      const result = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(result.error || `Send failed (${resp.status})`);
+
+      setSendSuccessBanner(
+        `Message sent from ${activeMailbox.email} to ${recipients.join(", ")}`
+      );
+      setComposeTo("");
+      setComposeSubject("");
+      setComposeBody("");
+      setMailFolder("sent");
+      setSelectedMessage(null);
+      setTimeout(() => setSendSuccessBanner(""), 4000);
+    } catch (err) {
+      setSendError(err.message || "Failed to send message.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleDeleteAccount = async (id) => {
@@ -747,6 +740,7 @@ export default function StaffMailPortal({
                       </label>
                       <input
                         type="email"
+                        multiple
                         required
                         placeholder="colleague@cleadglobal.org or external email"
                         value={composeTo}
@@ -783,13 +777,17 @@ export default function StaffMailPortal({
                       />
                     </div>
 
+                    {sendError && (
+                      <p className="text-xs font-semibold text-red-400">{sendError}</p>
+                    )}
                     <div className="flex items-center gap-3 pt-2">
                       <button
                         type="submit"
-                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs inline-flex items-center gap-2 transition"
+                        disabled={isSending}
+                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-950 font-extrabold text-xs inline-flex items-center gap-2 transition"
                       >
                         <Send className="w-3.5 h-3.5" />
-                        Send Official Email
+                        {isSending ? "Sending..." : "Send Official Email"}
                       </button>
                       <a
                         href={`mailto:${encodeURIComponent(
