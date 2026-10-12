@@ -50,6 +50,7 @@ export default function StaffMailPortal({
 }) {
   const [mailboxes, setMailboxes] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [activeMailbox, setActiveMailbox] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isLoggedIn = isAuthenticated;
   const [currentUser, setCurrentUser] = useState(null);
@@ -95,9 +96,6 @@ export default function StaffMailPortal({
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isSignupMode, setIsSignupMode] = useState(false);
-
-  // Built-in Webmail state
-  const [activeMailbox, setActiveMailbox] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
