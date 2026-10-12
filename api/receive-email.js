@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+const { initializeApp, getApps, getApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const { Resend } = require('resend');
 
@@ -32,15 +32,13 @@ function getClients() {
   // Env vars often turn real newlines into the two characters \n
   if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
 
-  if (!admin.apps.length) {
-    admin.initializeApp({ credential: admin.credential.cert(sa) });
-  }
+  const app = getApps().length ? getApp() : initializeApp({ credential: cert(sa) });
 
   cached = {
     resend: new Resend(apiKey),
     webhookSecret,
-    // The app uses a NAMED Firestore database, so admin.firestore() (default DB) would miss it.
-    db: getFirestore(admin.app(), DATABASE_ID),
+    // The app uses a NAMED Firestore database, so the default DB would miss it.
+    db: getFirestore(app, DATABASE_ID),
   };
   return cached;
 }
@@ -66,7 +64,7 @@ module.exports = async function handler(req, res) {
   try {
     ({ resend, webhookSecret, db } = getClients());
   } catch (err) {
-    console.error('receive-email config error:', err.message);
+    console.error('receive-email config error:', err);
     return res.status(500).json({ ok: false, code: 'ERR_CONFIG', error: err.message });
   }
 
