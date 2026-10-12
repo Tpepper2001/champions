@@ -1,6 +1,6 @@
-import admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
-import { Resend } from 'resend';
+const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
+const { Resend } = require('resend');
 
 // Vercel env vars needed:
 //   RESEND_API_KEY, RESEND_WEBHOOK_SECRET (whsec_...),
@@ -9,6 +9,9 @@ import { Resend } from 'resend';
 const DATABASE_ID =
   process.env.FIRESTORE_DATABASE_ID ||
   'ai-studio-champions-b506e80d-724a-46be-956b-3fd850955e31';
+
+const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
+const RESEND_WEBHOOK_SECRET = (process.env.RESEND_WEBHOOK_SECRET || '').trim();
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -35,7 +38,7 @@ const bareAddress = (s) => {
   return (m ? m[1] : String(s || '')).trim().toLowerCase();
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -114,4 +117,4 @@ export default async function handler(req, res) {
     console.error('receive-email error:', err);
     return res.status(500).json({ error: 'Failed to process email' });
   }
-}
+};
