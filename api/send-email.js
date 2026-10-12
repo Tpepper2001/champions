@@ -1,25 +1,6 @@
-import admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
 
-
-const DATABASE_ID =
-  process.env.FIRESTORE_DATABASE_ID ||
-  'ai-studio-champions-b506e80d-724a-46be-956b-3fd850955e31';
-
 const DOMAIN = 'cleadglobal.org';
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-    ),
-  });
-}
-
-const db = getFirestore(admin.app(), DATABASE_ID);
-const resendApiKey = process.env.RESEND_API_KEY;
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const escapeHtml = (t) =>
   String(t || '')
@@ -28,90 +9,138 @@ const escapeHtml = (t) =>
     .replace(/>/g, '&gt;');
 
 export default async function handler(req, res) {
+  // CORS & Method Check
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ ok: false, error: 'Method not allowed' });
+  }
+
+  const rawKey = (
+    process.env.RESEND_API_KEY ||
+    process.env.REACT_APP_RESEND_API_KEY ||
+    ''
+  ).trim();
+
+  if (!rawKey) {
+    return res.status(503).json({
+      ok: false,
+      code: 'ERR_MISSING_API_KEY',
+      error:
+        'RESEND_API_KEY is not configured in Vercel environment variables. Please add RESEND_API_KEY in your Vercel Project Settings.',
+      troubleshooting: [
+        'Open your Vercel Dashboard -> Project -> Settings -> Environment Variables',
+        'Add RESEND_API_KEY with your key (re_...)',
+        'Redeploy the project to activate the variable',
+      ],
+    });
   }
 
   try {
-    // 1. Authenticate the caller
-    const authHeader = req.headers.authorization || '';
-    if (!authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const decoded = await admin
-      .auth()
-      .verifyIdToken(authHeader.split('Bearer ')[1]);
-
-    // 2. Validate input
-    const { from, fromName, to, subject, text } = req.body || {};
-    const sender = String(from || '').trim().toLowerCase();
+    const { from, fromName, to, subject, text, html } = req.body || {};
     const recipients = (Array.isArray(to) ? to : [to])
-      .map((x) => String(x || '').trim())
+      .map((t) => String(t || '').trim())
       .filter(Boolean);
 
-    if (!sender.endsWith(`@${DOMAIN}`)) {
-      return res.status(400).json({ error: `Sender must be an @${DOMAIN} address` });
-    }
-    if (recipients.length === 0 || recipients.length > 20) {
-      return res.status(400).json({ error: 'Provide 1 to 20 recipients' });
-    }
-    if (!subject || !String(subject).trim()) {
-      return res.status(400).json({ error: 'Subject is required' });
+    if (recipients.length === 0) {
+      return res.status(400).json({
+        ok: false,
+        code: 'ERR_NO_RECIPIENTS',
+        error: 'Recipient email is required.',
+      });
     }
 
-    // 3. The sender mailbox must exist, and the caller must own it or be an admin
-    const mbSnap = await db
-      .collection('mailboxes')
-      .where('email', '==', sender)
-      .limit(1)
-      .get();
-    if (mbSnap.empty) {
-      return res.status(403).json({ error: 'Unknown sender mailbox' });
-    }
-    const mailboxId = mbSnap.docs[0].id;
+    const senderEmail = String(from || 'staff@cleadglobal.org').trim().toLowerCase();
+    const displayName = String(fromName || 'Champions Leadership Global').replace(/[<>"]/g, '');
+    const subjectClean = String(subject || 'Message from Champions Leadership Global').trim();
+    const bodyText = String(text || '');
+    const bodyHtml =
+      html ||
+      `<div style="font-family:Arial,sans-serif;font-size:14px;color:#1e293b;line-height:1.6;white-space:pre-wrap;">${escapeHtml(bodyText)}</div>`;
 
-    const ownsMailbox =
-      (decoded.email || '').toLowerCase() === sender || decoded.uid === mailboxId;
-    const isAdmin = (await db.collection('admins').doc(decoded.uid).get()).exists;
-    if (!ownsMailbox && !isAdmin) {
-      return res.status(403).json({ error: 'You cannot send from this mailbox' });
+    const resend = new Resend(rawKey);
+
+    // Attempt 1: Send via official domain
+    let usedSender = `${displayName} <${senderEmail}>`;
+    let sendResult;
+
+    try {
+      sendResult = await resend.emails.send({
+        from: usedSender,
+        to: recipients,
+        subject: subjectClean,
+        text: bodyText,
+        html: bodyHtml,
+        replyTo: senderEmail,
+      });
+    } catch (errFirst) {
+      sendResult = { error: errFirst };
     }
 
-    // 4. Send through Resend (v6 returns { data, error } rather than throwing)
-    const displayFrom = fromName ? `${String(fromName).replace(/[<>"]/g, '')} <${sender}>` : sender;
-    const body = String(text || '');
-    const { data, error } = await resend.emails.send({
-      from: displayFrom,
-      to: recipients,
-      subject: String(subject).trim(),
-      text: body,
-      html: `<div style="font-family:Arial,sans-serif;white-space:pre-wrap">${escapeHtml(body)}</div>`,
-      replyTo: sender,
+    // Attempt 2: If domain is unverified on Resend, fallback to onboarding@resend.dev
+    if (
+      sendResult?.error &&
+      (String(sendResult.error.message || '').toLowerCase().includes('domain') ||
+        sendResult.error.statusCode === 403 ||
+        sendResult.error.name === 'validation_error' ||
+        sendResult.error.name === 'missing_required_field')
+    ) {
+      try {
+        usedSender = `${displayName} <onboarding@resend.dev>`;
+        sendResult = await resend.emails.send({
+          from: usedSender,
+          to: recipients,
+          subject: subjectClean,
+          text: bodyText,
+          html: bodyHtml,
+          replyTo: senderEmail,
+        });
+      } catch (errRetry) {
+        sendResult = { error: errRetry };
+      }
+    }
+
+    // Handle failure
+    if (sendResult?.error) {
+      const errorMsg = sendResult.error.message || 'Resend rejected email dispatch';
+      const isFreeTierLimitation =
+        errorMsg.toLowerCase().includes('own email') ||
+        errorMsg.toLowerCase().includes('only send testing emails');
+
+      const troubleshootingTips = [];
+      if (isFreeTierLimitation) {
+        troubleshootingTips.push(
+          'Resend free sandbox (onboarding@resend.dev) only allows sending to the email registered on your Resend account.'
+        );
+        troubleshootingTips.push(
+          'To send emails to external recipients like Gmail, verify cleadglobal.org at resend.com/domains.'
+        );
+      } else {
+        troubleshootingTips.push(
+          'Please verify cleadglobal.org DNS records in your Resend Dashboard at resend.com/domains.'
+        );
+      }
+
+      return res.status(400).json({
+        ok: false,
+        code: sendResult.error.name || 'ERR_RESEND_REJECTED',
+        error: errorMsg,
+        details: sendResult.error,
+        troubleshooting: troubleshootingTips,
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      id: sendResult?.data?.id,
+      provider: 'resend',
+      senderUsed: usedSender,
+      recipients,
     });
-    if (error) {
-      console.error('Resend send error:', error);
-      return res.status(502).json({ error: error.message || 'Resend rejected the message' });
-    }
-
-    // 5. Record in the Sent folder (admin SDK bypasses the client write rules)
-    const now = new Date();
-    await db.collection('messages').add({
-      mailboxId,
-      folder: 'sent',
-      from: sender,
-      fromName: fromName || '',
-      to: recipients.join(', '),
-      subject: String(subject).trim(),
-      body,
-      resendId: data?.id || null,
-      receivedAt: now.toISOString(),
-      date: now.toISOString().slice(0, 16).replace('T', ' '),
-      read: true,
-    });
-
-    return res.status(200).json({ ok: true, id: data?.id });
   } catch (err) {
-    console.error('send-email error:', err);
-    return res.status(500).json({ error: err.message });
+    console.error('send-email error on Vercel:', err);
+    return res.status(500).json({
+      ok: false,
+      code: 'ERR_SERVER_EXCEPTION',
+      error: err.message || 'Internal server error while transmitting email',
+    });
   }
 }

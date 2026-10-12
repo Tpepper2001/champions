@@ -1570,14 +1570,22 @@ export default function StaffMailPortal({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                       <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-slate-400">
-                          <span className="font-bold">Resend API Proxy</span>
-                          <span className={`w-2.5 h-2.5 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : "bg-rose-500 animate-pulse"}`} />
+                          <span className="font-bold">Resend API Relay</span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : isCheckingStatus ? "bg-amber-400 animate-pulse" : "bg-rose-500 animate-pulse"}`} />
                         </div>
                         <div className="text-sm font-extrabold text-white">
-                          {resendStatus?.configured ? "Configured & Active" : "Missing RESEND_API_KEY"}
+                          {resendStatus?.configured
+                            ? "Configured & Active"
+                            : isCheckingStatus
+                            ? "Checking Environment..."
+                            : "Missing RESEND_API_KEY"}
                         </div>
                         <p className="text-[11px] font-mono text-slate-400">
-                          {resendStatus?.apiKeyMasked ? `Key: ${resendStatus.apiKeyMasked}` : "Set RESEND_API_KEY in .env"}
+                          {resendStatus?.apiKeyMasked
+                            ? `Key: ${resendStatus.apiKeyMasked}`
+                            : isCheckingStatus
+                            ? "Detecting..."
+                            : "Set RESEND_API_KEY in Environment"}
                         </p>
                       </div>
 
@@ -2170,9 +2178,9 @@ export default function StaffMailPortal({
                             <span className="text-xs font-black text-white uppercase tracking-wider">
                               Delivery & Error Logs Console
                             </span>
-                            <span className={`w-2 h-2 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : "bg-rose-500"}`} />
+                            <span className={`w-2 h-2 rounded-full ${resendStatus?.configured ? "bg-emerald-400" : isCheckingStatus ? "bg-amber-400 animate-pulse" : "bg-rose-500"}`} />
                             <span className="text-[10px] font-mono text-slate-400">
-                              Resend: {resendStatus?.configured ? "Key Active" : "Key Missing in .env"}
+                              Resend: {resendStatus?.configured ? `Key Active (${resendStatus.apiKeyMasked})` : isCheckingStatus ? "Checking..." : "Key Missing in Environment"}
                             </span>
                           </div>
 
