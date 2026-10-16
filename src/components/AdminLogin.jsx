@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Lock, User, ArrowLeft, ShieldAlert, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { auth, signInWithEmailAndPassword } from "../firebase";
+import Footer from "./Footer";
 
 export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
   const [email, setEmail] = useState("");
@@ -13,147 +14,116 @@ export default function AdminLogin({ onLoginSuccess, onCancel, logoUrl }) {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       onLoginSuccess();
     } catch (err) {
       console.error(err);
-      setError("Invalid email or password.");
+      setError("Incorrect email or password.");
       setIsLoading(false);
     }
   };
 
+  const field =
+    "mt-1 flex items-center rounded-lg border border-[#0A1128]/20 focus-within:border-[#0A1128] focus-within:ring-2 focus-within:ring-[#F4D03F]";
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Back button */}
-        <button
-          type="button"
-          onClick={onCancel}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition mb-6 px-3 py-1.5 rounded-lg hover:bg-slate-900/60 border border-transparent hover:border-slate-800"
-        >
-          <ArrowLeft className="w-4 h-4" /> Return to Website
-        </button>
-
-        {/* Login Card */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl space-y-6">
-          {/* Header */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-amber-400/20 to-rose-500/20 border border-amber-400/30 text-amber-400 mb-1 shadow-lg shadow-amber-400/5">
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt="CLG Logo"
-                  className="w-12 h-12 rounded-xl object-contain bg-white/10 p-1"
-                />
-              ) : (
-                <Lock className="w-8 h-8" />
-              )}
-            </div>
-            <div>
-              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-2">
-                Restricted Access
-              </span>
-              <h2 className="text-2xl font-black text-white tracking-tight">
-                Website Manager
-              </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Enter your administrative credentials to manage content & photos.
-              </p>
-            </div>
-          </div>
-
-          {/* Error Alert */}
-          {error && (
-            <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs flex items-center gap-2.5 animate-shake">
-              <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-400" />
-              <span>{error}</span>
-            </div>
+    <div className="flex h-screen flex-col bg-white font-sans text-[#0A1128]">
+      <div className="flex min-h-0 flex-1">
+        {/* Brand panel */}
+        <div className="hidden w-[42%] flex-col justify-between bg-[#0A1128] p-12 text-white lg:flex">
+          {logoUrl ? (
+            <img src={logoUrl} alt="" className="h-10 w-10 rounded object-contain" />
+          ) : (
+            <Lock className="h-8 w-8 text-[#F4D03F]" />
           )}
+          <div>
+            <div className="mb-6 h-1 w-12 bg-[#F4D03F]" />
+            <h1 className="text-4xl font-semibold leading-tight">
+              Manage your
+              <br />
+              website.
+            </h1>
+            <p className="mt-4 max-w-sm text-white/60">Update text, photos, events and more. Changes go live when you save.</p>
+          </div>
+          <button onClick={onCancel} className="self-start text-sm text-white/60 transition-colors hover:text-[#F4D03F]">
+            ← Back to website
+          </button>
+        </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                Email
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <User className="w-4 h-4" />
+        {/* Form */}
+        <div className="flex flex-1 items-center justify-center overflow-y-auto p-6">
+          <div className="w-full max-w-sm">
+            <h2 className="text-2xl font-semibold">Sign in</h2>
+            <p className="mt-1 text-sm text-[#0A1128]/60">Administrator access only.</p>
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <label className="block">
+                <span className="text-sm font-medium">Email</span>
+                <div className={field}>
+                  <input
+                    type="email"
+                    required
+                    autoFocus
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError("");
+                    }}
+                    className="min-w-0 flex-1 bg-transparent px-3 py-2.5 outline-none"
+                  />
                 </div>
-                <input
-                  type="email"
-                  required
-                  autoFocus
-                  autoComplete="email"
-                  placeholder="admin@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) setError("");
-                  }}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                Password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError("");
-                  }}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200"
-                  tabIndex="-1"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-bold text-sm transition shadow-lg shadow-amber-400/20 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <span>Sign In to Manager</span>
+              <label className="block">
+                <span className="text-sm font-medium">Password</span>
+                <div className={field}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError("");
+                    }}
+                    className="min-w-0 flex-1 bg-transparent px-3 py-2.5 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="px-3 text-[#0A1128]/50 hover:text-[#0A1128]"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </label>
+
+              {error && (
+                <p role="alert" className="rounded-r border-l-4 border-[#F4D03F] bg-[#F4D03F]/15 px-3 py-2 text-sm font-medium">
+                  {error}
+                </p>
               )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#F4D03F] py-3 font-semibold text-[#0A1128] transition hover:brightness-95 disabled:opacity-60"
+              >
+                {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Sign in
+              </button>
+            </form>
+
+            <button onClick={onCancel} className="mt-6 text-sm text-[#0A1128]/60 hover:text-[#0A1128] lg:hidden">
+              ← Back to website
             </button>
-          </form>
+          </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
