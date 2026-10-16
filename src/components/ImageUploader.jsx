@@ -51,17 +51,17 @@ export default function ImageUploader({
   };
 
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 transition hover:border-slate-300">
+    <div className="bg-[#0A1128]/10 border border-[#0A1128]/[0.15] rounded-2xl p-4 transition hover:border-[#0A1128]/[0.15]">
       {label && (
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#0A1128]/80">
             {label}
           </label>
           {onReset && (
             <button
               type="button"
               onClick={onReset}
-              className="text-xs font-semibold text-slate-500 hover:text-amber-600 transition"
+              className="text-xs font-semibold text-[#0A1128]/50 hover:text-[#0A1128] transition"
               title="Reset to default image"
             >
               Reset to original
@@ -73,7 +73,7 @@ export default function ImageUploader({
       {/* Preview and Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
         {/* Thumbnail Preview */}
-        <div className="relative group shrink-0 border border-slate-200 bg-slate-200 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+        <div className="relative group shrink-0 border border-[#0A1128]/[0.15] bg-[#0A1128]/10 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
           {value && !imgError ? (
             <img
               src={value}
@@ -83,7 +83,7 @@ export default function ImageUploader({
             />
           ) : (
             <div
-              className={`flex flex-col items-center justify-center text-slate-400 p-4 ${
+              className={`flex flex-col items-center justify-center text-[#0A1128]/60 p-4 ${
                 aspect === "avatar"
                   ? "w-20 h-20 rounded-full"
                   : aspect === "square"
@@ -91,7 +91,7 @@ export default function ImageUploader({
                   : "w-36 h-24"
               }`}
             >
-              <ImageIcon className="w-6 h-6 mb-1 text-slate-400" />
+              <ImageIcon className="w-6 h-6 mb-1 text-[#0A1128]/60" />
               <span className="text-[10px] text-center font-medium">
                 {imgError ? "Invalid URL" : "No image"}
               </span>
@@ -99,11 +99,11 @@ export default function ImageUploader({
           )}
 
           {value && !imgError && (
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-[#0A1128]/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => setShowPreviewModal(true)}
-                className="p-1.5 bg-white/90 text-slate-800 rounded-lg hover:bg-white shadow"
+                className="p-1.5 bg-[#0A1128]/5 text-[#0A1128] rounded-lg hover:bg-white shadow"
                 title="View full preview"
               >
                 <Eye className="w-4 h-4" />
@@ -115,8 +115,8 @@ export default function ImageUploader({
         {/* Action Controls */}
         <div className="flex-1 w-full space-y-2">
           {/* URL Input */}
-          <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-amber-400 focus-within:border-transparent transition">
-            <Link2 className="w-4 h-4 text-slate-400 shrink-0" />
+          <div className="flex items-center gap-2 bg-white border border-[#0A1128]/[0.15] rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-[#F4D03F] focus-within:border-transparent transition">
+            <Link2 className="w-4 h-4 text-[#0A1128]/60 shrink-0" />
             <input
               type="text"
               value={value || ""}
@@ -125,13 +125,13 @@ export default function ImageUploader({
                 onChange(e.target.value);
               }}
               placeholder="Paste image URL (https://...)"
-              className="w-full text-xs text-slate-800 outline-none bg-transparent"
+              className="w-full text-xs text-[#0A1128] outline-none bg-transparent"
             />
             {value && (
               <button
                 type="button"
                 onClick={() => onChange("")}
-                className="text-slate-400 hover:text-slate-600 p-0.5"
+                className="text-[#0A1128]/60 hover:text-[#0A1128]/60 p-0.5"
                 title="Clear image"
               >
                 <X className="w-3.5 h-3.5" />
@@ -151,12 +151,12 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 rounded-xl text-xs font-bold transition shadow-sm active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F4D03F] hover:bg-[#F4D03F] text-[#0A1128] border border-[#F4D03F] rounded-xl text-xs font-bold transition shadow-sm active:scale-95"
             >
               <Upload className="w-3.5 h-3.5" />
               Upload from Device
             </button>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-[#0A1128]/50">
               {helperText || "PNG, JPG, WebP or SVG"}
             </span>
           </div>
@@ -166,26 +166,26 @@ export default function ImageUploader({
       {/* Full Preview Modal */}
       {showPreviewModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-[#0A1128]/60 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setShowPreviewModal(false)}
         >
           <div
             className="bg-white rounded-2xl max-w-2xl max-h-[85vh] overflow-hidden p-4 relative shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="text-sm font-bold text-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-[#0A1128]/[0.15] mb-3">
+              <span className="text-sm font-bold text-[#0A1128]">
                 {label || "Image Preview"}
               </span>
               <button
                 type="button"
                 onClick={() => setShowPreviewModal(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800"
+                className="p-1 rounded-lg hover:bg-[#0A1128]/10 text-[#0A1128]/50 hover:text-[#0A1128]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex items-center justify-center max-h-[70vh] overflow-auto rounded-xl bg-slate-900">
+            <div className="flex items-center justify-center max-h-[70vh] overflow-auto rounded-xl bg-white">
               <img
                 src={value}
                 alt="Full preview"
