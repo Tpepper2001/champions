@@ -46,6 +46,7 @@ service cloud.firestore {
         && (!('reviewsSection' in data) || data.reviewsSection is map)
         && (!('bookingSection' in data) || data.bookingSection is map)
         && (!('staffMail' in data) || data.staffMail is map)
+        && (!('customPages' in data) || data.customPages is list)
         && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
