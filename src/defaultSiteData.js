@@ -1,4 +1,5 @@
 export const defaultSiteData = {
+  customPages: [],
   branding: {
     name: "Champions' Leadership Global",
     logoUrl: "https://ijsr.org.ng/wp-content/uploads/2026/03/CLG2.png",
