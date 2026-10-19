@@ -781,7 +781,7 @@ const getViewFromLocation = () => {
   } catch (e) {}
 
   const rawHash = window.location.hash.replace(/^#\/?/, "").split("/")[0];
-  const valid = ["home", "ceo", "events", "team", "blog", "booking", "mail"];
+  const valid = ["home", "ceo", "events", "team", "blog", "booking", "mail", "page"];
   return valid.includes(rawHash) ? rawHash : "home";
 };
 
@@ -849,6 +849,7 @@ const mergeSiteData = (parsed) => {
       ...(parsed.reviewsSection || {}),
       items: ensureArr(parsed.reviewsSection?.items, defaultSiteData.reviewsSection.items),
     },
+    customPages: ensureArr(parsed.customPages, defaultSiteData.customPages || []),
     bookingSection: {
       ...defaultSiteData.bookingSection,
       ...(parsed.bookingSection || {}),
@@ -891,11 +892,21 @@ export default function App() {
     return null;
   });
 
-  const navigate = (v, post = null) => {
+  const [activePageSlug, setActivePageSlug] = useState(() =>
+    getViewFromLocation() === "page" ? getSlugFromHash() : null
+  );
+
+  const navigate = (v, post = null, pageSlug = null) => {
     setView(v);
     setMenuOpen(false);
     setSelectedPost(post);
-    if (v === "manager") {
+    setActivePageSlug(v === "page" ? pageSlug : null);
+    if (v === "page" && pageSlug) {
+      try {
+        window.history.pushState(null, "", "/");
+      } catch (e) {}
+      window.location.hash = `page/${pageSlug}`;
+    } else if (v === "manager") {
       try {
         window.history.pushState(null, "", "/websitemanager");
       } catch (e) {
@@ -1022,6 +1033,7 @@ export default function App() {
       const v = getViewFromLocation();
       const slug = getSlugFromHash();
       setView(v);
+      setActivePageSlug(v === "page" ? slug : null);
       setSelectedPost(
         slug
           ? siteData.blogSection.posts.find(
@@ -1062,13 +1074,30 @@ export default function App() {
     };
   }, []);
 
+  const livePages = (siteData.customPages || []).filter((p) => p && p.slug && p.published !== false);
   const navItems = [
     { label: "Home", key: "home" },
     { label: "Meet the CEO", key: "ceo" },
     { label: "Events", key: "events" },
     { label: "Team", key: "team" },
     { label: "Blog", key: "blog" },
+    ...livePages
+      .filter((p) => p.showInNav !== false)
+      .map((p) => ({ label: p.title, key: "page", slug: p.slug, id: p.id })),
   ];
+  const isNavActive = (item) =>
+    item.key === "page" ? view === "page" && activePageSlug === item.slug : view === item.key;
+
+  const openCustomTarget = (target) => {
+    if (!target) return;
+    if (/^https?:\/\//i.test(target)) {
+      window.open(target, "_blank", "noopener,noreferrer");
+    } else if (target.startsWith("page:")) {
+      navigate("page", null, target.slice(5));
+    } else {
+      navigate(target);
+    }
+  };
 
   // Parse article content with markdown headings
   const renderArticleContent = (content) => {
@@ -1159,13 +1188,13 @@ export default function App() {
           </div>
           <ul className="nav-links">
             {navItems.map((item) => (
-              <li key={item.key}>
+              <li key={item.id || item.key}>
                 <a
                   href="#!"
-                  className={view === item.key ? "active" : ""}
+                  className={isNavActive(item) ? "active" : ""}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(item.key);
+                    navigate(item.key, null, item.slug);
                   }}
                 >
                   {item.label}
@@ -1201,12 +1230,12 @@ export default function App() {
       <div className={"mobile-menu" + (menuOpen ? " open" : "")}>
         {navItems.map((item) => (
           <a
-            key={item.key}
+            key={item.id || item.key}
             href="#!"
-            className={view === item.key ? "active" : ""}
+            className={isNavActive(item) ? "active" : ""}
             onClick={(e) => {
               e.preventDefault();
-              navigate(item.key);
+              navigate(item.key, null, item.slug);
             }}
           >
             {item.label}
@@ -2926,6 +2955,111 @@ export default function App() {
         </section>
       )}
 
+      {/* CUSTOM PAGE VIEW */}
+      {view === "page" && (() => {
+        const page = livePages.find((p) => p.slug === activePageSlug);
+        if (!page) {
+          return (
+            <section className="page-padding" style={{ background: "#FFF8F0", textAlign: "center" }}>
+              <div className="section-container">
+                <h2 className="section-title">Page not found</h2>
+                <p style={{ color: "#666", margin: "1rem 0 2rem" }}>
+                  This page doesn&rsquo;t exist or isn&rsquo;t published yet.
+                </p>
+                <button className="btn-primary" onClick={() => navigate("home")}>
+                  Back to Home
+                </button>
+              </div>
+            </section>
+          );
+        }
+        return (
+          <div>
+            <section
+              style={{
+                position: "relative",
+                padding: "9rem 2rem 4rem",
+                background: page.bannerImage
+                  ? `linear-gradient(135deg, rgba(10,17,40,0.88), rgba(10,17,40,0.6)), url('${page.bannerImage}') center/cover`
+                  : "linear-gradient(135deg, #0A1128, #1a2a5e)",
+                color: "white",
+                textAlign: "center",
+              }}
+            >
+              <div className="section-container">
+                {page.label && (
+                  <div className="section-label" style={{ color: "#F4D03F" }}>
+                    {page.label}
+                  </div>
+                )}
+                <h1
+                  style={{
+                    fontFamily: "Playfair Display, serif",
+                    fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                    lineHeight: 1.1,
+                    margin: "0.5rem 0 1rem",
+                  }}
+                >
+                  {page.title}
+                </h1>
+                {page.subtitle && (
+                  <p style={{ maxWidth: 620, margin: "0 auto", opacity: 0.8, fontSize: "1.1rem" }}>
+                    {page.subtitle}
+                  </p>
+                )}
+              </div>
+            </section>
+            <section style={{ background: "white", padding: "4rem 2rem 5rem" }}>
+              <div style={{ maxWidth: 780, margin: "0 auto" }}>
+                {(page.blocks || []).map((block, i) => {
+                  if (block.type === "text") {
+                    return (
+                      <div key={block.id || i} className="article-content" style={{ marginBottom: "2.5rem" }}>
+                        {block.heading && <h2 style={{ marginTop: 0 }}>{block.heading}</h2>}
+                        {renderArticleContent(block.body)}
+                      </div>
+                    );
+                  }
+                  if (block.type === "image" && block.img) {
+                    return (
+                      <figure key={block.id || i} style={{ margin: "0 0 2.5rem" }}>
+                        <img
+                          src={block.img}
+                          alt={block.caption || page.title}
+                          style={{
+                            width: "100%",
+                            borderRadius: 20,
+                            display: "block",
+                            boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                          }}
+                        />
+                        {block.caption && (
+                          <figcaption
+                            style={{ textAlign: "center", color: "#888", fontSize: "0.85rem", marginTop: "0.8rem" }}
+                          >
+                            {block.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    );
+                  }
+                  if (block.type === "button" && block.label) {
+                    return (
+                      <div key={block.id || i} style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+                        <button className="btn-primary" onClick={() => openCustomTarget(block.target)}>
+                          {block.label}
+                        </button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            </section>
+          </div>
+        );
+      })()}
+
       {/* FOOTER */}
       <footer className="footer">
         <div className="footer-grid">
@@ -2978,13 +3112,16 @@ export default function App() {
               ["Team", "team"],
               ["Blog", "blog"],
               ["Book a Session", "booking"],
+              ...livePages
+                .filter((p) => p.showInFooter)
+                .map((p) => [p.title, "page", p.slug]),
             ].map((item) => (
-              <div key={item[1]} style={{ marginBottom: "0.8rem" }}>
+              <div key={item[2] ? `page-${item[2]}` : item[1]} style={{ marginBottom: "0.8rem" }}>
                 <a
                   href="#!"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(item[1]);
+                    navigate(item[1], null, item[2]);
                   }}
                   style={{
                     color: "rgba(255,255,255,0.6)",
