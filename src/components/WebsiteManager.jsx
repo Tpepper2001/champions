@@ -23,6 +23,9 @@ import {
   FileText,
   LogOut,
   Mail,
+  ArrowUp,
+  ArrowDown,
+  ExternalLink,
 } from "lucide-react";
 
 export default function WebsiteManager({
@@ -40,6 +43,7 @@ export default function WebsiteManager({
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [selectedPageId, setSelectedPageId] = useState(null);
 
   const currentEmail = auth?.currentUser?.email || "jerryoyedele@cleadglobal.org";
 
@@ -53,6 +57,7 @@ export default function WebsiteManager({
     { id: "events", label: "Events", icon: Calendar },
     { id: "team", label: "Team", icon: Users },
     { id: "blog", label: "Blog", icon: BookOpen },
+    { id: "pages", label: "Pages", icon: FileText },
     { id: "reviews", label: "Testimonials", icon: MessageSquare },
     { id: "booking", label: "Booking", icon: Type },
     { id: "backup", label: "Backup", icon: Download },
@@ -115,6 +120,98 @@ export default function WebsiteManager({
         [field]: value,
       },
     });
+  };
+
+  // ── Custom pages ─────────────────────────────────────────────
+  const RESERVED_SLUGS = ["home", "ceo", "events", "team", "blog", "booking", "mail", "page", "manager", "websitemanager", "admin"];
+  const customPages = Array.isArray(data.customPages) ? data.customPages : [];
+  const selectedPage = customPages.find((p) => p.id === selectedPageId) || customPages[0] || null;
+
+  const slugify = (s) =>
+    String(s || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+/, "")
+      .slice(0, 60);
+
+  const uniqueSlug = (raw, ownId) => {
+    const base = slugify(raw).replace(/-+$/, "") || "new-page";
+    const taken = new Set([
+      ...RESERVED_SLUGS,
+      ...customPages.filter((p) => p.id !== ownId).map((p) => p.slug),
+    ]);
+    let slug = base;
+    let n = 2;
+    while (taken.has(slug)) slug = `${base}-${n++}`;
+    return slug;
+  };
+
+  const setCustomPages = (pages) => onChange({ ...data, customPages: pages });
+
+  const updateCustomPage = (id, patch) =>
+    setCustomPages(customPages.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+
+  const addCustomPage = () => {
+    const id = `page-${Date.now()}`;
+    const title = "New Page";
+    const page = {
+      id,
+      title,
+      slug: uniqueSlug(title, id),
+      label: "",
+      subtitle: "",
+      bannerImage: "",
+      published: false,
+      showInNav: true,
+      showInFooter: false,
+      blocks: [
+        {
+          id: `blk-${Date.now()}`,
+          type: "text",
+          heading: "Welcome",
+          body: "Write the content of your new page here.",
+        },
+      ],
+    };
+    setCustomPages([...customPages, page]);
+    setSelectedPageId(id);
+  };
+
+  const deleteCustomPage = (id) => {
+    const page = customPages.find((p) => p.id === id);
+    if (window.confirm(`Delete page "${page?.title || "Untitled"}"? This cannot be undone.`)) {
+      setCustomPages(customPages.filter((p) => p.id !== id));
+      setSelectedPageId(null);
+    }
+  };
+
+  const blocksOf = (id) => customPages.find((p) => p.id === id)?.blocks || [];
+
+  const addBlock = (pageId, type) => {
+    const base = { id: `blk-${Date.now()}`, type };
+    const block =
+      type === "text"
+        ? { ...base, heading: "", body: "" }
+        : type === "image"
+        ? { ...base, img: "", caption: "" }
+        : { ...base, label: "Book a Session", target: "booking" };
+    updateCustomPage(pageId, { blocks: [...blocksOf(pageId), block] });
+  };
+
+  const updateBlock = (pageId, blockId, patch) =>
+    updateCustomPage(pageId, {
+      blocks: blocksOf(pageId).map((b) => (b.id === blockId ? { ...b, ...patch } : b)),
+    });
+
+  const removeBlock = (pageId, blockId) =>
+    updateCustomPage(pageId, { blocks: blocksOf(pageId).filter((b) => b.id !== blockId) });
+
+  const moveBlock = (pageId, index, dir) => {
+    const blocks = [...blocksOf(pageId)];
+    const j = index + dir;
+    if (j < 0 || j >= blocks.length) return;
+    [blocks[index], blocks[j]] = [blocks[j], blocks[index]];
+    updateCustomPage(pageId, { blocks });
   };
 
   // Export JSON file
@@ -1881,6 +1978,350 @@ export default function WebsiteManager({
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* PAGES (custom pages) */}
+            {activeTab === "pages" && (
+              <section className="space-y-6 animate-fade-in-up">
+                <div className="border-b border-[#0A1128]/10 pb-4">
+                  <h2 className="text-xl font-black text-[#0A1128] flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-[#0A1128]" />
+                    Pages
+                  </h2>
+                  <p className="text-xs text-[#0A1128]/60 mt-1">
+                    Add new pages to your website. Each page can have a banner, text sections, pictures and buttons, and can appear in the menu and footer.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-[#0A1128]">
+                    {customPages.length} {customPages.length === 1 ? "page" : "pages"}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={addCustomPage}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F4D03F] text-[#0A1128] text-xs font-bold hover:brightness-95 transition"
+                  >
+                    <Plus className="w-4 h-4" /> Add Page
+                  </button>
+                </div>
+
+                {customPages.length === 0 && (
+                  <div className="rounded-3xl border border-dashed border-[#0A1128]/20 p-10 text-center">
+                    <FileText className="mx-auto mb-3 h-8 w-8 text-[#0A1128]/30" />
+                    <p className="text-sm font-semibold text-[#0A1128]">No custom pages yet</p>
+                    <p className="mt-1 text-xs text-[#0A1128]/60">
+                      Click “Add Page” to create your first page, e.g. Programmes, Partner With Us or FAQ.
+                    </p>
+                  </div>
+                )}
+
+                {customPages.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {customPages.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setSelectedPageId(p.id)}
+                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+                          selectedPage?.id === p.id
+                            ? "border-[#0A1128] bg-[#0A1128] text-white"
+                            : "border-[#0A1128]/15 text-[#0A1128]/80 hover:border-[#0A1128]"
+                        }`}
+                      >
+                        {p.title || "Untitled page"}
+                        {p.published === false && (
+                          <span className="rounded bg-[#F4D03F] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#0A1128]">
+                            Draft
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {selectedPage && (
+                  <div className="space-y-6 rounded-3xl border border-[#0A1128]/[0.15] bg-white p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-xs text-[#0A1128]/60">
+                        Page address:{" "}
+                        <span className="font-mono font-semibold text-[#0A1128]">/#page/{selectedPage.slug}</span>
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/#page/${selectedPage.slug}`, "_blank")}
+                          disabled={selectedPage.published === false}
+                          title={
+                            selectedPage.published === false
+                              ? "Publish the page to preview it"
+                              : "Open the page in a new tab (save first to see recent changes)"
+                          }
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#0A1128]/15 px-3 py-1.5 text-xs font-semibold text-[#0A1128] hover:border-[#0A1128] disabled:opacity-40"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" /> View page
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteCustomPage(selectedPage.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#0A1128]/15 px-3 py-1.5 text-xs font-semibold text-[#0A1128] hover:border-[#0A1128]"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#0A1128]/80">
+                          Page Title
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedPage.title}
+                          onChange={(e) => updateCustomPage(selectedPage.id, { title: e.target.value })}
+                          className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white px-4 py-2.5 text-sm text-[#0A1128] outline-none focus:ring-2 focus:ring-[#F4D03F]"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#0A1128]/80">
+                          Page Address (slug)
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedPage.slug}
+                          onChange={(e) =>
+                            updateCustomPage(selectedPage.id, { slug: slugify(e.target.value) })
+                          }
+                          onBlur={() =>
+                            updateCustomPage(selectedPage.id, {
+                              slug: uniqueSlug(selectedPage.slug || selectedPage.title, selectedPage.id),
+                            })
+                          }
+                          className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white px-4 py-2.5 font-mono text-sm text-[#0A1128] outline-none focus:ring-2 focus:ring-[#F4D03F]"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#0A1128]/80">
+                          Small Label (above title)
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedPage.label || ""}
+                          onChange={(e) => updateCustomPage(selectedPage.id, { label: e.target.value })}
+                          className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white px-4 py-2.5 text-sm text-[#0A1128] outline-none focus:ring-2 focus:ring-[#F4D03F]"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#0A1128]/80">
+                          Subtitle
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedPage.subtitle || ""}
+                          onChange={(e) => updateCustomPage(selectedPage.id, { subtitle: e.target.value })}
+                          className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white px-4 py-2.5 text-sm text-[#0A1128] outline-none focus:ring-2 focus:ring-[#F4D03F]"
+                        />
+                      </div>
+                    </div>
+
+                    <ImageUploader
+                      label="Banner Picture (optional)"
+                      aspect="wide"
+                      value={selectedPage.bannerImage || ""}
+                      onChange={(v) => updateCustomPage(selectedPage.id, { bannerImage: v })}
+                      helperText="Wide landscape photo shown at the top of the page"
+                    />
+
+                    <div className="flex flex-wrap gap-x-6 gap-y-3">
+                      {[
+                        ["published", "Published (visible to visitors)", true],
+                        ["showInNav", "Show in top menu", true],
+                        ["showInFooter", "Show in footer links", false],
+                      ].map(([field, text, fallback]) => (
+                        <label key={field} className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-[#0A1128]">
+                          <input
+                            type="checkbox"
+                            checked={selectedPage[field] ?? fallback}
+                            onChange={(e) => updateCustomPage(selectedPage.id, { [field]: e.target.checked })}
+                            className="h-4 w-4 accent-[#0A1128]"
+                          />
+                          {text}
+                        </label>
+                      ))}
+                    </div>
+
+                    {/* CONTENT BLOCKS */}
+                    <div className="space-y-4 border-t border-[#0A1128]/10 pt-6">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h3 className="text-base font-bold text-[#0A1128]">Page content</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            ["text", "Text section"],
+                            ["image", "Picture"],
+                            ["button", "Button"],
+                          ].map(([type, text]) => (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => addBlock(selectedPage.id, type)}
+                              className="inline-flex items-center gap-1 rounded-lg border border-[#0A1128]/15 px-3 py-1.5 text-xs font-semibold text-[#0A1128] hover:border-[#0A1128]"
+                            >
+                              <Plus className="h-3.5 w-3.5" /> {text}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {(selectedPage.blocks || []).length === 0 && (
+                        <p className="rounded-xl bg-[#0A1128]/[0.03] p-4 text-xs text-[#0A1128]/60">
+                          This page is empty. Add a text section, picture or button above.
+                        </p>
+                      )}
+
+                      {(selectedPage.blocks || []).map((block, bi) => (
+                        <div
+                          key={block.id}
+                          className="space-y-3 rounded-2xl border border-[#0A1128]/[0.15] bg-[#0A1128]/[0.02] p-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0A1128]/60">
+                              {block.type === "text" ? "Text section" : block.type === "image" ? "Picture" : "Button"}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={bi === 0}
+                                onClick={() => moveBlock(selectedPage.id, bi, -1)}
+                                className="rounded-lg p-1.5 text-[#0A1128]/60 hover:bg-[#0A1128]/10 disabled:opacity-30"
+                                title="Move up"
+                              >
+                                <ArrowUp className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={bi === selectedPage.blocks.length - 1}
+                                onClick={() => moveBlock(selectedPage.id, bi, 1)}
+                                className="rounded-lg p-1.5 text-[#0A1128]/60 hover:bg-[#0A1128]/10 disabled:opacity-30"
+                                title="Move down"
+                              >
+                                <ArrowDown className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeBlock(selectedPage.id, block.id)}
+                                className="rounded-lg p-1.5 text-[#0A1128]/60 hover:bg-[#0A1128]/10 hover:text-[#0A1128]"
+                                title="Remove"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {block.type === "text" && (
+                            <>
+                              <div>
+                                <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">Heading (optional)</label>
+                                <input
+                                  type="text"
+                                  value={block.heading || ""}
+                                  onChange={(e) => updateBlock(selectedPage.id, block.id, { heading: e.target.value })}
+                                  className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-2.5 text-sm font-bold text-[#0A1128] outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">
+                                  Text (leave a blank line between paragraphs; ## makes a sub-heading)
+                                </label>
+                                <textarea
+                                  rows={6}
+                                  value={block.body || ""}
+                                  onChange={(e) => updateBlock(selectedPage.id, block.id, { body: e.target.value })}
+                                  className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-3 text-xs leading-relaxed text-[#0A1128] outline-none focus:ring-2 focus:ring-[#F4D03F]"
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {block.type === "image" && (
+                            <>
+                              <ImageUploader
+                                label="Picture"
+                                aspect="video"
+                                value={block.img || ""}
+                                onChange={(v) => updateBlock(selectedPage.id, block.id, { img: v })}
+                                helperText="Shown full width in the page"
+                              />
+                              <div>
+                                <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">Caption (optional)</label>
+                                <input
+                                  type="text"
+                                  value={block.caption || ""}
+                                  onChange={(e) => updateBlock(selectedPage.id, block.id, { caption: e.target.value })}
+                                  className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-2.5 text-xs text-[#0A1128] outline-none"
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {block.type === "button" && (
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                              <div>
+                                <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">Button text</label>
+                                <input
+                                  type="text"
+                                  value={block.label || ""}
+                                  onChange={(e) => updateBlock(selectedPage.id, block.id, { label: e.target.value })}
+                                  className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-2.5 text-xs font-semibold text-[#0A1128] outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">Goes to</label>
+                                <select
+                                  value={/^https?:\/\//.test(block.target || "") ? "__url__" : block.target || "booking"}
+                                  onChange={(e) =>
+                                    updateBlock(selectedPage.id, block.id, {
+                                      target: e.target.value === "__url__" ? "https://" : e.target.value,
+                                    })
+                                  }
+                                  className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-2.5 text-xs text-[#0A1128] outline-none"
+                                >
+                                  <option value="booking">Book a Session</option>
+                                  <option value="home">Home</option>
+                                  <option value="ceo">Meet the CEO</option>
+                                  <option value="events">Events</option>
+                                  <option value="team">Team</option>
+                                  <option value="blog">Blog</option>
+                                  {customPages
+                                    .filter((p) => p.id !== selectedPage.id)
+                                    .map((p) => (
+                                      <option key={p.id} value={`page:${p.slug}`}>
+                                        Page: {p.title || p.slug}
+                                      </option>
+                                    ))}
+                                  <option value="__url__">External web address…</option>
+                                </select>
+                              </div>
+                              {/^https?:\/\//.test(block.target || "") && (
+                                <div className="md:col-span-2">
+                                  <label className="text-[10px] font-bold uppercase text-[#0A1128]/60">Web address</label>
+                                  <input
+                                    type="text"
+                                    value={block.target}
+                                    onChange={(e) => updateBlock(selectedPage.id, block.id, { target: e.target.value })}
+                                    placeholder="https://..."
+                                    className="w-full rounded-xl border border-[#0A1128]/[0.15] bg-white p-2.5 text-xs text-[#0A1128] outline-none"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
