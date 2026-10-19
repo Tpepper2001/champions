@@ -55,6 +55,10 @@
           "type": "object",
           "description": "Published leadership articles and blog posts."
         },
+        "customPages": {
+          "type": "array",
+          "description": "Admin-created pages (title, slug, banner, content blocks, menu/footer visibility)."
+        },
         "reviewsSection": {
           "type": "object",
           "description": "Testimonials and participant reviews."
