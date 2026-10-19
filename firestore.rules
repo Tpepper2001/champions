@@ -11,13 +11,24 @@ service cloud.firestore {
       return request.auth != null;
     }
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email is string && request.auth.token.email.lower() == 'jerryoyedele@cleadglobal.org') ||
+        (request.auth.token.email is string && request.auth.token.email.lower() == 'oluwatoyinishola2024@gmail.com')
+      );
     }
     function isValidId(id) {
       return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
     function incoming() {
       return request.resource.data;
+    }
+
+    function isValidAdminDoc(data) {
+      return data is map
+        && data.keys().size() <= 10
+        && ('uid' in data && data.uid is string && data.uid.size() <= 128)
+        && ('email' in data && data.email is string && data.email.size() <= 200);
     }
 
     function isValidSiteSetting(data) {
@@ -39,8 +50,14 @@ service cloud.firestore {
     }
 
     match /admins/{uid} {
-      allow read: if isSignedIn() && request.auth.uid == uid;
-      allow write: if false;
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && (
+        request.auth.uid == uid ||
+        isAdmin() ||
+        (request.auth.token.email is string && request.auth.token.email.lower() == 'jerryoyedele@cleadglobal.org') ||
+        (request.auth.token.email is string && request.auth.token.email.lower() == 'oluwatoyinishola2024@gmail.com')
+      ) && isValidAdminDoc(incoming());
+      allow delete: if isAdmin();
     }
 
     match /site_settings/{settingId} {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ImageUploader from "./ImageUploader";
 import Footer from "./Footer";
+import { auth } from "../firebase";
 import {
   Save,
   RotateCcw,
@@ -39,6 +40,8 @@ export default function WebsiteManager({
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+
+  const currentEmail = auth?.currentUser?.email || "jerryoyedele@cleadglobal.org";
 
   const tabs = [
     { id: "branding", label: "Branding", icon: Sliders },
@@ -193,6 +196,19 @@ export default function WebsiteManager({
               );
             })}
           </nav>
+
+          <div className="hidden md:block p-3 border-t border-white/10 mt-auto">
+            <div className="rounded-lg bg-white/5 p-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="text-[11px] font-bold text-[#F4D03F]">Active Administrator</span>
+              </div>
+              <p className="text-xs font-semibold text-white truncate">
+                {currentEmail.toLowerCase() === "jerryoyedele@cleadglobal.org" ? "Jerry Oyedele" : "Website Manager"}
+              </p>
+              <p className="text-[11px] text-white/50 truncate">{currentEmail}</p>
+            </div>
+          </div>
         </aside>
 
         {/* MAIN COLUMN */}

@@ -444,5 +444,22 @@ Your purpose can become the compass that guides your life.`
     label: "Connect",
     title: "Contact Us",
     subtitle: "Have a question, collaboration idea, or just want to reach out? We would love to hear from you."
+  },
+  staffMail: {
+    portalUrl: "mail.cleadglobal.org",
+    domain: "cleadglobal.org",
+    accounts: [
+      {
+        id: "staff-jerry-oyedele",
+        fullName: "Jerry Oyedele",
+        role: "Founder & CEO / Website Manager",
+        department: "Executive & Leadership",
+        username: "jerryoyedele",
+        email: "jerryoyedele@cleadglobal.org",
+        status: "Active",
+        isAdmin: true,
+        createdAt: "2026-03-01"
+      }
+    ]
   }
 };

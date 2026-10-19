@@ -152,3 +152,55 @@ export function subscribeSiteData(callback) {
 
 export const saveSiteData = saveSiteDataToFirebase;
 export const loadSiteData = loadSiteDataFromFirebase;
+
+export async function registerAdminProfile(user, name = "Jerry Oyedele", role = "Founder & CEO / Website Manager") {
+  if (!user || !user.uid) return { success: false, error: "No user provided" };
+  const email = (user.email || "").toLowerCase();
+
+  try {
+    const adminDocRef = doc(db, "admins", user.uid);
+    await setDoc(
+      adminDocRef,
+      {
+        uid: user.uid,
+        email,
+        name,
+        role,
+        isAdmin: true,
+        registeredAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+
+    try {
+      const mailboxRef = doc(db, "mailboxes", `mailbox_${user.uid}`);
+      await setDoc(
+        mailboxRef,
+        {
+          uid: user.uid,
+          email,
+          username: email.split("@")[0],
+          fullName: name,
+          name,
+          role,
+          department: "Executive & Leadership",
+          status: "Active",
+          createdAt: new Date().toISOString().slice(0, 10),
+        },
+        { merge: true }
+      );
+    } catch (e) {
+      console.warn("Could not sync mailbox document for admin:", e);
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("registerAdminProfile error:", err);
+    try {
+      handleFirestoreError(err, OperationType.WRITE, `admins/${user.uid}`);
+    } catch (e) {
+      return { success: false, error: e };
+    }
+    return { success: false, error: err };
+  }
+}

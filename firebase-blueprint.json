@@ -1,5 +1,19 @@
 {
   "entities": {
+    "Admin": {
+      "title": "Admin",
+      "description": "An authenticated administrator and website manager profile.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 200 },
+        "name": { "type": "string", "maxLength": 200 },
+        "role": { "type": "string", "maxLength": 100 },
+        "isAdmin": { "type": "boolean" },
+        "registeredAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email"]
+    },
     "SiteSetting": {
       "title": "SiteSetting",
       "description": "Global website configuration, sections, and staff mail directory for Champions Leadership Global.",
@@ -117,6 +131,10 @@
     }
   },
   "firestore": {
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Stores admin user records for website managers and organization leaders."
+    },
     "/site_settings/{settingId}": {
       "schema": "SiteSetting",
       "description": "Stores the live website content document (settingId = 'main') synced across all clients."

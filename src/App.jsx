@@ -9,6 +9,7 @@ import {
   loadSiteData,
   subscribeSiteData,
   testConnection,
+  registerAdminProfile,
   auth,
   onAuthStateChanged,
   signOut,
@@ -988,8 +989,21 @@ export default function App() {
 
   // ── AUTHENTICATION ───────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsAuthenticated(!!user);
+      if (user && user.email) {
+        const emailLower = user.email.toLowerCase();
+        if (
+          emailLower === "jerryoyedele@cleadglobal.org" ||
+          emailLower === "oluwatoyinishola2024@gmail.com"
+        ) {
+          await registerAdminProfile(
+            user,
+            emailLower === "jerryoyedele@cleadglobal.org" ? "Jerry Oyedele" : "Website Admin",
+            "Founder & CEO / Website Manager"
+          ).catch((e) => console.warn("Admin profile auto-sync note:", e));
+        }
+      }
     });
     return unsubscribe;
   }, []);
