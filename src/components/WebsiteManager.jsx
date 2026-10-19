@@ -38,6 +38,7 @@ export default function WebsiteManager({
   const [saveToast, setSaveToast] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const tabs = [
     { id: "branding", label: "Branding", icon: Sliders },
@@ -54,7 +55,38 @@ export default function WebsiteManager({
     { id: "backup", label: "Backup", icon: Download },
   ];
 
+  const MAX_DOC_BYTES = 1000000; // Firestore documents are limited to ~1 MB
+  const docBytes = (() => {
+    try {
+      return new Blob([JSON.stringify(data)]).size;
+    } catch {
+      return 0;
+    }
+  })();
+
+  const explainSaveError = (e) => {
+    const msg = String(e?.message || e || "");
+    if (/permission|insufficient/i.test(msg)) {
+      return "Not allowed to save: this account isn't registered as a website admin.";
+    }
+    if (/exceeds|too large|maximum|invalid.*size/i.test(msg)) {
+      return "Content is too large to save. Replace large photos with smaller ones.";
+    }
+    if (/network|offline|unavailable|failed to fetch/i.test(msg)) {
+      return "No connection to the server. Check your internet and try again.";
+    }
+    return "Couldn't save your changes. Please try again.";
+  };
+
   const handleSaveClick = async () => {
+    setSaveError("");
+    if (docBytes > MAX_DOC_BYTES) {
+      setSaveError(
+        `Content is ${Math.round(docBytes / 1024)} KB; the limit is about 1,000 KB. Replace large photos with smaller ones.`
+      );
+      setTimeout(() => setSaveError(""), 8000);
+      return;
+    }
     setIsSaving(true);
     try {
       if (onSave) {
@@ -64,6 +96,8 @@ export default function WebsiteManager({
       setTimeout(() => setSaveToast(false), 3500);
     } catch (e) {
       console.error("Save error:", e);
+      setSaveError(explainSaveError(e));
+      setTimeout(() => setSaveError(""), 8000);
     } finally {
       setIsSaving(false);
     }
@@ -169,6 +203,14 @@ export default function WebsiteManager({
             </p>
 
             <div className="flex items-center gap-2">
+              <span
+                className={`hidden text-xs md:inline ${
+                  docBytes > MAX_DOC_BYTES * 0.85 ? "font-semibold text-[#0A1128]" : "text-[#0A1128]/50"
+                }`}
+                title="Total size of your site content (limit about 1,000 KB)"
+              >
+                {Math.round(docBytes / 1024)} / 1,000 KB
+              </span>
               {onOpenMailPortal && (
                 <button type="button" onClick={onOpenMailPortal} className={iconBtn} title="Staff mail" aria-label="Staff mail">
                   <Mail className="h-4 w-4" />
@@ -2123,6 +2165,15 @@ export default function WebsiteManager({
         </div>
       )}
 
+      {saveError && (
+        <div
+          role="alert"
+          className="fixed bottom-14 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border-l-4 border-[#F4D03F] bg-[#0A1128] px-4 py-3 text-sm font-medium text-white shadow-lg"
+        >
+          {saveError}
+        </div>
+      )}
+
       {resetConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A1128]/60 p-4">
           <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-2xl">
@@ -2141,10 +2192,16 @@ export default function WebsiteManager({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  onReset();
+                onClick={async () => {
                   setResetConfirmOpen(false);
-                  handleSaveClick();
+                  try {
+                    await onReset(); // already saves the defaults
+                    setSaveToast(true);
+                    setTimeout(() => setSaveToast(false), 3500);
+                  } catch (e) {
+                    setSaveError(explainSaveError(e));
+                    setTimeout(() => setSaveError(""), 8000);
+                  }
                 }}
                 className="rounded-lg bg-[#0A1128] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0A1128]/90"
               >
