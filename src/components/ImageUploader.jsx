@@ -13,27 +13,69 @@ export default function ImageUploader({
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const handleFileChange = (e) => {
+  // Photos are stored inside the site's single database record (1 MB limit),
+  // so every upload is resized and compressed before it is saved.
+  const compressImage = (file) =>
+    new Promise((resolve, reject) => {
+      if (file.type === "image/svg+xml") {
+        if (file.size > 150 * 1024) return reject(new Error("SVG is too large (max 150 KB)."));
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const img = new window.Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const keepAlpha = file.type === "image/png";
+        const TARGET = 110 * 1024; // ~110 KB per image
+        let maxDim = keepAlpha ? 800 : 1000;
+        let quality = 0.72;
+        let out = "";
+        for (let i = 0; i < 8; i++) {
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext("2d");
+          if (!keepAlpha) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          out = canvas.toDataURL(keepAlpha ? "image/png" : "image/jpeg", quality);
+          if (out.length * 0.75 <= TARGET) break;
+          maxDim = Math.round(maxDim * 0.8);
+          quality = Math.max(0.5, quality - 0.06);
+        }
+        resolve(out);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("That file could not be read as an image."));
+      };
+      img.src = url;
+    });
+
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
+    e.target.value = ""; // allow picking the same file again
     if (!file) return;
 
-    // Check size limit (max 5MB for localStorage safety)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image is larger than 5MB. Please choose a smaller image.");
+    if (file.size > 15 * 1024 * 1024) {
+      alert("Image is larger than 15 MB. Please choose a smaller image.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result;
-      if (typeof dataUrl === "string") {
-        setImgError(false);
-        onChange(dataUrl);
-      }
-    };
-    reader.readAsDataURL(file);
-    // Reset file input so same file can be selected again
-    e.target.value = "";
+    try {
+      const dataUrl = await compressImage(file);
+      setImgError(false);
+      onChange(dataUrl);
+    } catch (err) {
+      alert(err.message || "Could not use that image.");
+    }
   };
 
   const getAspectClass = () => {
